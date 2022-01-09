@@ -1,0 +1,48 @@
+{
+    "name": "Old Era on Wikipedia",
+    "version": "2.0.2",
+    "manifest_version": 2,
+    "description": "Convert dates BCE into Old Era dates (similar to Holocene Calendar aka Human Era).",
+    "content_scripts": [
+        {
+            "matches": [
+                "https://en.wikipedia.org/*"
+            ],
+            "js": [
+                "constants.js",
+                "patterns.js",
+                "helpers.js",
+                "markupPatternProcessors.js",
+                "location.js",
+                "translation.js",
+                "automaticTranslation.js",
+                "patternProcessors.js",
+                "pageChecker.js",
+                "summaryManager.js",
+                "content.js"
+            ],
+            "css": [
+                "styles.css"
+            ]
+        }
+    ],
+    "background": {
+        "scripts": [
+            "background.js"
+        ]
+    },
+    "browser_action": {
+        "default_icon": "images/icon16.png",
+        "default_popup": "popup.html"
+    },
+    "permissions": [
+        "https://en.wikipedia.org/*",
+        "storage"
+    ],
+    "icons": {
+        "16": "images/icon16.png",
+        "32": "images/icon32.png",
+        "48": "images/icon48.png",
+        "128": "images/icon128.png"
+    }
+}

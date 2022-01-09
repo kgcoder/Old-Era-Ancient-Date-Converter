@@ -1,0 +1,76 @@
+<!-- 
+* Copyright (c) Karen Grigorian
+*
+* This source code is licensed under the MIT license found in the
+* LICENSE file in the root directory of this source tree.
+* -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css" />
+    <script src="./popup.js"></script>
+
+    <title>Document</title>
+</head>
+
+<body>
+    <div style="display: flex;flex-direction: column;">
+        <div style="display: flex; justify-content: space-between;">
+            <a id="toggleOnOff" href="#">Toggle on/off</a>
+            <a id="aboutLink" href="#">About Old Era</a>
+        </div>
+        <br />
+        <span class="MenuTitle">Settings</span>
+        <div class="PopupItemDiv">
+            <input type="checkbox" id="DontUseServerCheckbox">
+            <label class="CheckboxLabel" for="DontUseServerCheckbox">don't use server (some dates and images will not be replaced)</label>
+        </div>
+        <div class="PopupItemDiv">
+            <input type="checkbox" id="TranslateYearsPreciselyCheckbox">
+            <label class="CheckboxLabel" for="TranslateYearsPreciselyCheckbox">always translate years precisely</label>
+        </div>
+
+        <div class="PopupItemDiv">
+            <input type="checkbox" id="TranslateInBookTitlesCheckbox">
+            <label class="CheckboxLabel" for="TranslateInBookTitlesCheckbox">translate dates in book titles</label>
+        </div>
+
+        <div class="PopupItemDiv">
+            <input type="checkbox" id="TranslateInQuotesCheckbox">
+            <label class="CheckboxLabel" for="TranslateInQuotesCheckbox">translate dates in quotes</label>
+        </div>
+        <br />
+        <div id="currentPageInfo" style="display:flex; flex-direction:column;">
+            <span class="MenuTitle">Current page status</span>
+            <span id="pageStatusLine"></span>
+    
+            <div id="otherVersions" style="display: none;flex-direction: column;">
+                <br />
+                <span class="MenuTitle">Other versions</span>
+                <a id="okVersion" href="#">last version that seems OK</a>
+                <a id="verifiedVersion" href="#">verified version</a>
+    
+            </div>
+    
+            <div id="pageInfo" style="display: none;flex-direction: column;">
+                <br />
+                <span class="MenuTitle"><a id="seeEdits" href="#">Page info</a></span>
+    
+    
+            </div>
+
+        </div>
+
+
+
+
+
+
+
+    </div>
+</body>
+
+</html>
