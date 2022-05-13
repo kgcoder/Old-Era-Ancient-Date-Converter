@@ -12,39 +12,37 @@ const summaryCacheTTL = 24 * 60 * 60 * 1000
 loadSummariesFromLocalStorage()
 
 
+const observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+        if(mutation.addedNodes.length){
+            mutation.addedNodes.forEach(node => {
+                if(node.className && node.className.includes("mw-mmv-final-image")) {
+                    const img = node
+                    replaceSrcInImage(img)
+                }
+
+                if (node.className && node.className.includes("mwe-popups")) {
+                    chrome.storage.local.get(['isExtensionOff'], function (result) {
+                        isExtensionOff = result.isExtensionOff ? result.isExtensionOff : false
+                        editSummaryIfNeeded(node)
+                    })
+                }
+            })
+
+        }
+     
+    })
+})
+observer.observe(document, { childList: true, subtree: true });
 
 
-document.addEventListener('DOMNodeInserted', async (details) => {
 
-   
-
-    if(details.target.className && details.target.className.includes("mw-mmv-final-image")) {
-        const img = details.target
-        replaceSrcInImage(img)
-    }
-
-    if (details.target.className && details.target.className.includes("mwe-popups")) {
-
-        chrome.storage.local.get(['isExtensionOff'], function (result) {
-        
-            isExtensionOff = result.isExtensionOff ? result.isExtensionOff : false
-           
-            editSummaryIfNeeded(details)
-        })
-    }
-
-
-
-
-});
-
-
-async function editSummaryIfNeeded(details){
+async function editSummaryIfNeeded(node){
 
     if(isExtensionOff)return
    
     const nonBreakableSpace = new RegExp(String.fromCharCode(160),'g')
-    const innerHTML = details.target.innerHTML.replace(/<img([^>]*?)>/,'<img$1/>').replace(/&nbsp;/g,' ').replace(nonBreakableSpace,' ')
+    const innerHTML = node.innerHTML.replace(/<img([^>]*?)>/,'<img$1/>').replace(/&nbsp;/g,' ').replace(nonBreakableSpace,' ')
     const result = innerHTML.match(/mwe-popups-extract.*?href="(.*?)"/)
     const url = result[1]
     const lastComponent = url.split("/").pop()
@@ -100,7 +98,7 @@ async function editSummaryIfNeeded(details){
     getSummaryTextsArray(targetDOM.documentElement)
 
     summaryTextNodesArray = []
-    getSummaryTextNodesArray(details.target)
+    getSummaryTextNodesArray(node)
 
     if(summaryTextsArray.length < summaryTextNodesArray.length){
         summaryTextsArray = [''].concat(summaryTextsArray)
