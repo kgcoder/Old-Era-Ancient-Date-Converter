@@ -142,7 +142,7 @@ function updatePageMetadata(response){
     if (pageNotAnalysedYet) message = 'page hasn\'t been analyzed yet'
     if (pageHasNoBCDates) message = 'page doesn\'t have BC dates'
     let messageColor = currentVersionSeemsOK ? 'green' : 'red'
-    if (pageHasNoBCDates || pageNotAnalysedYet || pageNotAnalysedYet) messageColor = black
+    if (pageHasNoBCDates || pageNotAnalysedYet || pageNotAnalysedYet) messageColor = 'black'
     updatePageStatus(message, messageColor)
 
     const title = document.getElementById("otherVersions")
