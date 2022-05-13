@@ -45,7 +45,7 @@ function updateIcon(tabId){
             chrome.browserAction.setIcon({ path: "/images/icon16gray.png" })
         } else {
             chrome.tabs.getSelected(null,function(tab) {
-                const url = tab.url;
+                const url = tab ? tab.url : '';
               
                 if(!url || !url.includes('wikipedia')){
                     chrome.browserAction.setIcon({ path: "/images/icon16.png" });
