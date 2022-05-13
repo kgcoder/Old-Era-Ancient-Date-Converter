@@ -156,16 +156,13 @@ window.onload = () => {
 
     pageIsLoaded = true
 
-
-   // shouldUseServer = false
-
-
+    getConfigFromLocalStorage(() => null)
 
     if (currentLocation && !isExtensionOff) {
         if (!shouldNotUseServer) {
             startRequest()  
         } else {
-            translateEverything()
+            translateEverything(null)
         }
     }
 
@@ -207,7 +204,7 @@ function getPageVersionFromHtml(html) {
 function startRequest() {
     if(!pageIsLoaded || requestHasStarted)return
     requestHasStarted = true
-    getConfigFromLocalStorage(function(){})
+    //getConfigFromLocalStorage(function(){})
     const encodedUrl = encodeURIComponent(currentLocation)
   
 
@@ -216,7 +213,6 @@ function startRequest() {
         return r.json()
     }).then(r => {
 
-       
         editsArray = r.edits
         pageHasIssues = r.hasIssues 
         pageId = r.id
@@ -248,31 +244,36 @@ function startRequest() {
 function translateEverything(r) {
     preparePageMetadata(fullHTML)
     
+    
     let html = new XMLSerializer().serializeToString(document.body)
+
+    html = html.replace('"=""','') 
     currentVersion = getPageVersionFromHtml(html)
-    
-    
+
     let htmlWithMarkers
 
     const { htmlWithIgParts, ignoredParts } = htmlWithIgnoredParts(html)
 
     let replacementsArray = []
     getLocalReplacements(htmlWithIgParts, replacementsArray)
-    replacementsArray = replacementsArray.sort((a,b) => a.index - b.index)
+    replacementsArray = replacementsArray.sort((a, b) => a.index - b.index)
+ 
 
     if (isTranslated) {
         const repsFromServer = getReplacementsFromServer(editsArray, htmlWithIgParts)
         replacementsArray = resolveReplacements(replacementsArray, repsFromServer)
     }
 
+    
     replacementsArray = replacementsArray.filter(replacement => replacement.edit.method !== 'bc-ig')
     replacementsArray = replacementsArray.sort((a, b) => a.index - b.index)
-
+    
     editsArray = replacementsArray.map(item => item.edit)
-
+    
     htmlWithMarkers = createHTMLWithMarkers(replacementsArray, htmlWithIgParts, ignoredParts)
 
-    
+
+
 
     if (htmlWithMarkers) {
 
@@ -289,6 +290,22 @@ function translateEverything(r) {
 
         textNodesArray = []
         getTextNodesArray(document.body)
+
+        const textInFirstNode = textNodesArray[1].firstNode.data
+  
+        if(textNodesArray.length < textsArray.length){
+      
+            const index = textsArray.findIndex(item => {
+                return textInFirstNode === item
+            })
+
+           
+            if(index > 0){
+                textsArray.splice(0, index);
+            }
+        }
+
+      
 
         
         doReplacements()

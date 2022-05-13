@@ -105,11 +105,12 @@ function processYearRangePattern(html, replacementsArray) {
         const spanClosing = result[40] || ''
         const bc  = result[41] || ''
 
-        let yearA2Substitute = ''
-        let method = 'year'
-
         const yearA1 = numberFromString(yearA1String)
         const yearA2 = numberFromString(yearA2String)
+        
+        let yearA2Substitute = ''
+        let method = methodForYear(yearA2)
+        
         if (!yearA1String && !yearB1String && yearA2 >= 10000| yearA2 === 0) {
             let index = result.index + partTillYearA2.length
             addReplacement(replacementsArray, 'bc-ig', yearA2String, index)
