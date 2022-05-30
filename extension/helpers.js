@@ -14,7 +14,7 @@ function giReg(pattern) {
 function convertTypeFromMakup(typeInMarkup) {
     if (!typeInMarkup) {
             return 'normal'
-    } else if (typeInMarkup.includes('b')) {
+    } else if (typeInMarkup.includes('t')) {
             return 'bookTitle'
     } else if (typeInMarkup.includes('q')) {
             return'quote'

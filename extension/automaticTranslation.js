@@ -36,6 +36,7 @@ function createAutomaticReplacements(html, replacementsArray) {
 
     processRoundYearRangePattern(html, replacementsArray)
     processYearRangePattern(html, replacementsArray)
+    processSimpleYearRangePattern(html, replacementsArray)
     processLongYearListPattern(html, replacementsArray)
     processYearRangeWithCircasPattern(html, replacementsArray)
     processYearMonthRangePattern(html, replacementsArray)

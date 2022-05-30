@@ -36,6 +36,7 @@ const leftFraction = `(${nakedYearPattern})(${supPattern})?/`
 const leftPartOfYearRangePattern = `((((${leftFraction})?((${nakedYearPattern})(${supPattern})?(</span>)?)`
 const middleOfYearRangePattern = `(${rangePattern})((c\\.|around)(${completeSpacePattern}))?)`
 const rightPartOfYearRangePattern = `(${leftFraction})?))((${nakedYearPattern})(</span>)?(${supPattern})?(${bcPattern}))`
+const simpleYearRangePattern = `(${nakedYearPattern})(${rangePattern})(${nakedYearPattern})(${bcPattern})`
 const yearRangePattern = `${leftPartOfYearRangePattern}${middleOfYearRangePattern}${rightPartOfYearRangePattern}`
 const roundYearRangePattern = `((${roundNakedYearPattern})(${rangePattern}))((${roundNakedYearPattern})${bcPattern})`
 const yearRangeWithCircasPattern = `((<span [^>]*?>)?(${spacePattern}))(${nakedYearPattern})(</span>)?${rangePattern}(<abbr title="circa">c.</abbr>|c.|<span title="circa">c.</span>)(<span [^>]*?>)?(${spacePattern})(${nakedYearPattern}(</span>)?${bcPattern})`

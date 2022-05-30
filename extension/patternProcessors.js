@@ -33,6 +33,8 @@ function processRoundYearRangePattern(html, replacementsArray) {
     let result;
     const reg = giReg(roundYearRangePattern)
     while ((result = reg.exec(html))) {
+
+        console.log('processRoundYearRangePattern',result)
   
         const stringTillSecondYear= result[1]
         const firstYearString = result[2]
@@ -68,7 +70,7 @@ function processRoundYearRangePattern(html, replacementsArray) {
         } else {
             addReplacement(replacementsArray, method, nakedSecondYearString, index)
             
-            if (method !== 'bc-ig') metod = 'remove'
+            if (method !== 'bc-ig') method = 'remove'
             
             index += nakedSecondYearString.length + spanOpening.length
             addReplacement(replacementsArray, method, spanSpace, index)
@@ -83,12 +85,41 @@ function processRoundYearRangePattern(html, replacementsArray) {
     }
 }
 
+function processSimpleYearRangePattern(html, replacementsArray) {
+    let result;
+    const reg = giReg(yearRangePattern)
+    console.log('html',html)
+    while ((result = reg.exec(html))) {
+        console.log('processSimpleYearRangePattern',result)
+        const year1String = result[11] || ''
+        const year2String = result[32] || ''
+        const year1 = numberFromString(year1String)
+        const year2 = numberFromString(year2String)
+
+        
+        if (year2 >= 10000 || year2 === 0) {
+            addReplacement(replacementsArray, 'bc-ig', year1String, result.index)
+            return
+        }
+        
+        if (year1String) {
+            let method = methodForYear(year1)
+            addReplacement(replacementsArray, method, year1String, result.index)     
+        }
+
+
+    }
+}
 
 function processYearRangePattern(html, replacementsArray) {
 
     let result;
     const reg = giReg(yearRangePattern)
+  
     while ((result = reg.exec(html))) {
+
+        console.log('processYearRangePattern',result)
+
   
         const partTillYearB2 = result[1] || ''  //or is it?
         const partTillYearB1 = result[3] || ''  //or is it?
@@ -111,7 +142,7 @@ function processYearRangePattern(html, replacementsArray) {
         let yearA2Substitute = ''
         let method = methodForYear(yearA2)
         
-        if (!yearA1String && !yearB1String && yearA2 >= 10000| yearA2 === 0) {
+        if (!yearA1String && !yearB1String && yearA2 >= 10000 || yearA2 === 0) {
             let index = result.index + partTillYearA2.length
             addReplacement(replacementsArray, 'bc-ig', yearA2String, index)
             return
