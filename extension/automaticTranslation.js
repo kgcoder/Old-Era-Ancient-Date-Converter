@@ -45,6 +45,7 @@ function createAutomaticReplacements(html, replacementsArray) {
     processDecadeRangePattern(html, replacementsArray)
     processYearPattern(html, replacementsArray)
     processDecadePattern(html, replacementsArray)
+    processCenturyOrMillenniumCategoryPattern(html,replacementsArray)
     processCenturyPattern(html, replacementsArray)
     processMillenniumPattern(html, replacementsArray)
 

@@ -373,23 +373,76 @@ function processMillenniumPattern(html, replacementsArray) {
     processCenturyOrMillenniumPattern(html,replacementsArray,'millennium')
 }
 
+function processCenturyOrMillenniumCategoryPattern(html, replacementsArray){
+    let method = ''
+    if(isPageCenturyCategory){
+        method = 'century'
+    }else if(isPageMillenniumCategory){
+        method = 'millennium'
+    }else{
+        return
+    }
+
+    const pattern = `(title="Category:${nakedCenturyPattern}(-|${spacePattern})${method} BCE?[^"]*?">)(${nakedCenturyPattern}( BCE?)?)</a></li>`
+    const reg = new RegExp(pattern, "gi");
+
+    while ((result = reg.exec(html))) {
+        console.log('category result',result)
+        const stringTillTarget = result[1] || ''
+        const targetString = result[6] || ''
+        if(method === 'millennium' && parseInt(targetString,10) > 10) continue
+        const index = result.index + stringTillTarget.length
+        addReplacement(replacementsArray, method, targetString, index)
+    }
+
+    const additionalPattern = `(<b>)(${nakedCenturyPattern}( BCE?)?)</b></li>`
+    const additionalReg = new RegExp(additionalPattern, "gi");
+
+    const additionalResult = additionalReg.exec(html)
+    if(additionalResult){
+        console.log('additional result',additionalResult)
+        const stringTillTarget = additionalResult[1] || ''
+        const targetString = additionalResult[2] || ''
+        if(method === 'millennium' && parseInt(targetString,10) > 10) return
+        const index = additionalResult.index + stringTillTarget.length
+
+        addReplacement(replacementsArray, method, targetString, index)
+
+    }
+
+}
+
 function processCenturyOrMillenniumPattern(html, replacementsArray, method) {
     
     let result;
     let pattern = method === 'millennium' ? millenniumPattern : centuriesPattern
     const reg = giReg(pattern)
     while ((result = reg.exec(html))) {
+        console.log('cent or mill result',result)
         const stringTillBC = result[1] || ''
         const centuryString = result[2] || ''
+        if(method === 'millennium' && parseInt(centuryString, 10) > 10) continue
         const bcWithSpace = result[11] || ''
         const bcSpan = result[12] || ''
         const bcSpanOpening = result[13] || ''
         const spaceInSpan = result[14] || ''
         const bc = result[16] || ''
+
+        const smallTag = result[22] || ''
+        const smallBC = result[23] || ''
+
+
       
         addReplacement(replacementsArray, method, centuryString, result.index)
         
-        if (!bcSpanOpening.length) {
+        if(smallTag.length){
+            let index = result.index + stringTillBC.length
+            const space = bcSpan
+            addReplacement(replacementsArray, 'remove', space, index)
+            index += space.length + smallTag.length
+            addReplacement(replacementsArray, 'remove', smallBC, index)
+
+        }else if (!bcSpanOpening.length) {
             const index = result.index + stringTillBC.length
             addReplacement(replacementsArray, 'remove', bcWithSpace, index)
         } else {

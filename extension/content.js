@@ -22,6 +22,9 @@ let editsCount = 0
 let properBCs = 0
 let isTranslated = false
 
+let isPageCenturyCategory = false
+let isPageMillenniumCategory = false
+
 let issuesInCurrentPageExist = false
 let numberOfBCsHasChangedInCurrentPage = false
 
@@ -209,6 +212,7 @@ function startRequest() {
   
 
     fetch(`${baseUrl}/api/pages/${encodedUrl}`).then(r => {
+        console.log('response',r)
         if(r.status !== 200)return {}
         return r.json()
     }).then(r => {
@@ -242,7 +246,9 @@ function startRequest() {
 
 
 function translateEverything(r) {
+    findIfPageIsMillenniumOrCenturyCategory()
     preparePageMetadata(fullHTML)
+
     
     
     let html = new XMLSerializer().serializeToString(document.body)
@@ -254,6 +260,7 @@ function translateEverything(r) {
 
     const { htmlWithIgParts, ignoredParts } = htmlWithIgnoredParts(html)
 
+    console.log('ignoredParts',ignoredParts)
     let replacementsArray = []
     getLocalReplacements(htmlWithIgParts, replacementsArray)
     replacementsArray = replacementsArray.sort((a, b) => a.index - b.index)
@@ -269,6 +276,7 @@ function translateEverything(r) {
     replacementsArray = replacementsArray.sort((a, b) => a.index - b.index)
     
     editsArray = replacementsArray.map(item => item.edit)
+    console.log('htmlWithIgParts',htmlWithIgParts)
     
     htmlWithMarkers = createHTMLWithMarkers(replacementsArray, htmlWithIgParts, ignoredParts)
 
@@ -276,6 +284,8 @@ function translateEverything(r) {
 
 
     if (htmlWithMarkers) {
+
+        console.log('htmlWithMarkers',htmlWithMarkers)
 
         const parser = new DOMParser();
         const originalBodyDOM = parser.parseFromString(html, "text/xml");
@@ -290,6 +300,22 @@ function translateEverything(r) {
 
         textNodesArray = []
         getTextNodesArray(document.body)
+
+        // console.log('textsArray',textsArray)
+        // console.log('originalTextsArray',originalTextsArray)
+        // console.log('textNodesArray',textNodesArray)
+
+
+        // textsArray.forEach((text,index) => {
+        //     if(textNodesArray.length - 1 < index)return
+        //     const textInFirstNode = textNodesArray[index].firstNode.data
+        //     if(text !== textInFirstNode){
+        //         console.log('failed at index:',index)
+        //         console.log('text:',text)
+        //         console.log('textInFirstNode:',textInFirstNode)
+
+        //     }
+        // })
 
         const textInFirstNode = textNodesArray[1].firstNode.data
   
@@ -361,6 +387,19 @@ function updateIcon() {
 }
 
 
+function findIfPageIsMillenniumOrCenturyCategory(){
+    const html = document.body.innerHTML
+    const reg = new RegExp(`<h1.*>Category:${nakedCenturyPattern}(-|${spacePattern})(millennium|century)( BCE?)?[^<]*?</h1>`)
+    const matches = html.match(reg)
+    if(matches){
+        console.log('matches',matches)
+        isPageCenturyCategory = matches[5] === 'century'
+        isPageMillenniumCategory = matches[5] === 'millennium'
+        console.log('fullTitle',matches[5])
+
+    }
+}
+
 function updatePageTitle() {
     try{
         const html = document.body.innerHTML
@@ -380,6 +419,7 @@ function doReplacements() {
     for (let i = 0; i < textsArray.length; i++) {
         const text = textsArray[i]
         const nodes = textNodesArray[i]
+        if(!nodes)continue
         const pair = replaceTextInNodeIfNeeded(nodes, text)
         newTextNodesArray.push(pair)
     }
@@ -452,6 +492,7 @@ function replaceTextInNodeIfNeeded(oldNodes, sourceText) {
     }
     if (!occurrences.length) return oldNodes
 
+    console.log('oldNodes',oldNodes)
     const { firstNode: firstOldNode, lastNode: lastOldNode } = oldNodes
 
 
@@ -512,13 +553,16 @@ function getReplacementNode(text, originalSubstitute, method, type = 'normal') {
             const year = originalNumber
             if (isNaN(year)) return emptySpan()
             const translatedYear = `${10001 - year}`
-            return textWithComment(text, `${year} BC`, translatedYear, type)
+            const translatedYearString = `${translatedYear}${translatedYear <= 6000 ? '\u00A0OE' : ''}`
+            return textWithComment(text, `${year} BC`, translatedYearString, type)
         }
         case 'impreciseYear': {
             const year = originalNumber
             if (isNaN(year)) return emptySpan()
             const translatedYear = `${(shouldTranslateYearsPrecisely ? 10001 : 10000) - year}`
-            return textWithComment(text, `${year} BC`, translatedYear, type)
+            console.log('translatedYear',translatedYear)
+            const translatedYearString = `${translatedYear}${translatedYear <= 6000 ? '\u00A0OE' : ''}`  
+            return textWithComment(text, `${year} BC`, translatedYearString, type)
         }
         case 'oneDigitYear': {
             const year = originalNumber

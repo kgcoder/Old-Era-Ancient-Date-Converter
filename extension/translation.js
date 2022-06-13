@@ -208,7 +208,7 @@ function createHTMLWithMarkers(replacementsArray, htmlWithIgParts, ignoredParts)
     result += htmlWithIgParts.substr(lastIndex, htmlWithIgParts.length - lastIndex)
 
 
-    const chunks = result.split('IgnoredPart')
+    const chunks = result.split('<IgnoredPart>')
     if (chunks.length === 1) return result
     let newHtml = ''
     for (let i = 0; i < ignoredParts.length; i++) {
@@ -227,7 +227,7 @@ function htmlWithIgnoredParts(html) {
     const ignoredParts = []
     const newHTML = html.replace(pattern, (match) => {
         ignoredParts.push(match)
-        return 'IgnoredPart'
+        return '<IgnoredPart>'
     })
 
     return { htmlWithIgParts: newHTML, ignoredParts }
