@@ -20,6 +20,7 @@ let translatedForVersion = ''
 let numberOfBCsHasChanged = false
 let editsCount = 0
 let properBCs = 0
+let locallyFoundBCs = 0
 let isTranslated = false
 
 let isPageCenturyCategory = false
@@ -260,7 +261,6 @@ function translateEverything(r) {
 
     const { htmlWithIgParts, ignoredParts } = htmlWithIgnoredParts(html)
 
-    console.log('ignoredParts',ignoredParts)
     let replacementsArray = []
     getLocalReplacements(htmlWithIgParts, replacementsArray)
     replacementsArray = replacementsArray.sort((a, b) => a.index - b.index)
@@ -393,10 +393,8 @@ function findIfPageIsMillenniumOrCenturyCategory(){
     const reg = new RegExp(`<h1.*>Category:${nakedCenturyPattern}(-|${spacePattern})(millennium|century)( BCE?)?[^<]*?</h1>`)
     const matches = html.match(reg)
     if(matches){
-        console.log('matches',matches)
         isPageCenturyCategory = matches[5] === 'century'
         isPageMillenniumCategory = matches[5] === 'millennium'
-        console.log('fullTitle',matches[5])
 
     }
 }
@@ -420,8 +418,10 @@ function doReplacements() {
     for (let i = 0; i < textsArray.length; i++) {
         const text = textsArray[i]
         const nodes = textNodesArray[i]
+      
         if(!nodes)continue
         const pair = replaceTextInNodeIfNeeded(nodes, text)
+
         newTextNodesArray.push(pair)
     }
     textNodesArray = newTextNodesArray
@@ -430,12 +430,13 @@ function doReplacements() {
 
 
 function updateDates(){
-
       const spans = Array.from(document.body.getElementsByClassName('oedatecase'))
 
       spans.forEach(span => {
         updateDataInSpan(span)
       })
+
+
 
 
 
@@ -448,7 +449,7 @@ function updateDataInSpan(span){
     const method = span.getAttribute("m")
     const type = span.getAttribute("t")
 
-    const translations = getReplacementStrings(originalText,originalSubstitute,method,type)
+    const translations = getReplacementStrings(originalText,originalSubstitute,method)
 
     if(!translations)return
 
@@ -582,7 +583,7 @@ function getDateCaseNode(originalText, originalSubstitute, method, type = 'norma
 }
 
 
-function getReplacementStrings(text, originalSubstitute, method, type = 'normal') {
+function getReplacementStrings(text, originalSubstitute, method) {
     const originalText = text
     text = text.replace(',','')
    
@@ -600,7 +601,6 @@ function getReplacementStrings(text, originalSubstitute, method, type = 'normal'
             const year = originalNumber
             if (isNaN(year)) return null
             const translatedYear = `${(shouldTranslateYearsPrecisely ? 10001 : 10000) - year}`
-            console.log('translatedYear',translatedYear)
             const translatedYearString = `${translatedYear}${translatedYear <= 6000 ? '\u00A0OE' : ''}`  
             
             return [translatedYearString, `${year} BC`, translatedYearString]

@@ -222,6 +222,7 @@ function findAllIndicesOfSubstringOccurrences(parentString, substring) {
 function preparePageMetadata(html){
     const { htmlWithIgParts } = htmlWithIgnoredParts(html)
     const numberOfBCsOnCurrentPage = countProperBCs(htmlWithIgParts)
+    locallyFoundBCs = numberOfBCsOnCurrentPage
     numberOfBCsHasChangedInCurrentPage = numberOfBCsOnCurrentPage != properBCs
 }
 

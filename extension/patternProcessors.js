@@ -33,8 +33,6 @@ function processRoundYearRangePattern(html, replacementsArray) {
     let result;
     const reg = giReg(roundYearRangePattern)
     while ((result = reg.exec(html))) {
-
-        console.log('processRoundYearRangePattern',result)
   
         const stringTillSecondYear= result[1]
         const firstYearString = result[2]
@@ -88,9 +86,7 @@ function processRoundYearRangePattern(html, replacementsArray) {
 function processSimpleYearRangePattern(html, replacementsArray) {
     let result;
     const reg = giReg(yearRangePattern)
-    console.log('html',html)
     while ((result = reg.exec(html))) {
-        console.log('processSimpleYearRangePattern',result)
         const year1String = result[11] || ''
         const year2String = result[32] || ''
         const year1 = numberFromString(year1String)
@@ -118,9 +114,6 @@ function processYearRangePattern(html, replacementsArray) {
   
     while ((result = reg.exec(html))) {
 
-        console.log('processYearRangePattern',result)
-
-  
         const partTillYearB2 = result[1] || ''  //or is it?
         const partTillYearB1 = result[3] || ''  //or is it?
      
@@ -418,7 +411,6 @@ function processCenturyOrMillenniumPattern(html, replacementsArray, method) {
     let pattern = method === 'millennium' ? millenniumPattern : centuriesPattern
     const reg = giReg(pattern)
     while ((result = reg.exec(html))) {
-        console.log('cent or mill result',result)
         const stringTillBC = result[1] || ''
         const centuryString = result[2] || ''
         if(method === 'millennium' && parseInt(centuryString, 10) > 10) continue
@@ -514,3 +506,8 @@ function processDecadePattern(html, replacementsArray){
 
     }
 }
+
+
+
+
+

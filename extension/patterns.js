@@ -9,6 +9,8 @@ const completeSpacePattern = `(<span[^>]*?>)(${spacePattern})(</span>)|${spacePa
 const bcPattern = `(${completeSpacePattern}|-)((b\\.(${completeSpacePattern})?c\\.?|bc)e?|(<small>)(bce?)</small>)`
 const methods = Object.keys(methodConversions).join('|')
 const rangePattern = `(${spacePattern})?(—|−|–|-|\\&#8211;|\\&ndash;|\\&#8212;|\\&mdash;|or|to|to late|to early|to the|and|and late|and early|-to-|until|till)(${spacePattern})?`
+const dashPattern = `(${spacePattern})?(—|−|–|-|\\&#8211;|\\&ndash;|\\&#8212;|\\&mdash;)(${spacePattern})?`
+
 const nakedYearPattern = '\\b([1-9]{1},[0-9]{3}|[0-9]{1,4})(?!\\])\\b'
 const roundNakedYearPattern = '\\b[0-9]{1,3},?000(?!\\])\\b'
 
@@ -46,8 +48,7 @@ const longYearListPattern = `(?<!(${monthNames.join('|')})(${completeSpacePatter
 const centuryRangePattern = `(${nakedCenturyPattern})-?(${rangePattern})(${nakedCenturyPattern})(${spacePattern}|-)(century|centuries)${bcPattern}`
 const millenniumRangePattern = `(${nakedCenturyPattern})-?(${rangePattern})(${nakedCenturyPattern})(${spacePattern}|-)(millennium|millennia)${bcPattern}`
 
-
-
+const h2Pattern = `<h2><span[^>]*?></span><span class="mw-headline"[^>]*?>(.*?)</span><IgnoredPart></h2>`
 
 const yearInMarkUpWithInnerSpansPattern = `(<span class="(bc-y|bc-i)"( data-t="([^>]*?)")?( data-s="([^>]*?)")?>)([^<]*?)(<span[^>]*?>)(.)(</span>)([^<]*?)</span>`
 const yearInMarkupPattern = `(<span class="(bc-y|bc-i)"( data-t="([^>]*?)")?( data-s="([^>]*?)")?>)([^<]*?)</span>`

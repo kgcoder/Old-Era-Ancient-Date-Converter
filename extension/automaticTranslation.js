@@ -20,7 +20,13 @@ function getLocalReplacements(htmlWithIgParts, replacementsArray) {
     createYearReplacementsWithInnerSpansFromMarkup(htmlWithIgParts, replacementsArray)
     createReplacementsFromMarkup(htmlWithIgParts, replacementsArray)
     
+    findH2Headlines(htmlWithIgParts, replacementsArray)
+
+
+    
     createAutomaticReplacements(htmlWithIgParts, replacementsArray)
+
+
 
     
 }
@@ -48,6 +54,8 @@ function createAutomaticReplacements(html, replacementsArray) {
     processCenturyOrMillenniumCategoryPattern(html,replacementsArray)
     processCenturyPattern(html, replacementsArray)
     processMillenniumPattern(html, replacementsArray)
+
+  
 
 }
 
