@@ -106,6 +106,7 @@ async function editSummaryIfNeeded(node){
 
    
     doReplacementsInSummary()
+    updateDatesInSummary(node)
 
     if(substituteImageUrl){
         const imgs = document.getElementsByClassName('mwe-popups-thumbnail')
@@ -203,4 +204,12 @@ function doReplacementsInSummary() {
         newTextNodesArray.push(pair)
     }
     summaryTextNodesArray = newTextNodesArray
+}
+
+function updateDatesInSummary(node){
+    const spans = Array.from(node.getElementsByClassName('oedatecase'))
+
+    spans.forEach(span => {
+      updateDataInSpan(span)
+    })
 }

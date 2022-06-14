@@ -24,8 +24,6 @@ chrome.runtime.onMessage.addListener(function (message) {
 
 document.addEventListener('DOMContentLoaded', function () {
 
-    
-
     const aboutLink = document.getElementById("aboutLink")
 
     aboutLink.addEventListener('click', function () {
@@ -118,7 +116,6 @@ function getPageMetadata() {
 
         chrome.tabs.sendMessage(tabs[0].id, 'giveMePageMetadata', function (response, error) {
          
-
             updatePageMetadata(response)
 
         })
@@ -193,9 +190,11 @@ function toggleUsageOfServer() {
 
 function togglePreciseTranslationOfYears() {
     shouldTranslateYearsPrecisely = !shouldTranslateYearsPrecisely
-    chrome.storage.local.set({ shouldTranslateYearsPrecisely })
+    chrome.storage.local.set({ shouldTranslateYearsPrecisely }, function(){
+        sendMessageToPage('updateTranslation')
 
-    sendMessageToPage('updateTranslation')
+    })
+    
 }
 
 
@@ -215,8 +214,6 @@ function toggleTranslationsInQuotes() {
 
 
 function sendMessageToPage(message) {
-    if(isExtensionOff && message !== 'turnOff')return
-
     chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
         chrome.tabs.sendMessage(tabs[0].id, message)
     })

@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 let pageHasIssues = false
-let replacementSpans = []
+//let replacementSpans = []
 
 function updateTranslation() {
 
@@ -15,7 +15,8 @@ function updateTranslation() {
         shouldTranslateDatesInBookTitles = !!result.shouldTranslateDatesInBookTitles
         shouldTranslateDatesInQuotes = !!result.shouldTranslateDatesInQuotes
 
-        doReplacements()
+
+        updateDates()
     })
 }
 
@@ -28,46 +29,7 @@ function toggleServer() {
 }
 
 
-function undoReplacements() {
-    const spans = Array.from(document.body.getElementsByClassName('replacement'))
-    replacementSpans = spans
-  
 
-
-    // expanded.forEach(element => {
-    //     element.classList.add('mw-collapsed');
-    //     element.classList.remove('mw-expanded')
-    // })
-
-
-
-    for (let i = 0; i < spans.length; i++) {
-        const span = spans[i]
-        const originalText = targets[i]
-        replaceSpanWithOriginalText(span, originalText)
-
-    }
-    // textNodesArray = newTextNodesArray
-}
-
-
-function redoReplacements() {
-    const textSpans = Array.from(document.body.getElementsByClassName('originalText'))
-
-    for (let i = 0; i < textSpans.length; i++) {
-        const span = textSpans[i]
-        const edit = editsArray[i]
-
-        const replacementNode = getReplacementNode(edit.target, edit.originalSubstitute, edit.method, edit.type)
-
-        if (replacementNode) {
-            span.parentNode.insertBefore(replacementNode, span)
-            span.parentNode.removeChild(span);
-        }
-
-    }
-
-}
 
 function getReplacementsFromServer(editsArray, htmlWithIgParts) {
 
@@ -85,7 +47,6 @@ function getReplacementsFromServer(editsArray, htmlWithIgParts) {
         }
 
         const [string_num_of_oc, string_oc, target_num_of_oc, target_oc] = orderChunks
-
         const pattern1 = new RegExp(escapeText(string), 'g')
         const matchesCount = (htmlWithIgParts.match(pattern1) || []).length
 

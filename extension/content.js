@@ -73,16 +73,16 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 
     if (message === 'turnOff') {
       
-        undoReplacements()
+        updateTranslation()
         replaceImages(images, true)
     }
     if (message === 'turnOn') {
         
         getConfigFromLocalStorage(function() {
             if (allWorkFinishedForPage) {
-                    redoReplacements()
-                    replaceImages(images)
-                    chrome.runtime.sendMessage('pageMetadataIsReady') //message for the popup script  
+                updateTranslation()
+                replaceImages(images)
+                chrome.runtime.sendMessage('pageMetadataIsReady') //message for the popup script  
             } else if (currentLocation) {
                 startRequest()
             }
@@ -335,6 +335,7 @@ function translateEverything(r) {
 
         
         doReplacements()
+        updateDates()
 
     }
 
@@ -428,6 +429,46 @@ function doReplacements() {
 }
 
 
+function updateDates(){
+
+      const spans = Array.from(document.body.getElementsByClassName('oedatecase'))
+
+      spans.forEach(span => {
+        updateDataInSpan(span)
+      })
+
+
+
+}
+
+
+function updateDataInSpan(span){
+    const originalText = span.getAttribute("o")
+    const originalSubstitute = span.getAttribute("s")
+    const method = span.getAttribute("m")
+    const type = span.getAttribute("t")
+
+    const translations = getReplacementStrings(originalText,originalSubstitute,method,type)
+
+    if(!translations)return
+
+    const [translated, originalForToast, translatedForToast] = translations
+
+    if(isExtensionOff 
+    || (type === 'bookTitle' && !shouldTranslateDatesInBookTitles)
+    || (type === 'quote' && !shouldTranslateDatesInQuotes)){
+
+        span.innerHTML = originalText
+        span.title = translatedForToast ?? undefined
+        
+    }else{
+        span.innerHTML = translated
+        span.title = originalForToast ?? undefined
+
+    }
+}
+
+
 
 function replaceImages(images, reverse = false) {
 
@@ -468,18 +509,7 @@ function getImageNameFromUrl(url){
 }
 
 
-function replaceSpanWithOriginalText(span, originalText) {
 
-    const newSpan = document.createElement('span')
-    const textNode = document.createTextNode(originalText)
-    newSpan.className = 'originalText'
-    newSpan.appendChild(textNode)
-
-    span.parentNode.insertBefore(newSpan, span)
-
-    span.parentNode.removeChild(span);
-
-}
 
 function replaceTextInNodeIfNeeded(oldNodes, sourceText) {
     
@@ -492,7 +522,6 @@ function replaceTextInNodeIfNeeded(oldNodes, sourceText) {
     }
     if (!occurrences.length) return oldNodes
 
-    console.log('oldNodes',oldNodes)
     const { firstNode: firstOldNode, lastNode: lastOldNode } = oldNodes
 
 
@@ -511,7 +540,7 @@ function replaceTextInNodeIfNeeded(oldNodes, sourceText) {
             firstNode = precedingTextNode
         }
 
-        const replacementNode = getReplacementNode(obj.originalText, obj.originalSubstitute, obj.method, obj.type)
+        const replacementNode = getDateCaseNode(obj.originalText, obj.originalSubstitute, obj.method, obj.type)
 
         if (replacementNode) {
             firstOldNode.parentNode.insertBefore(replacementNode, firstOldNode)
@@ -540,10 +569,21 @@ function replaceTextInNodeIfNeeded(oldNodes, sourceText) {
 
 
 
+function getDateCaseNode(originalText, originalSubstitute, method, type = 'normal'){
+    const span = document.createElement('span')
+    span.setAttribute("o",originalText)
+    span.setAttribute("s",originalSubstitute)
+    span.setAttribute("m",method)
+    span.setAttribute("t",type)
+    span.className = "rt-commentedText oedatecase"
+    const textNode = document.createTextNode(originalText)
+    span.appendChild(textNode)
+    return span
+}
 
 
-
-function getReplacementNode(text, originalSubstitute, method, type = 'normal') {
+function getReplacementStrings(text, originalSubstitute, method, type = 'normal') {
+    const originalText = text
     text = text.replace(',','')
    
     const originalNumber = originalSubstitute ? numberFromString(originalSubstitute, 10) : numberFromString(text, 10)
@@ -551,51 +591,57 @@ function getReplacementNode(text, originalSubstitute, method, type = 'normal') {
 
         case 'year': {
             const year = originalNumber
-            if (isNaN(year)) return emptySpan()
+            if (isNaN(year)) return null
             const translatedYear = `${10001 - year}`
             const translatedYearString = `${translatedYear}${translatedYear <= 6000 ? '\u00A0OE' : ''}`
-            return textWithComment(text, `${year} BC`, translatedYearString, type)
+            return [translatedYearString, `${year} BC`, translatedYearString]
         }
         case 'impreciseYear': {
             const year = originalNumber
-            if (isNaN(year)) return emptySpan()
+            if (isNaN(year)) return null
             const translatedYear = `${(shouldTranslateYearsPrecisely ? 10001 : 10000) - year}`
             console.log('translatedYear',translatedYear)
             const translatedYearString = `${translatedYear}${translatedYear <= 6000 ? '\u00A0OE' : ''}`  
-            return textWithComment(text, `${year} BC`, translatedYearString, type)
+            
+            return [translatedYearString, `${year} BC`, translatedYearString]
+            
         }
         case 'oneDigitYear': {
             const year = originalNumber
-            if (isNaN(year)) return emptySpan()
-            const translatedYear = `${(10001 - year) % 10}`
-            return textWithComment(text, `${year} BC`, translatedYear, type)
+            if (isNaN(year)) return null
+            const translatedYear = 10001 - year
+            const translatedYearString = `${translatedYear % 10}`
+            return [translatedYearString, `${year} BC`,`${translatedYear}`]
         }
         case 'twoDigitYear': {
             const year = originalNumber
-            if (isNaN(year)) return emptySpan()
-            const translatedYear = `${(10001 - year) % 100}`
-            return textWithComment(text, `${year} BC`, `${translatedYear < 10 ? '0' : ''}${translatedYear}`, type)
+            if (isNaN(year)) return null
+            const translatedYear = 10001 - year
+            const translatedYearString = `${translatedYear % 100}`
+            return [`${translatedYear % 100 < 10 ? '0' : ''}${translatedYearString}`, `${year} BC`, `${translatedYear}`]
         }
             
         case 'bc-i2': {
             const year = originalNumber
-            if (isNaN(year)) return emptySpan()
-            const translatedYear = `${(10000 - year) % 100}`
-            return textWithComment(text, `${year} BC`, `${translatedYear < 10 ? '0' : ''}${translatedYear}`, type)
+            if (isNaN(year)) return null
+            const translatedYear = 10000 - year
+            const translatedYearString = `${translatedYear % 100}`
+            return [`${translatedYear % 100 < 10 ? '0' : ''}${translatedYearString}`, `${year} BC`, `${translatedYear}`]
         }
         case 'decade':
         case 'bc-dp':
         case 'bc-sd': {
             const decadeWord = method === 'bc-sd' ? '' : method === 'bc-dp' ? ' decades' :' decade'
             const decade = originalNumber
-            if (isNaN(decade)) return emptySpan()
+            if (isNaN(decade)) return null
             const baseYear = 9990 - decade
             const firstYear = baseYear + 2
             let lastYear = (baseYear + 11)
             if (lastYear === 10001) lastYear = 10000
             const lastYearShort = lastYear % 100
             const translated = `${firstYear}/${lastYearShort < 10 ? lastYear : lastYearShort}${decadeWord}`
-            return textWithComment(text, `${numberFromString(text, 10)}s BC`, translated, type)
+            
+            return [translated, `${numberFromString(text, 10)}s BC`, translated]
         }
 
         case 'century': {
@@ -606,14 +652,15 @@ function getReplacementNode(text, originalSubstitute, method, type = 'normal') {
             const translatedCentury = 101 - century
             const translatedCenturyWithEnding = `${translatedCentury}${numberSuffix(translatedCentury)}`
             const originalCenturyWithEnding = `${century}${numberSuffix(century)}`
-            return textWithComment(text, `${originalCenturyWithEnding} century BC`, translatedCenturyWithEnding, type)
+
+            return [translatedCenturyWithEnding, `${originalCenturyWithEnding} century BC`, `${translatedCenturyWithEnding} century`]
         }
 
         case '00s': {
             const x00s = originalNumber
-            if (isNaN(x00s)) return emptySpan()
+            if (isNaN(x00s)) return null
             const translated = `${9900 - x00s}s`
-            return textWithComment(text, `${numberFromString(text, 10)}s BC`, translated, type)
+            return [translated, `${numberFromString(text, 10)}s BC`, translated]
         }
 
         case 'millennium': {
@@ -624,38 +671,36 @@ function getReplacementNode(text, originalSubstitute, method, type = 'normal') {
             const translatedMillennium = 11 - millennium
             const translatedMillenniumWithEnding = `${translatedMillennium}${numberSuffix(translatedMillennium)}`
             const originalMillenniumWithEnding = `${millennium}${numberSuffix(millennium)}`
-            return textWithComment(text, `${originalMillenniumWithEnding} millennium BC`, translatedMillenniumWithEnding, type)
+            return [translatedMillenniumWithEnding, `${originalMillenniumWithEnding} millennium BC`, `${translatedMillenniumWithEnding} millennium`]
         }
 
 
 
         case '000s': {
             const x000s = originalNumber
-            if (isNaN(x000s)) return emptySpan()
+            if (isNaN(x000s)) return null
             const translated = `${9000 - x000s}s`
-            return textWithComment(text, `${numberFromString(text, 10)}s BC`, translated, type)
+            return [translated, `${numberFromString(text, 10)}s BC`, translated]
         }
 
         case 'remove': {
-            if (shouldTranslateDate(type)) {
-                return emptySpan()//null
-            }
+            return ["", "", ""]
         }
 
         case 'OE': {
-            return textWithComment(text, '', 'Old Era', type)
+            return ["Old Era", "", ""]
         }
 
         case 'ofOE': {
-            return textWithComment(text, '', 'of the Old Era', type)
+            return ["of the Old Era", "", ""]
         }
             
         case 'abbreviatedTimeline': {
-            return textWithComment(text, 'Old Era', 'OE', type)
+            return ["OE", "", ""]
         }
 
         default:
-            return document.createTextNode(text)
+            return [originalText, "", ""]
     }
 }
 
@@ -665,37 +710,7 @@ function createMarker(text, method, type = 'normal', originalSubstitute = '') {
     return `{{${method}|${text}|${type}|${originalSubstitute}}}`
 }
 
-function textWithComment(originalText, toast, translatedText, type = 'normal') {
-    const shouldTranslate = shouldTranslateDate(type)
-    const span = document.createElement('span')
-    const mainText = shouldTranslate ? translatedText : originalText
-    if(toast){
-        toast = shouldTranslate ? toast : translatedText
-        span.title = toast
-    }
-    span.className = "rt-commentedText replacement"
-    const textNode = document.createTextNode(mainText)
-    span.appendChild(textNode)
-    return span
-}
 
-
-function emptySpan() {
-    const span = document.createElement('span')
-    span.className = "replacement"
-    const textNode = document.createTextNode('')
-    span.appendChild(textNode)
-    return span
-}
-
-function shouldTranslateDate(type) {
-    if (type === 'bookTitle') {
-        return shouldTranslateDatesInBookTitles
-    } else if (type === 'quote') {
-        return shouldTranslateDatesInQuotes
-    }
-    return true
-}
 
 
 function numberSuffix(number) {
