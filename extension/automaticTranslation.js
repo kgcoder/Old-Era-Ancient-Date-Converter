@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-function getLocalReplacements(htmlWithIgParts, replacementsArray) {
+function getLocalReplacements(htmlWithIgParts, replacementsArray, pageData) {
 
     // createCenturiesAndMillenniaReplacementsFromAltMarkup(htmlWithIgParts, replacementsArray)
     // createYearReplacementsWithInnerSpansFromAltMarkup(htmlWithIgParts, replacementsArray)
@@ -24,7 +24,7 @@ function getLocalReplacements(htmlWithIgParts, replacementsArray) {
 
 
     
-    createAutomaticReplacements(htmlWithIgParts, replacementsArray)
+    createAutomaticReplacements(htmlWithIgParts, replacementsArray, pageData)
 
 
 
@@ -38,18 +38,18 @@ function getLocalReplacements(htmlWithIgParts, replacementsArray) {
 
 
 
-function createAutomaticReplacements(html, replacementsArray) {
+function createAutomaticReplacements(html, replacementsArray, pageData) {
 
-    processRoundYearRangePattern(html, replacementsArray)
-    processYearRangePattern(html, replacementsArray)
-    processSimpleYearRangePattern(html, replacementsArray)
-    processLongYearListPattern(html, replacementsArray)
-    processYearRangeWithCircasPattern(html, replacementsArray)
+    processRoundYearRangePattern(html, replacementsArray, pageData)
+    processYearRangePattern(html, replacementsArray, pageData)
+    processSimpleYearRangePattern(html, replacementsArray, pageData)
+    processLongYearListPattern(html, replacementsArray, pageData)
+    processYearRangeWithCircasPattern(html, replacementsArray, pageData)
     processYearMonthRangePattern(html, replacementsArray)
     processCenturyRangePattern(html, replacementsArray)
     processMillenniumRangePattern(html, replacementsArray)
     processDecadeRangePattern(html, replacementsArray)
-    processYearPattern(html, replacementsArray)
+    processYearPattern(html, replacementsArray, pageData)
     processDecadePattern(html, replacementsArray)
     processCenturyOrMillenniumCategoryPattern(html,replacementsArray)
     processCenturyPattern(html, replacementsArray)

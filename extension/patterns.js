@@ -8,7 +8,7 @@ const spacePattern = ' |\\s|\\&nbsp;|\\&#160;|\\&#8201;'
 const completeSpacePattern = `(<span[^>]*?>)(${spacePattern})(</span>)|${spacePattern}`
 const bcPattern = `(${completeSpacePattern}|-)((b\\.(${completeSpacePattern})?c\\.?|bc)e?|(<small>)(bce?)</small>)`
 const methods = Object.keys(methodConversions).join('|')
-const rangePattern = `(${spacePattern})?(—|−|–|-|\\&#8211;|\\&ndash;|\\&#8212;|\\&mdash;|or|to|to late|to early|to the|and|and late|and early|-to-|until|till)(${spacePattern})?`
+const rangePattern = `(${spacePattern})?(—|−|–|-|\\&#8211;|\\&ndash;|\\&#8212;|\\&mdash;|or|to|to late|to early|to the|and|and late|and early|-to-|until|till|through)(${spacePattern})?`
 const dashPattern = `(${spacePattern})?(—|−|–|-|\\&#8211;|\\&ndash;|\\&#8212;|\\&mdash;)(${spacePattern})?`
 
 const nakedYearPattern = '\\b([1-9]{1},[0-9]{3}|[0-9]{1,4})(?!\\])\\b'

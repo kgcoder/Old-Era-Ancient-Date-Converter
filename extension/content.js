@@ -26,8 +26,14 @@ let isTranslated = false
 let isPageCenturyCategory = false
 let isPageMillenniumCategory = false
 
+
 let issuesInCurrentPageExist = false
 let numberOfBCsHasChangedInCurrentPage = false
+
+let currentPageData = {
+    isPageAboutEarlyCenturyOrMillennium:false,
+    doesPageContainCenturiesTemplate:false
+}
 
 let currentVersionSeemsOK = true
 let isCurrentVersionVerified = false
@@ -248,6 +254,8 @@ function startRequest() {
 
 function translateEverything(r) {
     findIfPageIsMillenniumOrCenturyCategory()
+    findIfPageIsAboutEarlyCenturyOrMillennium()
+    findIfPageContainsCenturiesTemplate()
     preparePageMetadata(fullHTML)
 
     
@@ -262,7 +270,7 @@ function translateEverything(r) {
     const { htmlWithIgParts, ignoredParts } = htmlWithIgnoredParts(html)
 
     let replacementsArray = []
-    getLocalReplacements(htmlWithIgParts, replacementsArray)
+    getLocalReplacements(htmlWithIgParts, replacementsArray, currentPageData)
     replacementsArray = replacementsArray.sort((a, b) => a.index - b.index)
  
 
@@ -397,6 +405,31 @@ function findIfPageIsMillenniumOrCenturyCategory(){
         isPageMillenniumCategory = matches[5] === 'millennium'
 
     }
+}
+
+
+function findIfPageIsAboutEarlyCenturyOrMillennium(){
+    const html = document.body.innerHTML
+    const reg = new RegExp(`<h1.*>${nakedCenturyPattern} (millennium|century)( BCE?)</h1>`)
+    const matches = html.match(reg)
+    if(matches){
+        console.log('matches',matches)
+        const word = matches[4]
+
+        const millennium = word === 'millennium' ? parseInt(matches[2],10) : 1
+        const century = word === 'century' ? parseInt(matches[2],10) : 1
+
+
+        currentPageData.isPageAboutEarlyCenturyOrMillennium = millennium >= 3 || century >= 30
+    
+        console.log('isPageAboutEarlyCenturyOrMillennium',currentPageData.isPageAboutEarlyCenturyOrMillennium)
+
+    }
+}
+
+
+function findIfPageContainsCenturiesTemplate(){
+
 }
 
 function updatePageTitle() {

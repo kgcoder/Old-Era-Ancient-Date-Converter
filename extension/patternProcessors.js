@@ -4,10 +4,16 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-function processLongYearListPattern(html, replacementsArray) {
+function processLongYearListPattern(html, replacementsArray, pageData) {
     let result;
     const yearReg = giReg(nakedYearPattern)
     const reg = giReg(longYearListPattern)
+
+
+
+    if(pageData){
+
+    }
     while ((result = reg.exec(html))) {
 
         const fullString = result[0]
@@ -23,13 +29,13 @@ function processLongYearListPattern(html, replacementsArray) {
         }
         instances.pop()
         instances.forEach(({ index, target }) => {
-            const method = methodForYear(numberFromString(target))
+            const method = methodForYear(numberFromString(target),pageData)
             addReplacement(replacementsArray,method,target,index, true)
         })
     }
 }
 
-function processRoundYearRangePattern(html, replacementsArray) {
+function processRoundYearRangePattern(html, replacementsArray, pageData) {
     let result;
     const reg = giReg(roundYearRangePattern)
     while ((result = reg.exec(html))) {
@@ -46,8 +52,10 @@ function processRoundYearRangePattern(html, replacementsArray) {
         let method = 'year'
         const firstYear = numberFromString(firstYearString)
         const secondYear = numberFromString(nakedSecondYearString)
+
+        const {isPageAboutEarlyCenturyOrMillennium} = pageData
         
-        if (firstYear >= 3000) {
+        if (!isPageAboutEarlyCenturyOrMillennium && firstYear >= 3000) {
             method = 'impreciseYear'
         }
 
@@ -83,7 +91,7 @@ function processRoundYearRangePattern(html, replacementsArray) {
     }
 }
 
-function processSimpleYearRangePattern(html, replacementsArray) {
+function processSimpleYearRangePattern(html, replacementsArray,pageData) {
     let result;
     const reg = giReg(yearRangePattern)
     while ((result = reg.exec(html))) {
@@ -99,7 +107,7 @@ function processSimpleYearRangePattern(html, replacementsArray) {
         }
         
         if (year1String) {
-            let method = methodForYear(year1)
+            let method = methodForYear(year1,pageData)
             addReplacement(replacementsArray, method, year1String, result.index)     
         }
 
@@ -107,7 +115,7 @@ function processSimpleYearRangePattern(html, replacementsArray) {
     }
 }
 
-function processYearRangePattern(html, replacementsArray) {
+function processYearRangePattern(html, replacementsArray, pageData) {
 
     let result;
     const reg = giReg(yearRangePattern)
@@ -133,7 +141,7 @@ function processYearRangePattern(html, replacementsArray) {
         const yearA2 = numberFromString(yearA2String)
         
         let yearA2Substitute = ''
-        let method = methodForYear(yearA2)
+        let method = methodForYear(yearA2, pageData)
         
         if (!yearA1String && !yearB1String && yearA2 >= 10000 || yearA2 === 0) {
             let index = result.index + partTillYearA2.length
@@ -167,7 +175,7 @@ function processYearRangePattern(html, replacementsArray) {
     }
 }
 
-function processYearRangeWithCircasPattern(html, replacementsArray) {
+function processYearRangeWithCircasPattern(html, replacementsArray,pageData) {
     let result;
     const reg = giReg(yearRangeWithCircasPattern)
     while ((result = reg.exec(html))) {
@@ -177,7 +185,7 @@ function processYearRangeWithCircasPattern(html, replacementsArray) {
 
         if (yearString) {
             const index = result.index + stringTillYear.length
-            addReplacement(replacementsArray, methodForYear(numberFromString(yearString)), yearString, index)  
+            addReplacement(replacementsArray, methodForYear(numberFromString(yearString),pageData), yearString, index)  
         }
     }
 }
@@ -196,7 +204,7 @@ function processYearListPattern(html, replacementsArray) {
 
 
 
-function processYearPattern(html, replacementsArray) {
+function processYearPattern(html, replacementsArray,pageData) {
 
     let result;
     const reg = giReg(yearPattern)
@@ -245,13 +253,13 @@ function processYearPattern(html, replacementsArray) {
         if (year1String) {
             let yearMethod = 'year'
             if (method === 'year') {
-                yearMethod = methodForYear(year1)
+                yearMethod = methodForYear(year1,pageData)
             }
             addReplacement(replacementsArray, yearMethod, year1String, result.index) 
         }
 
         if (method === 'year') {
-            method = methodForYear(year2)
+            method = methodForYear(year2,pageData)
         }
 
         if (!extraSpan && !spanOpening && !smallTag) {

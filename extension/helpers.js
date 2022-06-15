@@ -27,7 +27,28 @@ function numberFromString(string) {
     return parseInt(newString, 10)
 }
 
-function methodForYear(year) {
-    if (year >= 3000 && year % 10 === 0) return'impreciseYear'
+function methodForYear(year, pageData) {
+    if (!pageData.isPageAboutEarlyCenturyOrMillennium && year >= 3000 && year % 10 === 0) return'impreciseYear'
     return 'year'
+}
+
+function getPageDataForSummary(html){
+    const reg = new RegExp(`href="/wiki/(\\d+(st|nd|rd|th))_(millennium|century)_BCE?`,"gi")
+
+    console.log('summary html',html)
+    const result = reg.exec(html)
+    if(!result){
+     return {isPageAboutEarlyCenturyOrMillennium:false }
+    }
+    console.log('getPageDataForSummary', result)
+
+    const number = parseInt(result[1],10)
+
+    const word = result[3]
+
+    const millennium = word === 'millennium' ? number : 1
+    const century = word === 'century' ? number : 1
+
+    const pageData = {isPageAboutEarlyCenturyOrMillennium:millennium >=3 || century >= 30 }
+    return pageData
 }
