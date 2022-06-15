@@ -181,6 +181,11 @@ function createCenturiesAndMillenniaReplacementsFromMarkup(html, replacementsArr
         const nakedBC = result[18] || ''
         let type = result[5] || ''
 
+        const spaceBeforeSmallTag = result[14] || ''
+        const smallTag = result[24] || ''
+        const smallBC = result[25] || ''
+
+
         if (method === 'bc-m' && (centMill === 'millennium' || centMill === 'millennia')) {
             method = 'millennium'
         } else if (method === 'bc-c') {
@@ -195,7 +200,14 @@ function createCenturiesAndMillenniaReplacementsFromMarkup(html, replacementsArr
         const index = result.index + spanOpening.length
         addReplacement(replacementsArray, method, centuryString, index , false, type)
 
-        if (bcSpanOpening.length) {
+        if(smallTag){
+            let index = result.index + stringTillBC.length
+            addReplacement(replacementsArray, 'remove', spaceBeforeSmallTag, index, false, type)
+            
+            index += spaceBeforeSmallTag.length + smallTag.length
+            addReplacement(replacementsArray, 'remove', smallBC, index, false, type)
+
+        }else if (bcSpanOpening.length) {
             let index = result.index + stringTillBC.length + bcSpanOpening.length
             addReplacement(replacementsArray, 'remove', space, index, false, type)
             
