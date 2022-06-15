@@ -201,7 +201,7 @@ function processYearPattern(html, replacementsArray) {
     let result;
     const reg = giReg(yearPattern)
     while ((result = reg.exec(html))) {
-
+        console.log('year result',result)
         const partTillYear2 = result[1] || ''
         const year1String = result[2] || ''
         const year2WithBC = result[6] || ''
@@ -214,6 +214,10 @@ function processYearPattern(html, replacementsArray) {
         const spanOpening = result[14] || ''
         const spanClosing = result[16] || ''
         const nakedBC = result[17] || ''
+
+        const spaceBeforeSmallTag = result[13] || ''
+        const smallTag = result[23] || ''
+        const smallBC = result[24] || ''
 
 
         let year2Substitute = ''
@@ -250,7 +254,7 @@ function processYearPattern(html, replacementsArray) {
             method = methodForYear(year2)
         }
 
-        if (!extraSpan && !spanOpening) {
+        if (!extraSpan && !spanOpening && !smallTag) {
             if (lastSup) {
                 let index = result.index + partTillYear2.length
                 addReplacement(replacementsArray, method, nakedYear2String, index, true, 'normal', year2Substitute)       
@@ -288,6 +292,15 @@ function processYearPattern(html, replacementsArray) {
             index += year2Space.length + spanClosing.length
             addReplacement(replacementsArray, 'remove', nakedBC, index)
             
+        }else if (smallTag){
+            let index = result.index + partTillYear2.length
+            addReplacement(replacementsArray, method, nakedYear2String, index,true, 'normal', year2Substitute)
+
+            index += nakedYear2String.length
+            addReplacement(replacementsArray, 'remove', spaceBeforeSmallTag, index)
+
+            index += spaceBeforeSmallTag.length + smallTag.length
+            addReplacement(replacementsArray, 'remove', smallBC, index)
         }
 
     }
@@ -485,16 +498,32 @@ function processDecadePattern(html, replacementsArray){
     let result;
     const reg = giReg(decadePattern)
     while ((result = reg.exec(html))) {
+        console.log('decade result',result)
         const fullString = result[0] || ''
+        const spaceBeforeSmallTag = result[2] || ''
         const decadeString = result[1] || ''
         const spanOpening = result[3] || ''
         const spanSpace = result[4] || ''
         const spanClosing = result[5] || ''
         const bc = result[6] || ''
+        const smallTag = result[12] || ''
+        const smallBC = result[13] || ''
 
-        if (!spanOpening) {
+
+        if (!spanOpening && !smallTag) {
             addReplacement(replacementsArray, 'decade', fullString, result.index)
-        } else {
+        } else if (smallTag) {
+             addReplacement(replacementsArray, 'decade', decadeString, result.index)
+
+             let index = result.index + decadeString.length
+             addReplacement(replacementsArray, 'remove', spaceBeforeSmallTag, index)
+
+              index += spaceBeforeSmallTag.length + smallTag.length
+              addReplacement(replacementsArray, 'remove', smallBC, index)
+
+        }else {
+
+        
             addReplacement(replacementsArray, 'decade', decadeString, result.index)
 
             let index = result.index + decadeString.length + spanOpening.length
