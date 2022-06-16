@@ -49,7 +49,6 @@ async function editSummaryIfNeeded(node){
     const fullUrl = 'https://en.wikipedia.org/wiki/' + lastComponent
 
 
-    console.log('summary',innerHTML)
     let editsArray = []
     let substituteImageUrl = ''
     // let summary = getSummaryFromLocalDict(fullUrl)
@@ -77,7 +76,7 @@ async function editSummaryIfNeeded(node){
     let replacementsArray = []
 
     const pageData = getPageDataForSummary(innerHTML)
-    
+
     getLocalReplacements(htmlWithIgParts, replacementsArray, pageData)
 
     replacementsArray = replacementsArray.filter(replacement => replacement.edit.method !== 'bc-ig')

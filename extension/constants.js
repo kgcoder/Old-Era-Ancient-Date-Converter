@@ -121,5 +121,12 @@ const methodConversions = {
     'bc-tn': 'OE', // Old Era  timelineName
     'bc-ot': 'ofOE', //of the Old Era ofTimeline
     'bc-at': 'abbreviatedTimeline', //OE
+
+    //the following classes should not be used in markup
+    'bc-ybc': 'bc-ybc',// add BC to year before 10,000 BC
+    'bc-yoe': 'bc-yoe',// add OE to year no matter what
+    'bc-ioe': 'bc-ioe',// add OE to year no matter what
+    'bc-y_': 'bc-y_',// don't use label no matter what
+    'bc-i_': 'bc-i_'// don't use label no matter what
 }
 

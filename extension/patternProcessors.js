@@ -24,7 +24,7 @@ function processLongYearListPattern(html, replacementsArray, pageData) {
             const target = yearResult[0]
             
             const year = numberFromString(target)
-            if (year >= 10000 || year === 0) return
+            if (year > 10000 || year === 0) return
             instances.push({index,target})
         }
         instances.pop()
@@ -39,7 +39,6 @@ function processRoundYearRangePattern(html, replacementsArray, pageData) {
     let result;
     const reg = giReg(roundYearRangePattern)
     while ((result = reg.exec(html))) {
-  
         const stringTillSecondYear= result[1]
         const firstYearString = result[2]
         const fullSecondYearString = result[7]
@@ -49,40 +48,67 @@ function processRoundYearRangePattern(html, replacementsArray, pageData) {
         const spanClosing = result[12]
         const nakedBC = result[13]
 
-        let method = 'year'
+        const spaceBeforeSmallTag = result[9]
+        const smallTag = result[19]
+        const smallBC = result[20]
+
+
+        let method1 = 'year'
+        let method2 = 'year'
         const firstYear = numberFromString(firstYearString)
         const secondYear = numberFromString(nakedSecondYearString)
 
         const {isPageAboutEarlyCenturyOrMillennium} = pageData
         
         if (!isPageAboutEarlyCenturyOrMillennium && firstYear >= 3000) {
-            method = 'impreciseYear'
+            method1 = 'impreciseYear'
         }
 
-        if (firstYear >= 10000) {
-            method = 'bc-ig'
+        if (!isPageAboutEarlyCenturyOrMillennium && secondYear >= 3000) {
+            method2 = 'impreciseYear'
         }
-        
-        addReplacement(replacementsArray, method, firstYearString, result.index)     
 
-        if (method !== 'bc-ig' && secondYear < 3000) {
-            method = 'year'
+        if(firstYear > 10000 && secondYear > 10000){
+            method1 = 'bc-ig'
+            method2 = 'bc-ig'
+        }else if(firstYear > 10000 && secondYear <= 10000){
+            method1 = 'bc-ybc'
+            method2 = method2 === 'impreciseYear' ? 'bc-ioe' : 'bc-yoe'
+        }else if (firstYear <= 10000 && secondYear < firstYear){
+            method1 = method1 === 'year' ? 'bc-y_' : 'bc-i_'
         }
+
+   
+        addReplacement(replacementsArray, method1, firstYearString, result.index)     
+
+     
         let index = result.index + stringTillSecondYear.length
 
-        if (!spanOpening) {
-            addReplacement(replacementsArray, method, fullSecondYearString, index)  
+        if(smallTag){
+            addReplacement(replacementsArray, method2, nakedSecondYearString, index)
+
+            if (method2 !== 'bc-ig') method2 = 'remove'
+
+            index += nakedSecondYearString.length
+            addReplacement(replacementsArray, method2, spaceBeforeSmallTag, index)
+
+            index += spaceBeforeSmallTag.length + smallTag.length
+            addReplacement(replacementsArray, method2, smallBC, index)
+
+
+        }else if (!spanOpening) {
+            addReplacement(replacementsArray, method2, fullSecondYearString, index)  
 
         } else {
-            addReplacement(replacementsArray, method, nakedSecondYearString, index)
+            addReplacement(replacementsArray, method2, nakedSecondYearString, index)
             
-            if (method !== 'bc-ig') method = 'remove'
+            if (method2 !== 'bc-ig') method2 = 'remove'
             
             index += nakedSecondYearString.length + spanOpening.length
-            addReplacement(replacementsArray, method, spanSpace, index)
+            addReplacement(replacementsArray, method2, spanSpace, index)
 
             index += spanSpace.length + spanClosing.length
-            addReplacement(replacementsArray, method, nakedBC, index)
+            addReplacement(replacementsArray, method2, nakedBC, index)
 
         }
 
@@ -93,24 +119,80 @@ function processRoundYearRangePattern(html, replacementsArray, pageData) {
 
 function processSimpleYearRangePattern(html, replacementsArray,pageData) {
     let result;
-    const reg = giReg(yearRangePattern)
+    const reg = giReg(simpleYearRangePattern)
     while ((result = reg.exec(html))) {
-        const year1String = result[11] || ''
-        const year2String = result[32] || ''
-        const year1 = numberFromString(year1String)
-        const year2 = numberFromString(year2String)
+        const stringTillBeginingOfYear2 = result[1] || ''
+        const year1String = result[3] || ''
+        const year2FullString = result[8] || ''
 
+        const year2StringBeforeSpan = result[10] || ''
+        const spanOpening = result[13] || ''
+        const spaceInSpan = result[14] || ''
+        const spanClosing = result[15] || ''
+        const bcAfterSpan = result[16] || ''  
+
+        const year2StringBeforeSmallTag = result[10] || ''
+        const smallTag = result[22] || ''
+        const spaceBeforeSmallTag = result[12] || ''
+        const smallBC = result[23] || ''
+
+        let method1 = 'year'
+        let method2 = 'year'
+
+        const firstYear = numberFromString(year1String)
+        const secondYear = numberFromString(year2FullString)
+
+        const {isPageAboutEarlyCenturyOrMillennium} = pageData
         
-        if (year2 >= 10000 || year2 === 0) {
-            addReplacement(replacementsArray, 'bc-ig', year1String, result.index)
-            return
-        }
-        
-        if (year1String) {
-            let method = methodForYear(year1,pageData)
-            addReplacement(replacementsArray, method, year1String, result.index)     
+        if (!isPageAboutEarlyCenturyOrMillennium && firstYear >= 3000) {
+            method1 = 'impreciseYear'
         }
 
+        if (!isPageAboutEarlyCenturyOrMillennium && secondYear >= 3000) {
+            method2 = 'impreciseYear'
+        }
+
+        if(firstYear > 10000 && secondYear > 10000){
+            method1 = 'bc-ig'
+            method2 = 'bc-ig'
+        }else if(firstYear > 10000 && secondYear <= 10000){
+            method1 = 'bc-ybc'
+            method2 = method2 === 'impreciseYear' ? 'bc-ioe' : 'bc-yoe'
+        }else if (firstYear <= 10000 && secondYear < firstYear){
+            method1 = method1 === 'year' ? 'bc-y_' : 'bc-i_'
+        }
+
+        let index = result.index
+        addReplacement(replacementsArray, method1, year1String, index)
+
+        if(spanOpening){
+            index += stringTillBeginingOfYear2.length
+            addReplacement(replacementsArray, method2, year2StringBeforeSpan, index)
+
+            if (method2 !== 'bc-ig') method2 = 'remove'
+
+            index += year2StringBeforeSpan.length + spanOpening.length
+            addReplacement(replacementsArray, method2, spaceInSpan, index)
+
+            index += spaceInSpan.length + spanClosing.length
+            addReplacement(replacementsArray, method2, bcAfterSpan, index)
+        }else if(smallTag){
+            index += stringTillBeginingOfYear2.length
+            addReplacement(replacementsArray, method2, year2StringBeforeSmallTag, index)
+
+            if (method2 !== 'bc-ig') method2 = 'remove'
+            
+            index += year2StringBeforeSmallTag.length
+            addReplacement(replacementsArray, method2, spaceBeforeSmallTag, index)
+
+            index += spaceBeforeSmallTag.length + smallTag.length
+            addReplacement(replacementsArray, method2, smallBC, index)
+
+
+        }else{
+            index += stringTillBeginingOfYear2.length
+            addReplacement(replacementsArray, method2, year2FullString, index)
+        }
 
     }
 }
@@ -143,7 +225,7 @@ function processYearRangePattern(html, replacementsArray, pageData) {
         let yearA2Substitute = ''
         let method = methodForYear(yearA2, pageData)
         
-        if (!yearA1String && !yearB1String && yearA2 >= 10000 || yearA2 === 0) {
+        if (!yearA1String && !yearB1String && yearA2 > 10000 || yearA2 === 0) {
             let index = result.index + partTillYearA2.length
             addReplacement(replacementsArray, 'bc-ig', yearA2String, index)
             return
@@ -209,7 +291,6 @@ function processYearPattern(html, replacementsArray,pageData) {
     let result;
     const reg = giReg(yearPattern)
     while ((result = reg.exec(html))) {
-        console.log('year result',result)
         const partTillYear2 = result[1] || ''
         const year1String = result[2] || ''
         const year2WithBC = result[6] || ''
@@ -355,7 +436,7 @@ function processYearMonthRangePattern(html, replacementsArray) {
         const year = numberFromString(yearString)
         const year2 = numberFromString(secondYearNakedString)
         if(year <= year2)continue
-        if(year >= 10000 || year === 0) continue
+        if(year > 10000 || year === 0) continue
         addReplacement(replacementsArray, 'year', yearString, result.index) 
     }
 }
@@ -401,7 +482,6 @@ function processCenturyOrMillenniumCategoryPattern(html, replacementsArray){
     const reg = new RegExp(pattern, "gi");
 
     while ((result = reg.exec(html))) {
-        console.log('category result',result)
         const stringTillTarget = result[1] || ''
         const targetString = result[6] || ''
         if(method === 'millennium' && parseInt(targetString,10) > 10) continue
@@ -414,7 +494,6 @@ function processCenturyOrMillenniumCategoryPattern(html, replacementsArray){
 
     const additionalResult = additionalReg.exec(html)
     if(additionalResult){
-        console.log('additional result',additionalResult)
         const stringTillTarget = additionalResult[1] || ''
         const targetString = additionalResult[2] || ''
         if(method === 'millennium' && parseInt(targetString,10) > 10) return
@@ -506,7 +585,6 @@ function processDecadePattern(html, replacementsArray){
     let result;
     const reg = giReg(decadePattern)
     while ((result = reg.exec(html))) {
-        console.log('decade result',result)
         const fullString = result[0] || ''
         const spaceBeforeSmallTag = result[2] || ''
         const decadeString = result[1] || ''

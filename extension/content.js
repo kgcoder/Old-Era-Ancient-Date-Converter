@@ -219,7 +219,7 @@ function startRequest() {
   
 
     fetch(`${baseUrl}/api/pages/${encodedUrl}`).then(r => {
-        console.log('response',r)
+       // console.log('response',r)
         if(r.status !== 200)return {}
         return r.json()
     }).then(r => {
@@ -245,7 +245,7 @@ function startRequest() {
 
 
     }).catch(error => {
-        console.log(error)
+       // console.log(error)
         translateEverything(null)
     })
 
@@ -284,7 +284,6 @@ function translateEverything(r) {
     replacementsArray = replacementsArray.sort((a, b) => a.index - b.index)
     
     editsArray = replacementsArray.map(item => item.edit)
-    console.log('htmlWithIgParts',htmlWithIgParts)
     
     htmlWithMarkers = createHTMLWithMarkers(replacementsArray, htmlWithIgParts, ignoredParts)
 
@@ -292,8 +291,6 @@ function translateEverything(r) {
 
 
     if (htmlWithMarkers) {
-
-        console.log('htmlWithMarkers',htmlWithMarkers)
 
         const parser = new DOMParser();
         const originalBodyDOM = parser.parseFromString(html, "text/xml");
@@ -413,7 +410,6 @@ function findIfPageIsAboutEarlyCenturyOrMillennium(){
     const reg = new RegExp(`<h1.*>${nakedCenturyPattern} (millennium|century)( BCE?)</h1>`)
     const matches = html.match(reg)
     if(matches){
-        console.log('matches',matches)
         const word = matches[4]
 
         const millennium = word === 'millennium' ? parseInt(matches[2],10) : 1
@@ -422,7 +418,6 @@ function findIfPageIsAboutEarlyCenturyOrMillennium(){
 
         currentPageData.isPageAboutEarlyCenturyOrMillennium = millennium >= 3 || century >= 30
     
-        console.log('isPageAboutEarlyCenturyOrMillennium',currentPageData.isPageAboutEarlyCenturyOrMillennium)
 
     }
 }
@@ -623,21 +618,26 @@ function getReplacementStrings(text, originalSubstitute, method) {
     const originalNumber = originalSubstitute ? numberFromString(originalSubstitute, 10) : numberFromString(text, 10)
     switch (method) {
 
+        case 'bc-ybc':{
+            return [originalText + '\u00A0BC', "", ""]
+        }
+        case 'bc-yoe':{
+            return getYearReplacementString(originalNumber,'OE')
+        }
+        case 'bc-y_':{
+            return getYearReplacementString(originalNumber,'-')
+        }
         case 'year': {
-            const year = originalNumber
-            if (isNaN(year)) return null
-            const translatedYear = `${10001 - year}`
-            const translatedYearString = `${translatedYear}${translatedYear <= 6000 ? '\u00A0OE' : ''}`
-            return [translatedYearString, `${year} BC`, translatedYearString]
+            return getYearReplacementString(originalNumber,'any')
+        }
+        case 'bc-ioe':{
+            return getImpreciseYearReplacementString(originalNumber,'OE')
+        }
+        case 'bc-i_':{
+            return getImpreciseYearReplacementString(originalNumber,'-')
         }
         case 'impreciseYear': {
-            const year = originalNumber
-            if (isNaN(year)) return null
-            const translatedYear = `${(shouldTranslateYearsPrecisely ? 10001 : 10000) - year}`
-            const translatedYearString = `${translatedYear}${translatedYear <= 6000 ? '\u00A0OE' : ''}`  
-            
-            return [translatedYearString, `${year} BC`, translatedYearString]
-            
+            return getImpreciseYearReplacementString(originalNumber,'any')
         }
         case 'oneDigitYear': {
             const year = originalNumber
@@ -737,7 +737,39 @@ function getReplacementStrings(text, originalSubstitute, method) {
     }
 }
 
+function getYearReplacementString(year,label){
+    if (isNaN(year)) return null
+    const translatedYear = `${10001 - year}`
+    
+    label = resolveLabel(label, translatedYear)
+  
+    const translatedYearString = `${translatedYear}${label}`
+    return [translatedYearString, `${year} BC`, translatedYearString]
+}
 
+
+function getImpreciseYearReplacementString(year,label){
+    if (isNaN(year)) return null
+    let translatedYear = `${(shouldTranslateYearsPrecisely ? 10001 : 10000) - year}`
+    if(translatedYear == 0)translatedYear = 1
+
+    label = resolveLabel(label, translatedYear)
+
+    const translatedYearString = `${translatedYear}${label}`  
+    
+    return [translatedYearString, `${year} BC`, translatedYearString]
+}
+
+function resolveLabel(label, translatedYear){
+    if(label === 'any'){
+        return translatedYear <= 6000 ? '\u00A0OE' : ''
+    }else if(label === 'OE'){
+        return '\u00A0OE'
+    }else if(label === '-'){
+        return ''
+    }
+    return ''
+}
 
 function createMarker(text, method, type = 'normal', originalSubstitute = '') {
     return `{{${method}|${text}|${type}|${originalSubstitute}}}`

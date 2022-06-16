@@ -35,12 +35,10 @@ function methodForYear(year, pageData) {
 function getPageDataForSummary(html){
     const reg = new RegExp(`href="/wiki/(\\d+(st|nd|rd|th))_(millennium|century)_BCE?`,"gi")
 
-    console.log('summary html',html)
     const result = reg.exec(html)
     if(!result){
      return {isPageAboutEarlyCenturyOrMillennium:false }
     }
-    console.log('getPageDataForSummary', result)
 
     const number = parseInt(result[1],10)
 

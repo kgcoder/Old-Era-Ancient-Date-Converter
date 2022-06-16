@@ -41,8 +41,8 @@ function getLocalReplacements(htmlWithIgParts, replacementsArray, pageData) {
 function createAutomaticReplacements(html, replacementsArray, pageData) {
 
     processRoundYearRangePattern(html, replacementsArray, pageData)
-    processYearRangePattern(html, replacementsArray, pageData)
     processSimpleYearRangePattern(html, replacementsArray, pageData)
+    processYearRangePattern(html, replacementsArray, pageData)
     processLongYearListPattern(html, replacementsArray, pageData)
     processYearRangeWithCircasPattern(html, replacementsArray, pageData)
     processYearMonthRangePattern(html, replacementsArray)
@@ -62,7 +62,7 @@ function createAutomaticReplacements(html, replacementsArray, pageData) {
 
 
 
-function addReplacement(replacementsArray, method,targetString,index, checkIfExists = true, type = 'normal', originalSubstitute = '') {
+function addReplacement(replacementsArray, method,targetString, index, checkIfExists = true, type = 'normal', originalSubstitute = '') {
     
     if (checkIfExists) {
         const indexOfExistingReplacement = replacementsArray.findIndex(rep => rep.index === index)

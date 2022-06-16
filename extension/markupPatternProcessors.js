@@ -8,13 +8,14 @@ function ignoreSecondYearInRangeWithInnerSpansIfNeeded(html, replacementsArray) 
     let result;
     const reg = giReg(yearRangeInMarkupWithInnerSpansPattern)
     while ((result = reg.exec(html))) {
-
+        //console.log('ignoreSecondYearInRangeWithInnerSpansIfNeeded',result)
         const stringTillBeginingOfYear2Span = result[1] || ''
         const year1StringWithoutMarkup = result[3] || ''
         let method1 = result[5] || ''
         const substitute1 = result[9] || ''
         const year1String = result[10] || ''
         const mainYear2SpanOpening = result[15] || ''
+        const substitute2 = result[20] || ''
         const nakedYear2String = result[21] || ''
         const spanOpening = result[22] || ''
         const spanSpace = result[23] || ''
@@ -29,7 +30,7 @@ function ignoreSecondYearInRangeWithInnerSpansIfNeeded(html, replacementsArray) 
             year1 = numberFromString(substitute1 ? substitute1 : year1String)   
         }
 
-        if (year1 === 0 || year1 >= 10000) {
+        if (year1 > 10000) {
             let index = result.index + stringTillBeginingOfYear2Span.length + mainYear2SpanOpening.length
             addReplacement(replacementsArray, 'bc-ig', nakedYear2String, index, false)
             
@@ -48,6 +49,7 @@ function ignoreSecondYearInRangeWithoutInnerSpansIfNeeded(html, replacementsArra
     let result;
     const reg = giReg(yearRangeInMarkupPattern)
     while ((result = reg.exec(html))) {
+        //console.log('ignoreSecondYearInRangeWithoutInnerSpansIfNeeded',result)
 
         const stringTillBeginingOfYear2Span = result[1] || ''
         const year1StringWithoutMarkup = result[2] || ''
@@ -66,7 +68,7 @@ function ignoreSecondYearInRangeWithoutInnerSpansIfNeeded(html, replacementsArra
             year1 = numberFromString(substitute1 ? substitute1 : year1String)   
         }
 
-        if (year1 === 0 || year1 >= 10000) {
+        if (year1 === 0 || year1 > 10000) {
             const index = result.index + stringTillBeginingOfYear2Span.length + mainYear2SpanOpening.length
             addReplacement(replacementsArray, 'bc-ig', year2String, index, false)
 
@@ -79,6 +81,7 @@ function ignoreSecondYearInRangeWhenOnlyFirstIsInMarkup(html, replacementsArray)
     let result;
     const reg = giReg(yearRangeWithFirstYearInMarkupPattern)
     while ((result = reg.exec(html))) {
+        //console.log('ignoreSecondYearInRangeWhenOnlyFirstIsInMarkup',result)
         const stringTillYear2 = result[1] || ''
         const year1String = result[8] || ''
         const year2FullString = result[17] || ''
@@ -92,7 +95,7 @@ function ignoreSecondYearInRangeWhenOnlyFirstIsInMarkup(html, replacementsArray)
 
         const year1 = numberFromString(year1String)
 
-        if (year1 === 0 || year1 >= 10000) {
+        if (year1 === 0 || year1 > 10000) {
 
             let index = result.index + stringTillYear2.length
 
@@ -148,7 +151,7 @@ function createYearRangeReplacementsFromMarkup(html, replacementsArray) {
             
         }
 
-        if (year1 === 0 || year1 >= 10000) {
+        if (year1 === 0 || year1 > 10000) {
             let index = result.index + stringTillBeginingOfYear2Span.length + mainYear2SpanOpening.length
             addReplacement(replacementsArray, 'bc-ig', nakedYear2String, index, false)
             
@@ -244,7 +247,7 @@ function createYearReplacementsWithInnerSpansFromMarkup(html, replacementsArray)
 
         if (['year', 'impreciseYear'].includes(method)) {
             const year = numberFromString(target)
-            if (year === 0 || year >= 10000) {
+            if (year === 0 || year > 10000) {
                 method = 'bc-ig'
             }
         }
@@ -287,7 +290,7 @@ function createReplacementsFromMarkup(html, replacementsArray) {
 
         if (['year', 'impreciseYear'].includes(method)) {
             const year = numberFromString(target)
-            if (year === 0 || year >= 10000) {
+            if (year === 0 || year > 10000) {
                 method = 'bc-ig'
             }
         }
