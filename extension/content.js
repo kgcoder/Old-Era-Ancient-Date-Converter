@@ -282,6 +282,7 @@ function translateEverything(r) {
     
     replacementsArray = replacementsArray.filter(replacement => replacement.edit.method !== 'bc-ig')
     replacementsArray = replacementsArray.sort((a, b) => a.index - b.index)
+
     
     editsArray = replacementsArray.map(item => item.edit)
     
@@ -375,6 +376,38 @@ function resolveReplacements(replacementsArray, repsFromServer) {
             const serverRepWins = repFromServer.replacement !== sameLocalRep.replacement
             if (serverRepWins) {
                 sameLocalRep["duplicate"] = true
+
+                const serverMethod = repFromServer.edit.method
+                
+                const isServerMethodAYearMethod = serverMethod === 'year' || serverMethod === 'impreciseYear'
+                if(isServerMethodAYearMethod){
+                    const localMethod = sameLocalRep.edit.method
+                    let properMethod = serverMethod
+                    const shouldForceShowOELabel = localMethod === 'bc-yoe' || localMethod === 'bc-ioe'
+                    const shouldForceShowBCLabel = localMethod === 'bc-ybc'
+                    const shouldForceHideOELabel = localMethod === 'bc-y_' || localMethod === 'bc-i_'
+
+                    if(shouldForceShowBCLabel){
+                        properMethod = 'bc-ybc'
+                    }else if(shouldForceShowOELabel){
+                        properMethod = serverMethod === 'year' ? 'bc-yoe' : 'bc-ioe'
+                    }else if(shouldForceHideOELabel){
+                        properMethod = serverMethod === 'year' ? 'bc-y_' : 'bc-i_'
+                    }
+
+                    const edit = repFromServer.edit
+                    edit["method"] = properMethod
+
+                    const {
+                        target,
+                        originalSubstitute,
+                        type
+                    } = edit
+                    repFromServer["edit"] = edit
+                    repFromServer["replacement"] = createMarker(target,properMethod,type,originalSubstitute)
+                }
+         
+
             } else {
                 repFromServer["duplicate"] = true
             }
@@ -383,6 +416,7 @@ function resolveReplacements(replacementsArray, repsFromServer) {
 
     replacementsArray = replacementsArray.concat(repsFromServer)
     replacementsArray = replacementsArray.filter(item => !item.duplicate)
+
     return replacementsArray   
 }
 

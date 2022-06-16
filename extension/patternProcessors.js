@@ -124,6 +124,7 @@ function processSimpleYearRangePattern(html, replacementsArray,pageData) {
         const stringTillBeginingOfYear2 = result[1] || ''
         const year1String = result[3] || ''
         const year2FullString = result[8] || ''
+  
 
         const year2StringBeforeSpan = result[10] || ''
         const spanOpening = result[13] || ''
@@ -161,6 +162,7 @@ function processSimpleYearRangePattern(html, replacementsArray,pageData) {
         }else if (firstYear <= 10000 && secondYear < firstYear){
             method1 = method1 === 'year' ? 'bc-y_' : 'bc-i_'
         }
+
 
         let index = result.index
         addReplacement(replacementsArray, method1, year1String, index)
