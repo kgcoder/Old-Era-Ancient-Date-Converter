@@ -11,7 +11,7 @@ const methods = Object.keys(methodConversions).join('|')
 const rangePattern = `(${spacePattern})?(—|−|–|-|\\&#8211;|\\&ndash;|\\&#8212;|\\&mdash;|or|to|to late|to early|to the|and|and late|and early|-to-|until|till|through)(${spacePattern})?`
 const dashPattern = `(${spacePattern})?(—|−|–|-|\\&#8211;|\\&ndash;|\\&#8212;|\\&mdash;)(${spacePattern})?`
 
-const nakedYearPattern = '\\b([1-9]{1,3},[0-9]{3}|[0-9]{1,4}|10000|10,000)(?!\\])\\b'
+const nakedYearPattern = '\\b([1-9][0-9]{0,2},[0-9]{3}|[0-9]{1,4}|10000|10,000)(?!\\])\\b'
 const roundNakedYearPattern = '\\b[0-9]{1,3},?000(?!\\])\\b'
 
 const altCenturiesAndMillenniaMarkupPattern = `((bc-c|bc-m)( data-t="([^>]*?)")?( data-s="[^>]*?")?>)([^<]*?)</(bc-c|bc-m)>(${completeSpacePattern}|-)(century|centuries|cent\\.|c\\.|millennium|millennia))(${bcPattern})`

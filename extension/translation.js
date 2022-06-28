@@ -130,9 +130,7 @@ function getReplacementsFromServer(editsArray, htmlWithIgParts) {
     const filteredEdits = replacementsFromServer.filter(rep => !rep.isBroken)
 
     const badEdits = replacementsFromServer.filter(rep => rep.isBroken)
-    //console.log('badEdits',badEdits)
   
-
     issuesInCurrentPageExist = badEdits.length > 0
 
     pageHasIssues = pageHasIssues || filteredEdits.replacementsFromServer !== replacementsFromServer.length
@@ -146,10 +144,7 @@ function getReplacementsFromServer(editsArray, htmlWithIgParts) {
 
     replacementsFromServer = replacementsFromServer.sort((a, b) => a.edit.targetIndex - b.edit.targetIndex)
 
-
-
     //if (!replacements.length) return null
-
     return replacementsFromServer
 
 

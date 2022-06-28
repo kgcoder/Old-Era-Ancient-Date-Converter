@@ -28,6 +28,7 @@ function numberFromString(string) {
 }
 
 function methodForYear(year, pageData) {
+    if(year > 10000) return 'bc-ig'
     if (!pageData.isPageAboutEarlyCenturyOrMillennium && year >= 3000 && year % 10 === 0) return'impreciseYear'
     return 'year'
 }

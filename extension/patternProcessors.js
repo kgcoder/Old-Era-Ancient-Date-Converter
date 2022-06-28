@@ -470,14 +470,16 @@ function processMillenniumPattern(html, replacementsArray) {
     processCenturyOrMillenniumPattern(html,replacementsArray,'millennium')
 }
 
-function processCenturyOrMillenniumCategoryPattern(html, replacementsArray){
-    let method = ''
-    if(isPageCenturyCategory){
-        method = 'century'
-    }else if(isPageMillenniumCategory){
-        method = 'millennium'
-    }else{
-        return
+function processCenturyOrMillenniumCategoryPattern(html, replacementsArray, method = ''){
+    
+    if(!method){
+        if(isPageCenturyCategory){
+            method = 'century'
+        }else if(isPageMillenniumCategory){
+            method = 'millennium'
+        }else{
+            return
+        }
     }
 
     const pattern = `(title="Category:${nakedCenturyPattern}(-|${spacePattern})${method} BCE?[^"]*?">)(${nakedCenturyPattern}( BCE?)?)</a></li>`
@@ -504,6 +506,46 @@ function processCenturyOrMillenniumCategoryPattern(html, replacementsArray){
         addReplacement(replacementsArray, method, targetString, index)
 
     }
+
+}
+
+
+function processDecadeCategoryPattern(html, replacementsArray){
+    if(!isPageDecadeCategory)return
+
+    const pattern = `(title="Category:${nakedDecadePattern} BCE?[^"]*?">)(${nakedDecadePattern}( BCE?)?)</a>`
+    const reg = new RegExp(pattern, "gi");
+
+    while ((result = reg.exec(html))) {
+         const stringTillTarget = result[1] || ''
+         const targetString = result[2] || ''
+         const index = result.index + stringTillTarget.length
+         addReplacement(replacementsArray, 'bc-sd', targetString, index)
+
+    }
+
+    const additionalPattern = `(<a class="mw-selflink selflink">)(${nakedDecadePattern})</a>`
+    const additionalReg = new RegExp(additionalPattern, "gi");
+    const additionalResult = additionalReg.exec(html)
+    if(additionalResult){
+        const stringTillTarget = additionalResult[1] || ''
+        const targetString = additionalResult[2] || ''
+       
+        const index = additionalResult.index + stringTillTarget.length
+        addReplacement(replacementsArray, 'bc-sd', targetString, index)
+    }
+
+    const additionalPattern2 = `(<li><b>)(${nakedDecadePattern})</b></li>`
+    const additionalReg2 = new RegExp(additionalPattern2, "gi");
+    const additionalResult2 = additionalReg2.exec(html)
+    if(additionalResult2){
+        const stringTillTarget = additionalResult2[1] || ''
+        const targetString = additionalResult2[2] || ''
+        const index = additionalResult2.index + stringTillTarget.length
+        addReplacement(replacementsArray, 'bc-sd', targetString, index)
+    }
+
+    processCenturyOrMillenniumCategoryPattern(html, replacementsArray, 'century')
 
 }
 

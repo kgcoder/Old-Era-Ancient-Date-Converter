@@ -34,6 +34,25 @@ document.addEventListener('DOMContentLoaded', function () {
         })
     })
 
+    const whitePaperLink = document.getElementById("whitePaperLink")
+
+    whitePaperLink.addEventListener('click', function () {
+        chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
+            chrome.tabs.sendMessage(tabs[0].id, 'openWhitePaper')
+            window.close();
+        })
+    })
+
+    const timelineLink = document.getElementById("timelineLink")
+
+    timelineLink.addEventListener('click', function () {
+        chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
+            chrome.tabs.sendMessage(tabs[0].id, 'openTimeline')
+            window.close();
+        })
+    })
+
+
 
     const a1 = document.getElementById("okVersion")
 
@@ -124,10 +143,16 @@ function getPageMetadata() {
 
 
 function updatePageMetadata(response){
+    const link1 = document.getElementById("aboutLink")
+    const link2 = document.getElementById("whitePaperLink")
+    const link3 = document.getElementById("timelineLink")
     if (!response) {
         updatePageStatus('Wrong site, page doesn\'t exist in the database, or page update is needed')
+        link1.style = link2.style = link3.style = "pointer-events: none; color:lightgray"
         return
     }
+
+    link1.style = link2.style = link3.style = ""
 
     const { lastOkVersion, translatedForVersion,
         currentVersionSeemsOK, isCurrentVersionVerified,

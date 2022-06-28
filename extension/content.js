@@ -25,6 +25,7 @@ let isTranslated = false
 
 let isPageCenturyCategory = false
 let isPageMillenniumCategory = false
+let isPageDecadeCategory = false
 
 
 let issuesInCurrentPageExist = false
@@ -107,6 +108,18 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         const link = 'https://oldera.org'
         window.open(link)
     }
+
+    if (message === 'openWhitePaper') {
+        const link = 'https://github.com/kgcoder/Detectable-BC-dates/blob/main/detectable-bc-dates.pdf'
+        window.open(link)
+    }
+
+    if (message === 'openTimeline') {
+        const link = 'https://timeline.oldera.org/timeline/'
+        window.open(link)
+    }
+
+    
 
     if (message === 'updateTranslation') {
         updateTranslation()
@@ -254,6 +267,7 @@ function startRequest() {
 
 function translateEverything(r) {
     findIfPageIsMillenniumOrCenturyCategory()
+    findIfPageIsDecadeCategory()
     findIfPageIsAboutEarlyCenturyOrMillennium()
     findIfPageContainsCenturiesTemplate()
     preparePageMetadata(fullHTML)
@@ -435,6 +449,15 @@ function findIfPageIsMillenniumOrCenturyCategory(){
         isPageCenturyCategory = matches[5] === 'century'
         isPageMillenniumCategory = matches[5] === 'millennium'
 
+    }
+}
+
+function findIfPageIsDecadeCategory(){
+    const html = document.body.innerHTML
+    const reg = new RegExp(`<h1.*>Category:${nakedDecadePattern}( BCE?)?[^<]*?</h1>`)
+    const matches = html.match(reg)
+    if(matches){
+       isPageDecadeCategory = true
     }
 }
 
