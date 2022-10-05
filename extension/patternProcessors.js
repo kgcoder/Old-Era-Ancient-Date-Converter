@@ -76,6 +76,9 @@ function processRoundYearRangePattern(html, replacementsArray, pageData) {
             method2 = method2 === 'impreciseYear' ? 'bc-ioe' : 'bc-yoe'
         }else if (firstYear <= 10000 && secondYear < firstYear){
             method1 = method1 === 'year' ? 'bc-y_' : 'bc-i_'
+            if(shouldUseDotNotation && Math.floor(firstYear/100) === Math.floor(secondYear/100)){
+                method2 = method2 === 'year' ? 'yearShort' : 'impreciseYearShort'
+            }
         }
 
    
@@ -161,6 +164,9 @@ function processSimpleYearRangePattern(html, replacementsArray,pageData) {
             method2 = method2 === 'impreciseYear' ? 'bc-ioe' : 'bc-yoe'
         }else if (firstYear <= 10000 && secondYear < firstYear){
             method1 = method1 === 'year' ? 'bc-y_' : 'bc-i_'
+            if(shouldUseDotNotation && Math.floor(firstYear/100) === Math.floor(secondYear/100)){
+                method2 = method2 === 'year' ? 'yearShort' : 'impreciseYearShort'
+            }
         }
 
 

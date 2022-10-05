@@ -41,8 +41,8 @@ function getLocalReplacements(htmlWithIgParts, replacementsArray, pageData) {
 function createAutomaticReplacements(html, replacementsArray, pageData) {
 
     processRoundYearRangePattern(html, replacementsArray, pageData)
-    processSimpleYearRangePattern(html, replacementsArray, pageData)
     processYearRangePattern(html, replacementsArray, pageData)
+    processSimpleYearRangePattern(html, replacementsArray, pageData)
     processLongYearListPattern(html, replacementsArray, pageData)
     processYearRangeWithCircasPattern(html, replacementsArray, pageData)
     processYearMonthRangePattern(html, replacementsArray)

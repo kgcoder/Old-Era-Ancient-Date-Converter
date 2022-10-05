@@ -31,6 +31,8 @@ let isPageDecadeCategory = false
 let issuesInCurrentPageExist = false
 let numberOfBCsHasChangedInCurrentPage = false
 
+let shouldUseDotNotation = false
+
 let currentPageData = {
     isPageAboutEarlyCenturyOrMillennium:false,
     doesPageContainCenturiesTemplate:false
@@ -500,16 +502,37 @@ function updatePageTitle() {
 function doReplacements() {
     const newTextNodesArray = []
     targets = []
+    let j = 0
     for (let i = 0; i < textsArray.length; i++) {
         const text = textsArray[i]
-        const nodes = textNodesArray[i]
-      
-        if(!nodes)continue
-        const pair = replaceTextInNodeIfNeeded(nodes, text)
+        let nodes;
+        let cleanText = getTextWithoutMarkup(text);
 
-        newTextNodesArray.push(pair)
+       if(cleanText){
+            while(true){
+                if(j >= textNodesArray.length)break;
+                nodes = textNodesArray[j];
+                if(!nodes){
+                    j++;
+                    continue;
+                }
+                var textInNode = nodes.firstNode.data;
+            
+                if(cleanText !== textInNode) {
+                    j++;
+                    continue;
+                }else{
+                    var pair = replaceTextInNodeIfNeeded(nodes, text);
+                    newTextNodesArray.push(pair);
+                    break;
+                }
+            }   
+        }
+        j++
+
     }
-    textNodesArray = newTextNodesArray
+
+    textNodesArray = newTextNodesArray  
 
 }
 
@@ -687,6 +710,9 @@ function getReplacementStrings(text, originalSubstitute, method) {
         case 'year': {
             return getYearReplacementString(originalNumber,'any')
         }
+        case 'yearShort': {
+            return getYearReplacementString(originalNumber,'any',true)
+        }
         case 'bc-ioe':{
             return getImpreciseYearReplacementString(originalNumber,'OE')
         }
@@ -695,6 +721,9 @@ function getReplacementStrings(text, originalSubstitute, method) {
         }
         case 'impreciseYear': {
             return getImpreciseYearReplacementString(originalNumber,'any')
+        }
+        case 'impreciseYearShort': {
+            return getImpreciseYearReplacementString(originalNumber,'any',true)
         }
         case 'oneDigitYear': {
             const year = originalNumber
@@ -794,26 +823,42 @@ function getReplacementStrings(text, originalSubstitute, method) {
     }
 }
 
-function getYearReplacementString(year,label){
+function getYearString(translatedYear, label, shortened = false){
+    label = resolveLabel(label, translatedYear)
+
+    if(shouldUseDotNotation){
+        let yearWithinCentury = translatedYear % 100
+        let century = Math.floor(translatedYear / 100)
+        if(yearWithinCentury === 0){
+            yearWithinCentury = 100
+        }else{
+            century += 1
+        }
+
+        return `${shortened ? '' : century + '^'}${yearWithinCentury}${label}`
+
+    }
+    return `${translatedYear}${label}`
+
+    
+}
+
+function getYearReplacementString(year,label, shortened = false){
     if (isNaN(year)) return null
     const translatedYear = `${10001 - year}`
-    
-    label = resolveLabel(label, translatedYear)
+    const translatedYearString = getYearString(translatedYear,label, shortened)
   
-    const translatedYearString = `${translatedYear}${label}`
     return [translatedYearString, `${year} BC`, translatedYearString]
 }
 
 
-function getImpreciseYearReplacementString(year,label){
+function getImpreciseYearReplacementString(year,label, shortened = false){
     if (isNaN(year)) return null
     let translatedYear = `${(shouldTranslateYearsPrecisely ? 10001 : 10000) - year}`
     if(translatedYear == 0)translatedYear = 1
+    const translatedYearString = getYearString(translatedYear,label, shortened)
 
-    label = resolveLabel(label, translatedYear)
-
-    const translatedYearString = `${translatedYear}${label}`  
-    
+ 
     return [translatedYearString, `${year} BC`, translatedYearString]
 }
 
