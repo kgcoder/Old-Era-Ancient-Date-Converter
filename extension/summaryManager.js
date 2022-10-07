@@ -13,26 +13,47 @@ loadSummariesFromLocalStorage()
 
 
 const observer = new MutationObserver(function(mutations) {
-    mutations.forEach(function(mutation) {
-        if(mutation.addedNodes.length){
-            mutation.addedNodes.forEach(node => {
+     mutations.forEach(function(mutation) {
+         if(mutation.addedNodes.length){
+             mutation.addedNodes.forEach(node => {
                 if(node.className && node.className.includes("mw-mmv-final-image")) {
                     const img = node
                     replaceSrcInImage(img)
                 }
+                 chrome.storage.local.get(['isExtensionOff'], function (result) {
+                    isExtensionOff = result.isExtensionOff ? result.isExtensionOff : false
 
-                if (node.className && node.className.includes("mwe-popups")) {
-                    chrome.storage.local.get(['isExtensionOff'], function (result) {
-                        isExtensionOff = result.isExtensionOff ? result.isExtensionOff : false
-                        editSummaryIfNeeded(node)
-                    })
-                }
+
+                    if (node.className && node.className.includes("mwe-popups")) {
+                        editSummaryIfNeeded(node);
+                    }
+                    else if (node.className && node.className.includes("CategoryTreeSection")) {
+                        editSummaryIfNeeded(node);
+                    }
+                    else if(node.className && node.className.includes("cdx-menu-item__text__description")){
+                        editSummaryIfNeeded(node.parentElement);
+                    }
+                    else if (node.className && node.className.includes("mw-ui-icon")) {
+                        if(node.parentElement && node.parentElement.className && node.parentElement.className.includes("page-summary")){
+                            editSummaryIfNeeded(node.parentElement);
+                        }
+                    }
+                    else if (node.className && node.className.includes("cdx-menu-item")) {
+                        editSummaryIfNeeded(node);
+                    }
+                    else if(node.className && node.className.includes("ra-read-more")){
+                        editSummaryIfNeeded(node);
+                    }
+
+                 })
+              
             })
 
-        }
+         }
      
-    })
+     })
 })
+
 observer.observe(document, { childList: true, subtree: true });
 
 
@@ -44,9 +65,9 @@ async function editSummaryIfNeeded(node){
     const nonBreakableSpace = new RegExp(String.fromCharCode(160),'g')
     const innerHTML = node.innerHTML.replace(/<img([^>]*?)>/,'<img$1/>').replace(/&nbsp;/g,' ').replace(nonBreakableSpace,' ')
     const result = innerHTML.match(/mwe-popups-extract.*?href="(.*?)"/)
-    const url = result[1]
-    const lastComponent = url.split("/").pop()
-    const fullUrl = 'https://en.wikipedia.org/wiki/' + lastComponent
+   // const url = result[1]
+   // const lastComponent = url.split("/").pop()
+  //  const fullUrl = 'https://en.wikipedia.org/wiki/' + lastComponent
 
 
     let editsArray = []
@@ -90,8 +111,8 @@ async function editSummaryIfNeeded(node){
 
     const htmlWithMarkers = createHTMLWithMarkers(replacementsArray, htmlWithIgParts, ignoredParts)
 
-     
-    if (!htmlWithMarkers) return
+         if (!htmlWithMarkers) return
+
 
     const parser = new DOMParser();
     const targetDOM = parser.parseFromString(htmlWithMarkers, "text/xml");
@@ -102,10 +123,6 @@ async function editSummaryIfNeeded(node){
 
     summaryTextNodesArray = []
     getSummaryTextNodesArray(node)
-
-    if(summaryTextsArray.length < summaryTextNodesArray.length){
-        summaryTextsArray = [''].concat(summaryTextsArray)
-    }
 
    
     doReplacementsInSummary()
@@ -199,12 +216,37 @@ function getSummaryTextNodesArray(node) {
 
 
 function doReplacementsInSummary() {
+    const reg = new RegExp('\\s|\\&nbsp;|\\&#160;|\\&#8201;','gi')
     const newTextNodesArray = []
+    let j = 0
     for (let i = 0; i < summaryTextsArray.length; i++) {
         const text = summaryTextsArray[i]
-        const nodes = summaryTextNodesArray[i]
-        const pair = replaceTextInNodeIfNeeded(nodes, text)
-        newTextNodesArray.push(pair)
+        let nodes;
+        let cleanText = getTextWithoutMarkup(text)?.replace(reg, ' ');
+        if(cleanText){
+            while(true){
+                if(j >= summaryTextNodesArray.length)break;
+                nodes = summaryTextNodesArray[j];
+                if(!nodes){
+                    j++;
+                    continue;
+                }
+                if(!nodes)break;
+                var textInNode = nodes.firstNode.data.replace(reg, ' ');
+            
+                if(cleanText !== textInNode) {
+                    j++;
+                    continue;
+                }else{
+                    var pair = replaceTextInNodeIfNeeded(nodes, text);
+                    newTextNodesArray.push(pair);
+                    break;
+                }
+            }   
+        }
+        j++
+
+
     }
     summaryTextNodesArray = newTextNodesArray
 }
