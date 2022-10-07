@@ -458,6 +458,18 @@ function processCenturyRangePattern(html, replacementsArray) {
     }
 }
 
+function processCenturyRangeWithSlashPattern(html, replacementsArray) {
+    let result;
+    const reg = giReg(centuryRangeWithSlashPattern)
+    while ((result = reg.exec(html))) {
+        const century1String = result[1]
+        const century2String = result[5]
+        addReplacement(replacementsArray, 'century', century1String, result.index)
+        const index = result.index + century1String.length + 1
+        addReplacement(replacementsArray, 'century', century2String, index)
+    }
+}
+
 function processMillenniumRangePattern(html, replacementsArray) {
     let result;
     const reg = giReg(millenniumRangePattern)
@@ -467,6 +479,17 @@ function processMillenniumRangePattern(html, replacementsArray) {
     }
 }
 
+function processMillenniumRangeWithSlashPattern(html, replacementsArray){
+    let result;
+    const reg = giReg(millenniumRangeWithSlashPattern)
+    while ((result = reg.exec(html))) {
+        const millennium1String = result[1]
+        const millennium2String = result[5]
+        addReplacement(replacementsArray, 'millennium', millennium1String, result.index)
+        const index = result.index + millennium1String.length + 1
+        addReplacement(replacementsArray, 'millennium', millennium2String, index)
+    }
+}
 
 function processCenturyPattern(html, replacementsArray) {
     processCenturyOrMillenniumPattern(html,replacementsArray,'century')

@@ -46,7 +46,9 @@ const yearPattern = `(${leftFraction})?((${nakedYearPattern})(</span>)?(${supPat
 const yearInListPattern = `(${nakedYearPattern})(${supPattern})?`
 const longYearListPattern = `(?<!(${monthNames.join('|')})(${completeSpacePattern}))(${yearInListPattern}${yearListRange})?(${yearInListPattern}${yearListRange})?(${yearInListPattern}${yearListRange})?(${yearInListPattern}${yearListRange})?(${yearInListPattern}${yearListRange})?(${yearInListPattern}${yearListRange})?(${yearInListPattern}),?${yearListRange}${nakedYearPattern}${bcPattern}`
 const centuryRangePattern = `(${nakedCenturyPattern})-?(${rangePattern})(${nakedCenturyPattern})(${spacePattern}|-)(century|centuries)${bcPattern}`
+const centuryRangeWithSlashPattern = `(${nakedCenturyPattern})/(${nakedCenturyPattern})(${spacePattern}|-)(century|centuries)${bcPattern}`
 const millenniumRangePattern = `(${nakedCenturyPattern})-?(${rangePattern})(${nakedCenturyPattern})(${spacePattern}|-)(millennium|millennia)${bcPattern}`
+const millenniumRangeWithSlashPattern = `(${nakedCenturyPattern})/(${nakedCenturyPattern})(${spacePattern}|-)(millennium|millennia)${bcPattern}`
 
 const h2Pattern = `<h2><span[^>]*?></span><span class="mw-headline"[^>]*?>(.*?)</span><IgnoredPart></h2>`
 

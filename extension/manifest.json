@@ -1,6 +1,6 @@
 {
     "name": "Old Era on Wikipedia",
-    "version": "2.0.5",
+    "version": "2.0.6",
     "manifest_version": 2,
     "description": "Convert dates BCE into Old Era dates (similar to Holocene Calendar aka Human Era).",
     "content_scripts": [
