@@ -5,31 +5,27 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
    
     const message = request.message
   
    
     if (message === 'updateIcon') {
-        chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
-            updateIcon(tabs[0].id)
-        })     
+        const tabs = await chrome.tabs.query({ currentWindow: true, active: true })
+        updateIcon(tabs[0].id)
     }
   
 });
 
 
-chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, tab) {
     if(!tab.url || !tab.url.includes('wikipedia') || !tab.active || !changeInfo.status || changeInfo.status !== 'complete')return
     updateIcon(tabId)
 
 });
 
-// chrome.tabs.onCreated.addListener(function (tab) {
 
-// });
-
-chrome.tabs.onActivated.addListener(function (activeInfo) {
+chrome.tabs.onActivated.addListener(async function (activeInfo) {
     
     
     updateIcon(activeInfo.tabId)
@@ -39,25 +35,25 @@ chrome.tabs.onActivated.addListener(function (activeInfo) {
 
 function updateIcon(tabId){
     chrome.storage.local.get(['isExtensionOff'], function (result) {
-     
         if (result.isExtensionOff) {
-          
-            chrome.browserAction.setIcon({ path: "/images/icon16gray.png" })
+            chrome.action.setIcon({ path: "/images/icon16gray.png" })
         } else {
-            chrome.tabs.getSelected(null,function(tab) {
-                const url = tab ? tab.url : '';
+            chrome.tabs.query({
+                active: true,
+                lastFocusedWindow: true},
+                async function(tabs) {
+                const url = tabs && tabs.length ? tabs[0].url : '';
               
                 if(!url || !url.includes('wikipedia')){
-                    chrome.browserAction.setIcon({ path: "/images/icon16.png" });
+                    chrome.action.setIcon({ path: "/images/icon16.png" });
                     return
                 } 
                 chrome.tabs.sendMessage(tabId, 'giveMePageStatus', function (response) {
-                  
-    
+        
                     if (!response || response.currentVersionSeemsOK) {
-                        chrome.browserAction.setIcon({ path: "/images/icon16.png" });
+                        chrome.action.setIcon({ path: "/images/icon16.png" });
                     } else {
-                        chrome.browserAction.setIcon({ path: "/images/icon16alert.png" });
+                        chrome.action.setIcon({ path: "/images/icon16alert.png" });
                     }
     
                 })

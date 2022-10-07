@@ -4,12 +4,11 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-let summariesDict = {}
+
 let summaryTextsArray = []
 let summaryTextNodesArray = []
 
 const summaryCacheTTL = 24 * 60 * 60 * 1000
-loadSummariesFromLocalStorage()
 
 
 const observer = new MutationObserver(function(mutations) {
@@ -64,31 +63,10 @@ async function editSummaryIfNeeded(node){
    
     const nonBreakableSpace = new RegExp(String.fromCharCode(160),'g')
     const innerHTML = node.innerHTML.replace(/<img([^>]*?)>/,'<img$1/>').replace(/&nbsp;/g,' ').replace(nonBreakableSpace,' ')
-    const result = innerHTML.match(/mwe-popups-extract.*?href="(.*?)"/)
-   // const url = result[1]
-   // const lastComponent = url.split("/").pop()
-  //  const fullUrl = 'https://en.wikipedia.org/wiki/' + lastComponent
+ 
 
-
-    let editsArray = []
     let substituteImageUrl = ''
-    // let summary = getSummaryFromLocalDict(fullUrl)
-    // if (summary) {
-    //     editsArray = summary.summaryEdits
-    //     substituteImageUrl = summary.substituteSummaryImageUrl
-    // } else {
-
-    //     summary = await getSummaryFromServer(fullUrl)
-    //     editsArray = summary.summaryEdits
-    //     substituteImageUrl = summary.substituteSummaryImageUrl
-    //     editsArray.forEach(edit => {
-    //         edit.string = edit.string.replace(/&nbsp;/g,' ').replace(nonBreakableSpace,' ')
-    //         edit.target = edit.target.replace(/&nbsp;/g,' ').replace(nonBreakableSpace,' ')
-    //     })
-    //     addSummaryToLocalArray(fullUrl, summary)
-    // }
-    
-  
+   
     
 
 
@@ -138,60 +116,6 @@ async function editSummaryIfNeeded(node){
 
 
 
-}
-
-function loadSummariesFromLocalStorage() {
-    chrome.storage.local.get(['summariesDict'], function (result) {
-        if (result.summariesDict) {
-
-            const newDict = {}
-            const now = new Date()
-            for (const [key, value] of Object.entries(result.summariesDict)) {
-                if (value.timestamp > now.getTime() - summaryCacheTTL) {
-                    newDict[key] = value
-                }
-
-            }
-
-
-
-            summariesDict = newDict
-
-            chrome.storage.local.set({ summariesDict })
-        }
-
-    })
-}
-
-
-function addSummaryToLocalArray(url, summary) {
-    const newEntry = { summary, timestamp: (new Date()).getTime() }
-    summariesDict[url] = newEntry
-    chrome.storage.local.set({ summariesDict })
-}
-
-
-function getSummaryFromLocalDict(url) {
-    const entry = summariesDict[url]
-    if (!entry) return null
-    if (entry.timestamp < (new Date()).getTime() - summaryCacheTTL) {
-        summariesDict[url] = undefined
-        return null
-    }
-    return entry.summary
-}
-
-
-async function getSummaryFromServer(url) {
-    return new Promise(async (resolve, reject) => {
-
-        const encodedUrl = encodeURIComponent(url)
-        fetch(`${baseUrl}/api/summaries/${encodedUrl}`).then(r => r.json()).then(r => {
-
-            resolve(r)
-
-        }).catch(e => reject(e))
-    })
 }
 
 

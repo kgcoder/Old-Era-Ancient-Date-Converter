@@ -17,7 +17,6 @@ let pageHasIssues = false
 chrome.runtime.onMessage.addListener(function (message) {
     if(message === 'pageMetadataIsReady'){
         getPageMetadata()
-
     }
 })
 
@@ -202,8 +201,6 @@ function toggleExtension() {
         sendMessageToPage(isExtensionOff ? 'turnOff' : 'turnOn')
 
     })
-
-
 
 }
 

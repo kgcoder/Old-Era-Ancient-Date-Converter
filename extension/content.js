@@ -80,7 +80,6 @@ getConfigFromLocalStorage(function(){
 
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
    
-
     if (message === 'turnOff') {
       
         updateTranslation()
@@ -500,13 +499,14 @@ function updatePageTitle() {
 
 
 function doReplacements() {
+    const reg = new RegExp('\\s|\\&nbsp;|\\&#160;|\\&#8201;','gi')
     const newTextNodesArray = []
     targets = []
     let j = 0
     for (let i = 0; i < textsArray.length; i++) {
         const text = textsArray[i]
         let nodes;
-        let cleanText = getTextWithoutMarkup(text);
+        let cleanText = getTextWithoutMarkup(text)?.replace(reg, ' ');;
 
        if(cleanText){
             while(true){
@@ -516,7 +516,7 @@ function doReplacements() {
                     j++;
                     continue;
                 }
-                var textInNode = nodes.firstNode.data;
+                var textInNode = nodes.firstNode.data.replace(reg, ' ');
             
                 if(cleanText !== textInNode) {
                     j++;
