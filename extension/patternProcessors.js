@@ -698,4 +698,25 @@ function processDecadePattern(html, replacementsArray){
 
 
 
+function processDecadePattern2(text, replacementsArray){
+    let result;
+    const reg = giReg2(decadePattern2)
+    while ((result = reg.exec(text))) {
+        const decadeString = result[1] || ''
+        const space = result[2] || ''
+        const bc = result[3] || ''
+
+        
+        let index = result.index
+        addIntermediaryReplacement(replacementsArray,'decade',decadeString,index)
+        index += decadeString.length
+        addIntermediaryReplacement(replacementsArray,'remove',space,index)
+        index += space.length
+        addIntermediaryReplacement(replacementsArray,'remove',bc,index)
+
+
+    }
+}
+
+
 

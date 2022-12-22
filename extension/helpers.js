@@ -11,6 +11,11 @@ function giReg(pattern) {
 }
 
 
+function giReg2(pattern) {
+    return new RegExp(pattern, "gi");
+}
+
+
 function convertTypeFromMakup(typeInMarkup) {
     if (!typeInMarkup) {
             return 'normal'
