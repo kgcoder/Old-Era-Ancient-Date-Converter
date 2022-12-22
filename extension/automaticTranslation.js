@@ -195,27 +195,28 @@ function moveReplacementsFromTextToHtml(text,html,replacementsInTextArray,finalR
 
 
 function mergeReplacements(rawReplacements){
+    console.log({rawReplacements})
     const resultArray = []
     const groupsArray = []
     let currentGroup = []
     let lastIndex = 0
     for(let i = 0; i < rawReplacements.length;i++){
         const replacement = rawReplacements[i]
-        if(replacement.edit.method != 'remove'){
-            currentGroup = [replacement]
-            groupsArray.push(currentGroup)
+      
+        if(currentGroup.length === 0 || (replacement.index === lastIndex && replacement.edit.method === 'remove') ){
+            currentGroup.push(replacement)
         }else{
-            if(replacement.index === lastIndex){
-                currentGroup.push(replacement)
-            }else{
-                currentGroup = [replacement]
-                groupsArray.push(currentGroup)
-            }
+            groupsArray.push(currentGroup)
+            currentGroup = [replacement]  
         }
+        
         lastIndex = replacement.index + replacement.length
-
+    }
+    if(currentGroup.length > 0){
+        groupsArray.push(currentGroup)
     }
 
+    console.log({groupsArray})
 
     for(let i = 0; i < groupsArray.length; i++){
         const group = groupsArray[i]
@@ -234,6 +235,9 @@ function mergeReplacements(rawReplacements){
         addReplacement(resultArray,method,targetString,index)
 
     }
+
+    console.log({resultArray})
+
 
     return resultArray
 
