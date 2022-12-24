@@ -5,13 +5,13 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-function giReg(pattern) {
+function giRegForHtml(pattern) {
     pattern = negativeLookaheadPattern + pattern
     return new RegExp(pattern, "gi");
 }
 
 
-function giReg2(pattern) {
+function giRegForText(pattern) {
     return new RegExp(pattern, "gi");
 }
 
@@ -89,4 +89,32 @@ function getTextWithoutMarkup(text){
     cleanText += text.substr(lastIndex, text.length - lastIndex);
        
     return cleanText;
+}
+
+
+
+function checkIfSecondYearIsShortened(year1, year2) {
+ 
+    if (year2 < 10 && year1 > 9) {
+        const lastDigit = year1 % 10
+
+        if ((lastDigit === 2 && year2 === 1) || (lastDigit === 1 && year2 === 0)) {
+            const realYear = year1 - 1
+            return { numberOfDigits: 2, realYear }
+        }
+        if (lastDigit > year2) {
+            const realYear = Math.floor(year1 / 10.0) * 10 + year2
+            return { numberOfDigits: 1, realYear }
+        }
+    }
+
+    if (year2 < 100 && year2 > 9 && year1 > 99) {
+        const lastTwoDigits = year1 % 100
+        if (lastTwoDigits > year2) {
+            const realYear = Math.floor(year1 / 100.0) * 100 + year2
+            return { numberOfDigits: 2, realYear }  
+        }
+    }
+
+    return { numberOfDigits: 0, realYear:year2 }
 }

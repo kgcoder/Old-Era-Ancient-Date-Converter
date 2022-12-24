@@ -455,12 +455,9 @@ function findIfPageIsMillenniumOrCenturyCategory(){
 
     const title = getPageTitle()
 
-    console.log('innerText',title)
-
-    const reg = new RegExp(`^Category:${nakedCenturyPattern2}(-|${spacePattern2})(millennium|century)( BCE?)?.*?$`)
+    const reg = new RegExp(`^Category:${nakedCenturyPattern}(-|${spacePattern})(millennium|century)( BCE?)?.*?$`)
     const matches = title.match(reg)
     if(matches){
-        console.log("matches",matches)
         isPageCenturyCategory = matches[5] === 'century'
         isPageMillenniumCategory = matches[5] === 'millennium'
     }
@@ -469,7 +466,7 @@ function findIfPageIsMillenniumOrCenturyCategory(){
 function findIfPageIsDecadeCategory(){
     const title = getPageTitle()
 
-    const reg = new RegExp(`^Category:${nakedDecadePattern2}( BCE?)?.*?$`)
+    const reg = new RegExp(`^Category:${nakedDecadePattern}( BCE?)?.*?$`)
     const matches = title.match(reg)
     if(matches){
        isPageDecadeCategory = true

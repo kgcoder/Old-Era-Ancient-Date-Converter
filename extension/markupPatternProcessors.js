@@ -6,7 +6,7 @@
  */
 function ignoreSecondYearInRangeWithInnerSpansIfNeeded(html, replacementsArray) {
     let result;
-    const reg = giReg(yearRangeInMarkupWithInnerSpansPattern)
+    const reg = giRegForHtml(yearRangeInMarkupWithInnerSpansPattern)
     while ((result = reg.exec(html))) {
         //console.log('ignoreSecondYearInRangeWithInnerSpansIfNeeded',result)
         const stringTillBeginingOfYear2Span = result[1] || ''
@@ -47,7 +47,7 @@ function ignoreSecondYearInRangeWithInnerSpansIfNeeded(html, replacementsArray) 
 
 function ignoreSecondYearInRangeWithoutInnerSpansIfNeeded(html, replacementsArray) {
     let result;
-    const reg = giReg(yearRangeInMarkupPattern)
+    const reg = giRegForHtml(yearRangeInMarkupPattern)
     while ((result = reg.exec(html))) {
         //console.log('ignoreSecondYearInRangeWithoutInnerSpansIfNeeded',result)
 
@@ -79,7 +79,7 @@ function ignoreSecondYearInRangeWithoutInnerSpansIfNeeded(html, replacementsArra
 
 function ignoreSecondYearInRangeWhenOnlyFirstIsInMarkup(html, replacementsArray) {
     let result;
-    const reg = giReg(yearRangeWithFirstYearInMarkupPattern)
+    const reg = giRegForHtml(yearRangeWithFirstYearInMarkupPattern)
     while ((result = reg.exec(html))) {
         //console.log('ignoreSecondYearInRangeWhenOnlyFirstIsInMarkup',result)
         const stringTillYear2 = result[1] || ''
@@ -122,7 +122,7 @@ function ignoreSecondYearInRangeWhenOnlyFirstIsInMarkup(html, replacementsArray)
 
 function createYearRangeReplacementsFromMarkup(html, replacementsArray) {
     let result;
-    const reg = giReg(yearRangeInMarkupWithInnerSpansPattern)
+    const reg = giRegForHtml(yearRangeInMarkupWithInnerSpansPattern)
     while ((result = reg.exec(html))) {
 
         const stringTillBeginingOfYear2Span = result[1]
@@ -169,7 +169,7 @@ function createYearRangeReplacementsFromMarkup(html, replacementsArray) {
 
 function createCenturiesAndMillenniaReplacementsFromMarkup(html, replacementsArray) {
     let result;
-    const reg = giReg(centuriesAndMillenniaMarkupPattern)
+    const reg = giRegForHtml(centuriesAndMillenniaMarkupPattern)
     while ((result = reg.exec(html))) {
 
         const stringTillBC = result[1] || ''
@@ -226,7 +226,7 @@ function createCenturiesAndMillenniaReplacementsFromMarkup(html, replacementsArr
 
 function createYearReplacementsWithInnerSpansFromMarkup(html, replacementsArray) {
     let result;
-    const reg = giReg(markupWithInnerSpansPattern)
+    const reg = giRegForHtml(markupWithInnerSpansPattern)
     while ((result = reg.exec(html))) {
 
         const spanOpening = result[1] || ''
@@ -272,7 +272,7 @@ function createYearReplacementsWithInnerSpansFromMarkup(html, replacementsArray)
 
 function createReplacementsFromMarkup(html, replacementsArray) {
     let result;   
-    const reg = giReg(generalMarkupPattern)
+    const reg = giRegForHtml(generalMarkupPattern)
     while ((result = reg.exec(html))) {
 
         const spanOpening = result[1] || ''

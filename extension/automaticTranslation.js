@@ -13,9 +13,9 @@ function getLocalReplacements(htmlWithIgParts, replacementsArray, pageData) {
 
     createCenturiesAndMillenniaReplacementsFromMarkup(htmlWithIgParts, replacementsArray)
 
-    ignoreSecondYearInRangeWithInnerSpansIfNeeded(htmlWithIgParts, replacementsArray)
-    ignoreSecondYearInRangeWithoutInnerSpansIfNeeded(htmlWithIgParts, replacementsArray)
-    ignoreSecondYearInRangeWhenOnlyFirstIsInMarkup(htmlWithIgParts, replacementsArray)
+    // ignoreSecondYearInRangeWithInnerSpansIfNeeded(htmlWithIgParts, replacementsArray)
+    // ignoreSecondYearInRangeWithoutInnerSpansIfNeeded(htmlWithIgParts, replacementsArray)
+    // ignoreSecondYearInRangeWhenOnlyFirstIsInMarkup(htmlWithIgParts, replacementsArray)
 
     createYearReplacementsWithInnerSpansFromMarkup(htmlWithIgParts, replacementsArray)
     createReplacementsFromMarkup(htmlWithIgParts, replacementsArray)
@@ -45,54 +45,31 @@ function createAutomaticReplacements(html, replacementsArray, pageData) {
     processCenturyOrMillenniumCategoryPattern(html,replacementsArray)
     processDecadeCategoryPattern(html, replacementsArray)
 
-    console.log('category replacements',replacementsArray)
-
-
     let intermediaryReplacementsArray = []
 
 
     const rawReplacementsInHtmlArray = []
 
-   // processRoundYearRangePattern2(text,intermediaryReplacementsArray,pageData)
 
-
-    processYearRangePattern2(text,intermediaryReplacementsArray, pageData)
-
-
-    // processSimpleYearRangePattern(html, replacementsArray, pageData)  ???
+    processYearRangePattern(text,intermediaryReplacementsArray, pageData)
     processListWithMonthNamePattern(text, intermediaryReplacementsArray)
     processLongYearListPattern(text, intermediaryReplacementsArray, pageData)
-
-
-     processYearMonthRangePattern(text, intermediaryReplacementsArray)
-
-     processYearPattern(text, intermediaryReplacementsArray, pageData)
-
-     processCenturyRangePattern(text, intermediaryReplacementsArray)
-     processCenturyRangeWithSlashPattern(text, intermediaryReplacementsArray)
-     processMillenniumRangePattern(text, intermediaryReplacementsArray)
-     processMillenniumRangeWithSlashPattern(text, intermediaryReplacementsArray)
-   
-     processDecadeRangePattern(text, intermediaryReplacementsArray)
-
-
-
-
-
-     processDecadePattern2(text,intermediaryReplacementsArray)
-
-
-     processCenturyPattern(text,intermediaryReplacementsArray)
-     processMillenniumPattern(text,intermediaryReplacementsArray)
+    processYearMonthRangePattern(text, intermediaryReplacementsArray)
+    processYearPattern(text, intermediaryReplacementsArray, pageData)
+    processCenturyRangePattern(text, intermediaryReplacementsArray)
+    processCenturyRangeWithSlashPattern(text, intermediaryReplacementsArray)
+    processMillenniumRangePattern(text, intermediaryReplacementsArray)
+    processMillenniumRangeWithSlashPattern(text, intermediaryReplacementsArray)
+    processDecadeRangePattern(text, intermediaryReplacementsArray)
+    processDecadePattern(text,intermediaryReplacementsArray)
+    processCenturyPattern(text,intermediaryReplacementsArray)
+    processMillenniumPattern(text,intermediaryReplacementsArray)
 
 
     intermediaryReplacementsArray = intermediaryReplacementsArray.sort((a,b) => a.index - b.index)
 
-    console.log({intermediaryReplacementsArray})
     moveReplacementsFromTextToHtml(text,html,intermediaryReplacementsArray, rawReplacementsInHtmlArray)
-   // console.log({rawReplacementsInHtmlArray})
     const normalReplacementsInHtml = mergeReplacements(rawReplacementsInHtmlArray)
-    console.log({normalReplacementsInHtml})
     addNewReplacementsToArray(normalReplacementsInHtml,replacementsArray)
 
 
@@ -116,9 +93,7 @@ function createAutomaticReplacements(html, replacementsArray, pageData) {
 
 
 function extractTextFromHtml(html){
-    console.log('htmlWithIfParts',html)
    
-    console.log('html length',html.length)
     let isIgnoring = false
     let result = ''
     for(let index = 0;index < html.length; index++){
@@ -137,9 +112,6 @@ function extractTextFromHtml(html){
 
     }
 
-
-    console.log('text:',result)
-
     return result
 }
 
@@ -147,7 +119,6 @@ function extractTextFromHtml(html){
 function moveReplacementsFromTextToHtml(text,html,replacementsInTextArray,finalReplacementsArray){
     if(!replacementsInTextArray.length)return
 
-    console.log('looking at replacements:',replacementsInTextArray)
     let indexOfReplacement = 0
     let indexInTextToLookFor = replacementsInTextArray[indexOfReplacement].index
 
@@ -184,8 +155,6 @@ function moveReplacementsFromTextToHtml(text,html,replacementsInTextArray,finalR
                     console.log('some error')
                     console.log({currentReplacementInText})
                     error = true
-                    console.log('target in text:',targetInText)
-                    console.log('target in html:',targetInHtml)
                     indexInText++
                     indexInHtml++
                     continue
@@ -195,16 +164,6 @@ function moveReplacementsFromTextToHtml(text,html,replacementsInTextArray,finalR
                 const {target, index, method, length, originalSubstitute} = currentReplacementInText
 
                 addReplacement(finalReplacementsArray,method,target,indexInHtml,true,'normal',originalSubstitute)
-
-                if(indexOfReplacement == 34){
-                    console.log('replacement 34:',currentReplacementInText)
-                    console.log('array length',replacementsInTextArray.length)
-                }
-                if(target == '431'){
-                    console.log('processing 431')
-                    console.log(finalReplacementsArray[finalReplacementsArray.length - 1])
-                }
-
 
 
                 indexInText += targetLength
@@ -219,20 +178,12 @@ function moveReplacementsFromTextToHtml(text,html,replacementsInTextArray,finalR
                 
             }
 
-
-
-
-
             indexInText++
         }
     
 
         indexInHtml++
     }
-
-    console.log('last index',indexOfReplacement)
-
-    console.log('was error',error)
 
 }
 
@@ -259,8 +210,6 @@ function mergeReplacements(rawReplacements){
         groupsArray.push(currentGroup)
     }
 
-    console.log({groupsArray})
-
     for(let i = 0; i < groupsArray.length; i++){
         const group = groupsArray[i]
         const method = group[0].edit.method
@@ -279,7 +228,6 @@ function mergeReplacements(rawReplacements){
 
     }
 
-    console.log({resultArray})
 
 
     return resultArray
