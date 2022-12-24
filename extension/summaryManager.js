@@ -15,6 +15,10 @@ const observer = new MutationObserver(function(mutations) {
      mutations.forEach(function(mutation) {
          if(mutation.addedNodes.length){
              mutation.addedNodes.forEach(node => {
+                // console.log('node added',node.className)
+                // if(node.className && node.className.includes("loaded-infinite-scroll-container")){
+                //     console.log('node contents',node.innerHTML)
+                // }
                 if(node.className && node.className.includes("mw-mmv-final-image")) {
                     const img = node
                     replaceSrcInImage(img)
