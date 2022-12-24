@@ -442,21 +442,35 @@ function updateIcon() {
 }
 
 
+
+function getPageTitle(){
+    const h1 = document.getElementsByTagName('h1')
+    if(!h1 || !h1[0])return ""
+    const title = h1[0].innerText
+    if(title)return title
+    return ""
+}
+
 function findIfPageIsMillenniumOrCenturyCategory(){
-    const html = document.body.innerHTML
-    const reg = new RegExp(`<h1.*>Category:${nakedCenturyPattern}(-|${spacePattern})(millennium|century)( BCE?)?[^<]*?</h1>`)
-    const matches = html.match(reg)
+
+    const title = getPageTitle()
+
+    console.log('innerText',title)
+
+    const reg = new RegExp(`^Category:${nakedCenturyPattern2}(-|${spacePattern2})(millennium|century)( BCE?)?.*?$`)
+    const matches = title.match(reg)
     if(matches){
+        console.log("matches",matches)
         isPageCenturyCategory = matches[5] === 'century'
         isPageMillenniumCategory = matches[5] === 'millennium'
-
     }
 }
 
 function findIfPageIsDecadeCategory(){
-    const html = document.body.innerHTML
-    const reg = new RegExp(`<h1.*>Category:${nakedDecadePattern}( BCE?)?[^<]*?</h1>`)
-    const matches = html.match(reg)
+    const title = getPageTitle()
+
+    const reg = new RegExp(`^Category:${nakedDecadePattern2}( BCE?)?.*?$`)
+    const matches = title.match(reg)
     if(matches){
        isPageDecadeCategory = true
     }
@@ -464,9 +478,10 @@ function findIfPageIsDecadeCategory(){
 
 
 function findIfPageIsAboutEarlyCenturyOrMillennium(){
-    const html = document.body.innerHTML
-    const reg = new RegExp(`<h1.*>${nakedCenturyPattern} (millennium|century)( BCE?)</h1>`)
-    const matches = html.match(reg)
+    const title = getPageTitle()
+
+    const reg = new RegExp(`^${nakedCenturyPattern} (millennium|century)( BCE?)$`)
+    const matches = title.match(reg)
     if(matches){
         const word = matches[4]
 

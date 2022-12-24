@@ -4,33 +4,46 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-function processLongYearListPattern(html, replacementsArray, pageData) {
+
+function processListWithMonthNamePattern(text, replacementsArray){
     let result;
-    const yearReg = giReg(nakedYearPattern)
-    const reg = giReg(longYearListPattern)
+    const reg = giReg2(longYearListWithMonthPattern)
+    while ((result = reg.exec(text))) {
+        const stringTillDate = result[1]
+        const dateString = result[5]
+        const index = result.index + stringTillDate.length
+        addIntermediaryReplacement(replacementsArray,'bc-ig',dateString,index, true)
+    }
+}
+
+
+
+function processLongYearListPattern(text, replacementsArray, pageData) {
+    let result;
+    const yearReg = giReg2(nakedYearPattern2)
+    const reg = giReg2(longYearListPattern2)
 
 
 
     if(pageData){
 
     }
-    while ((result = reg.exec(html))) {
-
-        const fullString = result[0]
-        let yearResult
-        const instances = []
-        while (yearResult = yearReg.exec(fullString)) {
-            const index = result.index + yearResult.index
-            const target = yearResult[0]
+    while ((result = reg.exec(text))) {
+         const fullString = result[0]
+         let yearResult
+         const instances = []
+         while (yearResult = yearReg.exec(fullString)) {
+             const index = result.index + yearResult.index
+             const target = yearResult[0]
             
-            const year = numberFromString(target)
-            if (year > 10000 || year === 0) return
-            instances.push({index,target})
-        }
-        instances.pop()
+             const year = numberFromString(target)
+             if (year > 10000 || year === 0) return
+             instances.push({index,target})
+         }
+         instances.pop()
         instances.forEach(({ index, target }) => {
             const method = methodForYear(numberFromString(target),pageData)
-            addReplacement(replacementsArray,method,target,index, true)
+            addIntermediaryReplacement(replacementsArray,method,target,index, true)
         })
     }
 }
@@ -43,58 +56,58 @@ function processRoundYearRangePattern2(text, replacementsArray, pageData) {
     const reg = giReg2(roundYearRangePattern2)
     while ((result = reg.exec(text))) {
         console.log('round year range result',result)
-         const stringTillSecondYear= result[1]
-         const firstYearString = result[2]
-         const nakedSecondYearString = result[8]
-         const space = result[9]
-         const bc = result[10]
+        //  const stringTillSecondYear= result[1]
+        //  const firstYearString = result[2]
+        //  const nakedSecondYearString = result[8]
+        //  const space = result[9]
+        //  const bc = result[10]
 
 
 
-        let method1 = 'year'
-        let method2 = 'year'
-        const firstYear = numberFromString(firstYearString)
-        const secondYear = numberFromString(nakedSecondYearString)
-        console.log({firstYear})
-        console.log({secondYear})
+        // let method1 = 'year'
+        // let method2 = 'year'
+        // const firstYear = numberFromString(firstYearString)
+        // const secondYear = numberFromString(nakedSecondYearString)
+        // console.log({firstYear})
+        // console.log({secondYear})
 
-        const {isPageAboutEarlyCenturyOrMillennium} = pageData
+        // const {isPageAboutEarlyCenturyOrMillennium} = pageData
 
-        console.log({isPageAboutEarlyCenturyOrMillennium})
+        // console.log({isPageAboutEarlyCenturyOrMillennium})
         
-        if (!isPageAboutEarlyCenturyOrMillennium && firstYear >= 3000) {
-            method1 = 'impreciseYear'
-        }
+        // if (!isPageAboutEarlyCenturyOrMillennium && firstYear >= 3000) {
+        //     method1 = 'impreciseYear'
+        // }
 
-        if (!isPageAboutEarlyCenturyOrMillennium && secondYear >= 3000) {
-            method2 = 'impreciseYear'
-        }
+        // if (!isPageAboutEarlyCenturyOrMillennium && secondYear >= 3000) {
+        //     method2 = 'impreciseYear'
+        // }
 
-        if(firstYear > 10000 && secondYear > 10000){
-            method1 = 'bc-ig'
-            method2 = 'bc-ig'
-        }else if(firstYear > 10000 && secondYear <= 10000){
-            method1 = 'bc-ybc'
-            method2 = method2 === 'impreciseYear' ? 'bc-ioe' : 'bc-yoe'
-        }else if (firstYear <= 10000 && secondYear < firstYear){
-            method1 = method1 === 'year' ? 'bc-y_' : 'bc-i_'
-            if(shouldUseDotNotation && Math.floor(firstYear/100) === Math.floor(secondYear/100)){
-                method2 = method2 === 'year' ? 'yearShort' : 'impreciseYearShort'
-            }
-        }
+        // if(firstYear > 10000 && secondYear > 10000){
+        //     method1 = 'bc-ig'
+        //     method2 = 'bc-ig'
+        // }else if(firstYear > 10000 && secondYear <= 10000){
+        //     method1 = 'bc-ybc'
+        //     method2 = method2 === 'impreciseYear' ? 'bc-ioe' : 'bc-yoe'
+        // }else if (firstYear <= 10000 && secondYear < firstYear){
+        //     method1 = method1 === 'year' ? 'bc-y_' : 'bc-i_'
+        //     if(shouldUseDotNotation && Math.floor(firstYear/100) === Math.floor(secondYear/100)){
+        //         method2 = method2 === 'year' ? 'yearShort' : 'impreciseYearShort'
+        //     }
+        // }
 
    
-        addIntermediaryReplacement(replacementsArray, method1, firstYearString, result.index)     
-        let index = result.index + stringTillSecondYear.length
-        addIntermediaryReplacement(replacementsArray, method2, nakedSecondYearString, index)     
+        // addIntermediaryReplacement(replacementsArray, method1, firstYearString, result.index)     
+        // let index = result.index + stringTillSecondYear.length
+        // addIntermediaryReplacement(replacementsArray, method2, nakedSecondYearString, index)     
 
-        if (method2 !== 'bc-ig') method2 = 'remove'
+        // if (method2 !== 'bc-ig') method2 = 'remove'
 
-        index += nakedSecondYearString.length
-        addIntermediaryReplacement(replacementsArray, method2, space, index)     
+        // index += nakedSecondYearString.length
+        // addIntermediaryReplacement(replacementsArray, method2, space, index)     
 
-        index += space.length
-        addIntermediaryReplacement(replacementsArray, method2, bc, index)     
+        // index += space.length
+        // addIntermediaryReplacement(replacementsArray, method2, bc, index)     
 
     }
 }
@@ -185,29 +198,37 @@ function processSimpleYearRangePattern(html, replacementsArray,pageData) {
 }
 
 function processYearRangePattern2(text,replacementsArray, pageData){
+    const {isPageAboutEarlyCenturyOrMillennium} = pageData
+
     let result;
     const reg = giReg2(yearRangePattern2)
   
     while ((result = reg.exec(text))) {
         console.log("yearRangePattern2 result",result)
 
-        const partTillYearA2 = result[1] || ''
-        const yearA1String = result[2] || ''
-        const yearA2String = result[4] || ''
-        const yearB1String = result[12] || ''
+        const partTillSpace = result[1] || ''
+        const partTillYearB2 = result[2] || ''
+        const partTillYearB1 = result[3] || ''
+        const partTillYearA2 = result[4] || ''
+
+        const yearA1String = result[5] || ''
+        const yearA2String = result[7] || ''
+        const yearB1String = result[15] || ''
+        const yearB2String = result[17] || ''
+        const space = result[19] || ''
+        const bc = result[20] || ''
+
  
 
         const yearA1 = numberFromString(yearA1String)
         const yearA2 = numberFromString(yearA2String)
+        const yearB1 = numberFromString(yearB1String)
+        const yearB2 = numberFromString(yearB2String)
         
         let yearA2Substitute = ''
+        let yearB2Substitute = ''
         let method = methodForYear(yearA2, pageData)
         
-        if (!yearA1String && !yearB1String && yearA2 > 10000 || yearA2 === 0) {
-            let index = result.index + partTillYearA2.length
-            addIntermediaryReplacement(replacementsArray,'bc-ig',yearA2String,index)
-            return
-        }
 
         if (yearA1String) {
             const { numberOfDigits, realYear } = checkIfSecondYearIsShortened(yearA1, yearA2)
@@ -220,37 +241,95 @@ function processYearRangePattern2(text,replacementsArray, pageData){
             } else if (numberOfDigits === 2) {
                 method = 'twoDigitYear'      
             }
-        }
-   
 
-        if (yearA1String) {
             addIntermediaryReplacement(replacementsArray, 'year', yearA1String, result.index)
-        }
-
-        if (yearA2String) {
             const index = result.index + partTillYearA2.length
             addIntermediaryReplacement(replacementsArray, method, yearA2String, index, true, 'normal', yearA2Substitute)
+            
         }
 
+        if (yearB1String) {
+            const { numberOfDigits, realYear } = checkIfSecondYearIsShortened(yearB1, yearB2)
+            if (numberOfDigits !== 0) {
+                yearB2Substitute = `${realYear}`    
+            }
+            if (numberOfDigits === 1) {
+                method = 'oneDigitYear'
+
+            } else if (numberOfDigits === 2) {
+                method = 'twoDigitYear'      
+            }
+
+         
+            let index = result.index + partTillYearB1.length
+            addIntermediaryReplacement(replacementsArray, 'year', yearB1String, result.index)
+            index = result.index + partTillYearB2.length
+            addIntermediaryReplacement(replacementsArray, method, yearB2String, index, true, 'normal', yearB2Substitute)
+            index = result.index + partTillSpace.length
+            addIntermediaryReplacement(replacementsArray, 'remove', space, index)
+            index += space.length
+            addIntermediaryReplacement(replacementsArray, 'remove', bc, index)
+            
+        }
+
+
+        if(yearA1String || yearB1String) continue;//for now don't worry about labels if slashes are used
+            
+     
+
+        
+
+
+        
+
+        let method1 = 'year'
+        let method2 = 'year'
+        if (!isPageAboutEarlyCenturyOrMillennium && yearA2 % 10 === 0 && yearA2 >= 3000) {
+            method1 = 'impreciseYear'
+        }
+
+        if (!isPageAboutEarlyCenturyOrMillennium && yearB2 % 10 === 0 && yearB2 >= 3000) {
+            method2 = 'impreciseYear'
+        }
+
+
+
+        if(yearA2 > 10000 && yearB2 > 10000){
+            method1 = 'bc-ig'
+            method2 = 'bc-ig'
+        }else if(yearA2 > 10000 && yearB2 <= 10000){
+            method1 = 'bc-ybc'
+            method2 = method2 === 'impreciseYear' ? 'bc-ioe' : 'bc-yoe'
+        }else if (yearA2 <= 10000 && yearB2 < yearA2){
+            method1 = method1 === 'year' ? 'bc-y_' : 'bc-i_'
+            if(yearB2 >= 4000){
+                method2 = method2 ===  'impreciseYear' ? 'bc-ioe' : 'bc-yoe' 
+            }
+            if(shouldUseDotNotation && Math.floor(yearA2/100) === Math.floor(yearB2/100)){
+                method2 = method2 === 'year' ? 'yearShort' : 'impreciseYearShort'
+            }
+        }
+
+        console.log({method1})
+        console.log({method2})
+
+
+
+        let index = result.index + partTillYearA2.length
+        addIntermediaryReplacement(replacementsArray, method1, yearA2String, index)
+        index = result.index + partTillYearB2.length
+        addIntermediaryReplacement(replacementsArray, method2, yearB2String, index)
+        index = result.index + partTillSpace.length
+        method2 = method2 === 'bc-ig' ? 'bc-ig' : 'remove'
+        addIntermediaryReplacement(replacementsArray, method2, space, index)
+        index += space.length
+        addIntermediaryReplacement(replacementsArray, method2, bc, index)
+            
+     
     }
 }
 
 
-
-function processYearRangeWithCircasPattern(html, replacementsArray,pageData) {
-    let result;
-    const reg = giReg(yearRangeWithCircasPattern)
-    while ((result = reg.exec(html))) {
-  
-        const stringTillYear = result[1] || ''
-        const yearString = result[4] || ''
-
-        if (yearString) {
-            const index = result.index + stringTillYear.length
-            addReplacement(replacementsArray, methodForYear(numberFromString(yearString),pageData), yearString, index)  
-        }
-    }
-}
 
 function processYearListPattern(html, replacementsArray) {
     let result;
@@ -270,7 +349,6 @@ function processYearPattern(text, replacementsArray,pageData) {
     let result;
     const reg = giReg2(yearPattern2)
     while ((result = reg.exec(text))) {
-        console.log('year result',result)
         const partTillSpace = result[1] || ''
         const partTillYear2 = result[2] || ''
         const year1String = result[3] || ''
@@ -375,45 +453,39 @@ function processYearMonthRangePattern(text, replacementsArray) {
     }
 }
 
-function processCenturyRangePattern(html, replacementsArray) {
+function processCenturyRangePattern(text, replacementsArray) {
     let result;
-    const reg = giReg(centuryRangePattern)
-    while ((result = reg.exec(html))) {
+    const reg = giReg2(centuryRangePattern2)
+    while ((result = reg.exec(text))) {
+         const centuryString = result[1]
+        addIntermediaryReplacement(replacementsArray, 'century', centuryString, result.index)
+    }
+}
+
+function processCenturyRangeWithSlashPattern(text, replacementsArray) {
+    let result;
+    const reg = giReg(centuryRangeWithSlashPattern2)
+    while ((result = reg.exec(text))) {
+         const century1String = result[1]
+         addIntermediaryReplacement(replacementsArray, 'century', century1String, result.index)
+    }
+}
+
+function processMillenniumRangePattern(text, replacementsArray) {
+    let result;
+    const reg = giReg2(millenniumRangePattern2)
+    while ((result = reg.exec(text))) {
         const centuryString = result[1]
-        addReplacement(replacementsArray, 'century', centuryString, result.index)
+        addIntermediaryReplacement(replacementsArray, 'millennium', centuryString, result.index)
     }
 }
 
-function processCenturyRangeWithSlashPattern(html, replacementsArray) {
+function processMillenniumRangeWithSlashPattern(text, replacementsArray){
     let result;
-    const reg = giReg(centuryRangeWithSlashPattern)
-    while ((result = reg.exec(html))) {
-        const century1String = result[1]
-        const century2String = result[5]
-        addReplacement(replacementsArray, 'century', century1String, result.index)
-        const index = result.index + century1String.length + 1
-        addReplacement(replacementsArray, 'century', century2String, index)
-    }
-}
-
-function processMillenniumRangePattern(html, replacementsArray) {
-    let result;
-    const reg = giReg(millenniumRangePattern)
-    while ((result = reg.exec(html))) {
-        const centuryString = result[1]
-        addReplacement(replacementsArray, 'millennium', centuryString, result.index)
-    }
-}
-
-function processMillenniumRangeWithSlashPattern(html, replacementsArray){
-    let result;
-    const reg = giReg(millenniumRangeWithSlashPattern)
-    while ((result = reg.exec(html))) {
+    const reg = giReg2(millenniumRangeWithSlashPattern2)
+    while ((result = reg.exec(text))) {
         const millennium1String = result[1]
-        const millennium2String = result[5]
-        addReplacement(replacementsArray, 'millennium', millennium1String, result.index)
-        const index = result.index + millennium1String.length + 1
-        addReplacement(replacementsArray, 'millennium', millennium2String, index)
+        addIntermediaryReplacement(replacementsArray, 'millennium', millennium1String, result.index)
     }
 }
 
@@ -531,37 +603,27 @@ function processCenturyOrMillenniumPattern(text, replacementsArray, method) {
 
     
 
-function processDecadeRangePattern(html, replacementsArray) {
+function processDecadeRangePattern(text, replacementsArray) {
     let result;
-    const reg = giReg(decadeRangePattern)
-    while ((result = reg.exec(html))) {
+    const reg = giReg2(decadeRangePattern2)
+    while ((result = reg.exec(text))) {
         const stringTillSecondDecade = result[1] || ''
         const firstDecadeString = result[2] || ''
-        const fullSecondDecade = result[9] || ''
         const nakedSecondDecade = result[10] || ''
-        const spanOpening = result[12] || ''
-        const spanSpace = result[13] || ''
-        const spanClosing = result[14] || ''
-        const bc = result[15] || ''
-
-
+        const space = result[11] || ''
+        const bc = result[12] || ''
+  
         if (firstDecadeString) {
-            addReplacement(replacementsArray, 'bc-sd', firstDecadeString, result.index)
+            addIntermediaryReplacement(replacementsArray, 'bc-sd', firstDecadeString, result.index)
         }
 
         let index = result.index + stringTillSecondDecade.length
+        addIntermediaryReplacement(replacementsArray, 'bc-dp', nakedSecondDecade, index)
+        index += nakedSecondDecade.length
+        addIntermediaryReplacement(replacementsArray, 'remove', space, index)
+        index += space.length
+        addIntermediaryReplacement(replacementsArray, 'remove', bc, index)
 
-        if (!spanOpening) {
-            addReplacement(replacementsArray, 'bc-dp', fullSecondDecade, index)
-        } else {
-            addReplacement(replacementsArray, 'bc-dp', nakedSecondDecade, index)
-
-            index += nakedSecondDecade.length + spanOpening.length
-            addReplacement(replacementsArray, 'remove', spanSpace, index)
-
-            index += spanSpace.length + spanClosing.length
-            addReplacement(replacementsArray, 'remove', bc, index)
-        }
     }
 }
 
@@ -574,7 +636,6 @@ function processDecadePattern2(text, replacementsArray){
     let result;
     const reg = giReg2(decadePattern2)
     while ((result = reg.exec(text))) {
-        console.log('decade result',result)
         const decadeString = result[1] || ''
         const space = result[2] || ''
         const bc = result[3] || ''

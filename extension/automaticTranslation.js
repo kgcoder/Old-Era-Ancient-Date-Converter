@@ -40,36 +40,40 @@ function getLocalReplacements(htmlWithIgParts, replacementsArray, pageData) {
 
 function createAutomaticReplacements(html, replacementsArray, pageData) {
 
-
-
     const text = extractTextFromHtml(html)
+
+    processCenturyOrMillenniumCategoryPattern(html,replacementsArray)
+    processDecadeCategoryPattern(html, replacementsArray)
+
+    console.log('category replacements',replacementsArray)
+
 
     let intermediaryReplacementsArray = []
 
 
     const rawReplacementsInHtmlArray = []
 
-    processRoundYearRangePattern2(text,intermediaryReplacementsArray,pageData)
+   // processRoundYearRangePattern2(text,intermediaryReplacementsArray,pageData)
+
+
     processYearRangePattern2(text,intermediaryReplacementsArray, pageData)
 
 
     // processSimpleYearRangePattern(html, replacementsArray, pageData)  ???
-    // processLongYearListPattern(html, replacementsArray, pageData)
-    // processYearRangeWithCircasPattern(html, replacementsArray, pageData) ???
+    processListWithMonthNamePattern(text, intermediaryReplacementsArray)
+    processLongYearListPattern(text, intermediaryReplacementsArray, pageData)
 
 
      processYearMonthRangePattern(text, intermediaryReplacementsArray)
 
-     const testArray = []
      processYearPattern(text, intermediaryReplacementsArray, pageData)
 
-    // processCenturyOrMillenniumCategoryPattern(html,replacementsArray)
-    // processCenturyRangePattern(html, replacementsArray)
-    // processCenturyRangeWithSlashPattern(html, replacementsArray)
-    // processMillenniumRangePattern(html, replacementsArray)
-    // processMillenniumRangeWithSlashPattern(html, replacementsArray)
-    // processDecadeCategoryPattern(html, replacementsArray)
-    // processDecadeRangePattern(html, replacementsArray)
+     processCenturyRangePattern(text, intermediaryReplacementsArray)
+     processCenturyRangeWithSlashPattern(text, intermediaryReplacementsArray)
+     processMillenniumRangePattern(text, intermediaryReplacementsArray)
+     processMillenniumRangeWithSlashPattern(text, intermediaryReplacementsArray)
+   
+     processDecadeRangePattern(text, intermediaryReplacementsArray)
 
 
 
@@ -92,7 +96,7 @@ function createAutomaticReplacements(html, replacementsArray, pageData) {
     addNewReplacementsToArray(normalReplacementsInHtml,replacementsArray)
 
 
-    console.log({testArray})
+
 
 
   
