@@ -304,8 +304,6 @@ function translateEverything(r) {
     htmlWithMarkers = createHTMLWithMarkers(replacementsArray, htmlWithIgParts, ignoredParts)
 
 
-
-
     if (htmlWithMarkers) {
 
         const parser = new DOMParser();
@@ -531,6 +529,9 @@ function doReplacements() {
                 var textInNode = nodes.firstNode.data.replace(reg, ' ');
             
                 if(cleanText !== textInNode) {
+                    console.log('something is wrong while replacing')
+                    console.log('clean text:',cleanText)
+                    console.log('text in node',textInNode)
                     j++;
                     continue;
                 }else{

@@ -105,6 +105,13 @@ function processYearRangePattern(text,replacementsArray, pageData){
         }
 
         if (yearB1String) {
+
+            if(!yearA1String){
+                const index = result.index + partTillYearA2.length
+                addIntermediaryReplacement(replacementsArray, 'year', yearA2String, index)
+                
+            }
+
             const { numberOfDigits, realYear } = checkIfSecondYearIsShortened(yearB1, yearB2)
             if (numberOfDigits !== 0) {
                 yearB2Substitute = `${realYear}`    
@@ -126,6 +133,15 @@ function processYearRangePattern(text,replacementsArray, pageData){
             index += space.length
             addIntermediaryReplacement(replacementsArray, 'remove', bc, index)
             
+        }
+
+        if(yearA1String && !yearB1String){
+            let index = result.index + partTillYearB2.length
+            addIntermediaryReplacement(replacementsArray, method, yearB2String, index, true, 'normal', yearB2Substitute)
+            index = result.index + partTillSpace.length
+            addIntermediaryReplacement(replacementsArray, 'remove', space, index)
+            index += space.length
+            addIntermediaryReplacement(replacementsArray, 'remove', bc, index)
         }
 
 

@@ -40,7 +40,7 @@ function getLocalReplacements(htmlWithIgParts, replacementsArray, pageData) {
 
 function createAutomaticReplacements(html, replacementsArray, pageData) {
 
-    const text = extractTextFromHtml(html)
+    const {result:text,insertions} = extractTextFromHtml(html)
 
     processCenturyOrMillenniumCategoryPattern(html,replacementsArray)
     processDecadeCategoryPattern(html, replacementsArray)
@@ -68,8 +68,10 @@ function createAutomaticReplacements(html, replacementsArray, pageData) {
 
     intermediaryReplacementsArray = intermediaryReplacementsArray.sort((a,b) => a.index - b.index)
 
-    moveReplacementsFromTextToHtml(text,html,intermediaryReplacementsArray, rawReplacementsInHtmlArray)
+
+    moveReplacementsFromTextToHtml(text,html,intermediaryReplacementsArray, rawReplacementsInHtmlArray, insertions)
     const normalReplacementsInHtml = mergeReplacements(rawReplacementsInHtmlArray)
+
     addNewReplacementsToArray(normalReplacementsInHtml,replacementsArray)
 
 
@@ -96,15 +98,32 @@ function extractTextFromHtml(html){
    
     let isIgnoring = false
     let result = ''
+    let previousCharacter = ''
+    let isPreviousCharacterNumber = false
+    const insertions = []
+    const numReg = new RegExp('[0-9]')
     for(let index = 0;index < html.length; index++){
         const character = html.slice(index,index + 1)
         if(character === '<'){
             isIgnoring = true
+            previousCharacter = html.slice(index - 1,index)
+            if(previousCharacter.match(numReg)){
+                isPreviousCharacterNumber = true
+            }
             continue;
         }else if(character === '>'){
             isIgnoring = false
+            let nextCharacter = html.slice(index + 1,index + 2)
+            if(isPreviousCharacterNumber && nextCharacter.match(numReg)){
+                result += '@'
+                const indexOfInsetion = result.length - 1
+                insertions.push(indexOfInsetion)
+            }
+            isPreviousCharacterNumber = false
             continue;
         }
+
+
 
         if(!isIgnoring){
             result += character
@@ -112,11 +131,11 @@ function extractTextFromHtml(html){
 
     }
 
-    return result
+    return {result,insertions}
 }
 
 
-function moveReplacementsFromTextToHtml(text,html,replacementsInTextArray,finalReplacementsArray){
+function moveReplacementsFromTextToHtml(text,html,replacementsInTextArray,finalReplacementsArray,insertions){
     if(!replacementsInTextArray.length)return
 
     let indexOfReplacement = 0
@@ -127,6 +146,11 @@ function moveReplacementsFromTextToHtml(text,html,replacementsInTextArray,finalR
 
     let isIgnoring = false
     let error = false
+    let numberOfNextInsertion = 0
+    let indexOfNextInsertion = -1
+    if(insertions.length){
+        indexOfNextInsertion = insertions[numberOfNextInsertion]
+    }
     while(indexInHtml < html.length){
         const characterInHtml = html.slice(indexInHtml,indexInHtml + 1)
         if(characterInHtml === '<'){
@@ -140,6 +164,14 @@ function moveReplacementsFromTextToHtml(text,html,replacementsInTextArray,finalR
         }
 
         if(!isIgnoring){
+            if(indexInText === indexOfNextInsertion){
+                indexInText++;
+                numberOfNextInsertion++;
+                if(numberOfNextInsertion < insertions.length){
+                    indexOfNextInsertion = insertions[numberOfNextInsertion]
+                }
+           
+            }
             const characterInText = text.slice(indexInText,indexInText + 1)
             if(characterInText !== characterInHtml)error = true
 
@@ -154,6 +186,9 @@ function moveReplacementsFromTextToHtml(text,html,replacementsInTextArray,finalR
                 if(targetInText !== targetInHtml){
                     console.log('some error')
                     console.log({currentReplacementInText})
+                    console.log({targetInText})
+                    console.log({targetInHtml})
+                    console.log('text:',text.slice(currentReplacementInText.index - 20, currentReplacementInText.index + 20))
                     error = true
                     indexInText++
                     indexInHtml++
