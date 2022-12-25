@@ -277,7 +277,6 @@ function translateEverything(r) {
     
     let html = new XMLSerializer().serializeToString(document.body)
 
-    html = html.replace('"=""','') 
     currentVersion = getPageVersionFromHtml(html)
 
     let htmlWithMarkers
@@ -304,11 +303,15 @@ function translateEverything(r) {
     htmlWithMarkers = createHTMLWithMarkers(replacementsArray, htmlWithIgParts, ignoredParts)
 
 
+
+    //getSample(37,58409,htmlWithMarkers)
+
     if (htmlWithMarkers) {
 
         const parser = new DOMParser();
         const originalBodyDOM = parser.parseFromString(html, "text/xml");
-        const bodyDOM = parser.parseFromString(htmlWithMarkers, "text/xml");
+        const cleanHtml = removeAttributesFromTags(htmlWithMarkers)
+        const bodyDOM = parser.parseFromString(cleanHtml, "text/xml");
 
 
         textsArray = []
@@ -319,6 +322,9 @@ function translateEverything(r) {
 
         textNodesArray = []
         getTextNodesArray(document.body)
+
+        // console.log('textsArray',textsArray)
+        // console.log('textNodesArray',textNodesArray.map(node => node.firstNode.data))
 
         // console.log('textsArray',textsArray)
         // console.log('originalTextsArray',originalTextsArray)

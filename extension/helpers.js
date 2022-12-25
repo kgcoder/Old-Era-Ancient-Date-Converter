@@ -118,3 +118,16 @@ function checkIfSecondYearIsShortened(year1, year2) {
 
     return { numberOfDigits: 0, realYear:year2 }
 }
+
+
+
+
+function getSample(lineNumber,columnNumber,html){
+    const lines = html.split('\n')
+    const line = lines[lineNumber - 1]
+    console.log('line',line)
+    console.log('number of lines',lines.length)
+
+    console.log('broken string:',line.slice(columnNumber - 10,columnNumber + 20))
+
+}

@@ -55,13 +55,13 @@ function processLongYearListPattern(text, replacementsArray, pageData) {
 
 
 function processYearRangePattern(text,replacementsArray, pageData){
+    
     const {isPageAboutEarlyCenturyOrMillennium} = pageData
 
     let result;
     const reg = giRegForText(yearRangePattern)
   
     while ((result = reg.exec(text))) {
-
         const partTillSpace = result[1] || ''
         const partTillYearB2 = result[2] || ''
         const partTillYearB1 = result[3] || ''
