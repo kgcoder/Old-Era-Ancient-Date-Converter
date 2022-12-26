@@ -11,6 +11,12 @@ let shouldTranslateDatesInBookTitles = false
 let shouldTranslateDatesInQuotes = false
 let shouldNotUseServer = false
 let pageHasIssues = false
+
+let allowedSites = []
+
+let isCurrentSiteAllowed = false
+let currentDomain = ''
+
 //let lastOkVersion = ''
 
 
@@ -82,11 +88,16 @@ document.addEventListener('DOMContentLoaded', function () {
         })
     })
 
-    chrome.storage.local.get(['isExtensionOff', 'shouldNotUseServer', 'shouldTranslateYearsPrecisely', 'shouldTranslateDatesInBookTitles', 'shouldTranslateDatesInQuotes'], function (result) {
+    chrome.storage.local.get(['isExtensionOff', 'shouldNotUseServer', 'shouldTranslateYearsPrecisely', 'shouldTranslateDatesInBookTitles', 'shouldTranslateDatesInQuotes','sitesData'], function (result) {
         
         isExtensionOff = !!result.isExtensionOff
      
         updatePageInfoVisibility(!isExtensionOff)
+
+        if(result.sitesData){
+            const sitesData = JSON.parse(result.sitesData)
+            allowedSites = sitesData.allowedSites
+        }
 
         shouldNotUseServer = !!result.shouldNotUseServer
         document.getElementById('DontUseServerCheckbox').checked = shouldNotUseServer
@@ -102,9 +113,16 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('TranslateInQuotesCheckbox').checked = shouldTranslateDatesInQuotes
     })
 
+    document.getElementById('UseOnThisSiteCheckbox').addEventListener('click', () => {
+        toggleWebsiteUsage()
+    }, false)
+
+    
+
     document.getElementById('DontUseServerCheckbox').addEventListener('click', () => {
         toggleUsageOfServer()
     }, false)
+
 
 
     document.getElementById('toggleOnOff').addEventListener('click', () => {
@@ -155,7 +173,14 @@ function updatePageMetadata(response){
 
     const { lastOkVersion, translatedForVersion,
         currentVersionSeemsOK, isCurrentVersionVerified,
-        pageHasNoBCDates, pageIsNotTranslatedYet, pageNotAnalysedYet } = response
+        pageHasNoBCDates, pageIsNotTranslatedYet, pageNotAnalysedYet, isThisSiteAllowed, domain } = response
+
+    
+    isCurrentSiteAllowed = isThisSiteAllowed
+    currentDomain = domain
+
+    document.getElementById('UseOnThisSiteCheckbox').checked = isThisSiteAllowed
+    document.getElementById('DomainNameLabel').innerText = `Use on this website (${domain})`
 
     let message = currentVersionSeemsOK ? 'seems OK' : 'may have issues'
     if (currentVersionSeemsOK && isCurrentVersionVerified) message = 'is OK'
@@ -202,6 +227,20 @@ function toggleExtension() {
 
     })
 
+}
+
+
+function toggleWebsiteUsage() {
+    isCurrentSiteAllowed = !isCurrentSiteAllowed
+    if(!isCurrentSiteAllowed){
+        allowedSites = allowedSites.filter(site => site !== currentDomain)
+
+    }else{
+        allowedSites.push(currentDomain)
+    }
+
+    chrome.storage.local.set({ sitesData:JSON.stringify({allowedSites}) })
+    sendMessageToPage('toggleSiteUsage')
 }
 
 function toggleUsageOfServer() {

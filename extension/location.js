@@ -12,6 +12,16 @@ const additionalBaseURL = 'https://en.wikipedia.org/w/index.php?'
 let titleInURL = ''
 
 function prepareLocation() {
+
+
+    domain = currentLocation
+    .replace('https://www.','')
+    .replace('https://','')
+    .replace('http://www.','')
+    .replace('http://','')
+    domain = domain.split('/')[0]
+
+
     if (currentLocation.includes(mainBaseURL)) {
         titleInURL = currentLocation.replace(mainBaseURL, '')
     } else if (currentLocation.includes(additionalBaseURL)) {

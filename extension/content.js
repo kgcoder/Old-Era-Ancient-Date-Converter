@@ -48,26 +48,40 @@ let pageNotAnalysedYet = false
 let pageId = ''
 let requestHasStarted = false
 let pageIsLoaded = false
+let allowedSites = []
 
-
-
+let isThisSiteAllowed = false
 
 let images = []
 
 
 let editsArray = []
-
+let domain = ''
 
 
 
 
 function getConfigFromLocalStorage(callback){
-    chrome.storage.local.get(['isExtensionOff', 'shouldNotUseServer', 'shouldTranslateYearsPrecisely', 'shouldTranslateDatesInBookTitles', 'shouldTranslateDatesInQuotes'], function (result) {
+        chrome.storage.local.get(['isExtensionOff', 'shouldNotUseServer', 'shouldTranslateYearsPrecisely', 'shouldTranslateDatesInBookTitles', 'shouldTranslateDatesInQuotes','sitesData'], function (result) {
         isExtensionOff = !!result.isExtensionOff
         shouldNotUseServer = !!result.shouldNotUseServer
         shouldTranslateYearsPrecisely = !!result.shouldTranslateYearsPrecisely
         shouldTranslateDatesInBookTitles = !!result.shouldTranslateDatesInBookTitles
         shouldTranslateDatesInQuotes = !!result.shouldTranslateDatesInQuotes
+
+        if(result.sitesData){
+            const sitesData = JSON.parse(result.sitesData)
+            allowedSites = sitesData.allowedSites
+
+        }else{
+            allowedSites = ['en.wikipedia.org','britannica.com']
+            chrome.storage.local.set({ sitesData: JSON.stringify({allowedSites}) }).then(() => {
+               // console.log("Value is set");
+            });
+        }
+
+
+
         callback()
     })
 }
@@ -127,12 +141,14 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     }
 
     if (message === 'toggleServer') {
-        toggleServer()
+        window.location.reload()
+    }
+
+    if(message === 'toggleSiteUsage'){
+        window.location.reload()
     }
     if (message === 'giveMePageMetadata') {
-
-        sendPageMetadata(sendResponse)
-        
+        sendPageMetadata(sendResponse)  
     }
     if (message === 'giveMePageStatus') {
     
@@ -170,7 +186,9 @@ function sendPageMetadata(sendResponse) {
         lastOkVersion, translatedForVersion,
         currentVersionSeemsOK, isCurrentVersionVerified,
         pageHasNoBCDates, pageIsNotTranslatedYet,
-        pageNotAnalysedYet
+        pageNotAnalysedYet,
+        isThisSiteAllowed,
+        domain
     })
 }
 
@@ -182,8 +200,17 @@ window.onload = () => {
 
     getConfigFromLocalStorage(() => null)
 
-    if (currentLocation && !isExtensionOff) {
-        if (!shouldNotUseServer) {
+    const index = allowedSites.findIndex(site => currentLocation.includes(site))
+
+    isThisSiteAllowed = index !== -1
+
+    if(!isThisSiteAllowed){
+        chrome.runtime.sendMessage('pageMetadataIsReady') //message for the popup script
+        return
+    }
+
+    if (!isExtensionOff && currentLocation) {
+        if (!shouldNotUseServer && currentLocation.includes("en.wikipedia.org")) {
             startRequest()  
         } else {
             translateEverything(null)
@@ -518,8 +545,10 @@ function doReplacements() {
     const reg = new RegExp('\\s|\\&nbsp;|\\&#160;|\\&#8201;','gi')
     const newTextNodesArray = []
     targets = []
-    let j = 0
+    let lastIndexInNodes = 0;
+    
     for (let i = 0; i < textsArray.length; i++) {
+        let j = lastIndexInNodes;
         const text = textsArray[i]
         let nodes;
         let cleanText = getTextWithoutMarkup(text)?.replace(reg, ' ');;
@@ -535,19 +564,20 @@ function doReplacements() {
                 var textInNode = nodes.firstNode.data.replace(reg, ' ');
             
                 if(cleanText !== textInNode) {
-                    console.log('something is wrong while replacing')
-                    console.log('clean text:',cleanText)
-                    console.log('text in node',textInNode)
+                    // console.log('something is wrong while replacing')
+                    // console.log('clean text:',cleanText)
+                    // console.log('text in node',textInNode)
                     j++;
                     continue;
                 }else{
+                    lastIndexInNodes = j + 1;
                     var pair = replaceTextInNodeIfNeeded(nodes, text);
                     newTextNodesArray.push(pair);
                     break;
                 }
             }   
         }
-        j++
+       
 
     }
 
@@ -640,7 +670,6 @@ function getImageNameFromUrl(url){
 
 
 function replaceTextInNodeIfNeeded(oldNodes, sourceText) {
-    
     const occurrences = []
     const pattern = new RegExp('\\{\\{(.*?)\\|(.*?)\\|(.*?)\\|(.*?)\\}\\}', 'g')
     while ((result = pattern.exec(sourceText))) {
@@ -706,6 +735,7 @@ function getDateCaseNode(originalText, originalSubstitute, method, type = 'norma
     span.className = "rt-commentedText oedatecase"
     const textNode = document.createTextNode(originalText)
     span.appendChild(textNode)
+  
     return span
 }
 

@@ -21,13 +21,6 @@ function updateTranslation() {
 }
 
 
-function toggleServer() {
-    chrome.storage.local.get(['shouldNotUseServer'], function (result) {
-        shouldNotUseServer = !!result.shouldNotUseServer
-        window.location.reload()
-    })
-}
-
 
 
 

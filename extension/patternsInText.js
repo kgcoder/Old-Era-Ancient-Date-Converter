@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-const bcPattern = `(${spacePattern}|-)((b\\.(${spacePattern})?c\\.?|bc)e?)`
+const bcPattern = `(${spacePattern}|-)?((b\\.(${spacePattern})?c\\.?|bc)e?)`
 const rangePattern = `(${spacePattern})?(—|−|–|-|\\&#8211;|\\&ndash;|\\&#8212;|\\&mdash;|or|to|to late|to early|to the|and|and late|and early|-to-|until|till|through)(${spacePattern})?`
 const dashPattern = `(${spacePattern})?(—|−|–|-|\\&#8211;|\\&ndash;|\\&#8212;|\\&mdash;)(${spacePattern})?`
 const supPattern = '\\[\\d*?\\]'

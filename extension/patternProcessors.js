@@ -95,7 +95,7 @@ function processYearRangePattern(text,replacementsArray, pageData){
                 method = 'oneDigitYear'
 
             } else if (numberOfDigits === 2) {
-                method = 'twoDigitYear'      
+                method = 'twoDigitYear'     
             }
 
             addIntermediaryReplacement(replacementsArray, 'year', yearA1String, result.index)
@@ -129,7 +129,9 @@ function processYearRangePattern(text,replacementsArray, pageData){
             index = result.index + partTillYearB2.length
             addIntermediaryReplacement(replacementsArray, method, yearB2String, index, true, 'normal', yearB2Substitute)
             index = result.index + partTillSpace.length
-            addIntermediaryReplacement(replacementsArray, 'remove', space, index)
+            if(space.length){
+                addIntermediaryReplacement(replacementsArray, 'remove', space, index)
+            }
             index += space.length
             addIntermediaryReplacement(replacementsArray, 'remove', bc, index)
             
@@ -139,7 +141,9 @@ function processYearRangePattern(text,replacementsArray, pageData){
             let index = result.index + partTillYearB2.length
             addIntermediaryReplacement(replacementsArray, method, yearB2String, index, true, 'normal', yearB2Substitute)
             index = result.index + partTillSpace.length
-            addIntermediaryReplacement(replacementsArray, 'remove', space, index)
+            if(space.length){
+                addIntermediaryReplacement(replacementsArray, 'remove', space, index)
+            }
             index += space.length
             addIntermediaryReplacement(replacementsArray, 'remove', bc, index)
         }
@@ -183,7 +187,9 @@ function processYearRangePattern(text,replacementsArray, pageData){
         addIntermediaryReplacement(replacementsArray, method2, yearB2String, index)
         index = result.index + partTillSpace.length
         method2 = method2 === 'bc-ig' ? 'bc-ig' : 'remove'
-        addIntermediaryReplacement(replacementsArray, method2, space, index)
+        if(space.length){
+            addIntermediaryReplacement(replacementsArray, method2, space, index)
+        }
         index += space.length
         addIntermediaryReplacement(replacementsArray, method2, bc, index)
             
@@ -229,10 +235,7 @@ function processYearPattern(text, replacementsArray,pageData) {
             } else if (numberOfDigits === 2) {
                 method = 'twoDigitYear'      
             }
-        }
-
-        
-        if (year1String) {
+      
             let yearMethod = 'year'
             if (method === 'year') {
                 yearMethod = methodForYear(year1,pageData)
@@ -247,7 +250,9 @@ function processYearPattern(text, replacementsArray,pageData) {
         let index = result.index + partTillYear2.length
         addIntermediaryReplacement(replacementsArray, method, nakedYear2String, index, true, 'normal', year2Substitute)       
         index = result.index + partTillSpace.length
-        addIntermediaryReplacement(replacementsArray, 'remove', space, index)
+        if(space.length){
+            addIntermediaryReplacement(replacementsArray, 'remove', space, index)
+        }
         index += space.length
         addIntermediaryReplacement(replacementsArray, 'remove', bc, index)
 
@@ -421,7 +426,9 @@ function processCenturyOrMillenniumPattern(text, replacementsArray, method) {
     
         addIntermediaryReplacement(replacementsArray, method, centuryString, result.index)
         let index = result.index + stringTillSpace.length
-        addIntermediaryReplacement(replacementsArray,'remove',space,index)
+        if(space.length){
+            addIntermediaryReplacement(replacementsArray,'remove',space,index)
+        }
         index += space.length
         addIntermediaryReplacement(replacementsArray,'remove',bc,index)
         
@@ -448,7 +455,9 @@ function processDecadeRangePattern(text, replacementsArray) {
         let index = result.index + stringTillSecondDecade.length
         addIntermediaryReplacement(replacementsArray, 'bc-dp', nakedSecondDecade, index)
         index += nakedSecondDecade.length
-        addIntermediaryReplacement(replacementsArray, 'remove', space, index)
+        if(space.length){
+            addIntermediaryReplacement(replacementsArray, 'remove', space, index)
+        }
         index += space.length
         addIntermediaryReplacement(replacementsArray, 'remove', bc, index)
 
@@ -472,7 +481,9 @@ function processDecadePattern(text, replacementsArray){
         let index = result.index
         addIntermediaryReplacement(replacementsArray,'decade',decadeString,index)
         index += decadeString.length
-        addIntermediaryReplacement(replacementsArray,'remove',space,index)
+        if(space.length){
+            addIntermediaryReplacement(replacementsArray,'remove',space,index)
+        }
         index += space.length
         addIntermediaryReplacement(replacementsArray,'remove',bc,index)
 

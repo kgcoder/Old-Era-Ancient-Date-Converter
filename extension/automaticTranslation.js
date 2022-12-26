@@ -248,9 +248,8 @@ function mergeReplacements(rawReplacements){
     for(let i = 0; i < groupsArray.length; i++){
         const group = groupsArray[i]
         const method = group[0].edit.method
-        const index = group[0].index
-
-        
+        const originalSubstitute = group[0].edit.originalSubstitute
+        const index = group[0].index 
         
         let targetString = ''
         group.forEach(item => {
@@ -259,11 +258,9 @@ function mergeReplacements(rawReplacements){
 
 
 
-        addReplacement(resultArray,method,targetString,index)
+        addReplacement(resultArray,method,targetString,index,true,'normal',originalSubstitute)
 
     }
-
-
 
     return resultArray
 
@@ -273,7 +270,7 @@ function mergeReplacements(rawReplacements){
 
 function addNewReplacementsToArray(newReplacements,replacementsArray){
     newReplacements.forEach(rep => {
-        addReplacement(replacementsArray,rep.edit.method,rep.edit.target,rep.index)
+        addReplacement(replacementsArray,rep.edit.method,rep.edit.target,rep.index,true,'normal',rep.edit.originalSubstitute)
 
     })
 }
@@ -319,5 +316,6 @@ function addReplacement(replacementsArray, method,targetString, index, checkIfEx
         length:targetString.length,
         replacement: createMarker(targetString, method, type, originalSubstitute)
     }
+
     replacementsArray.push(replacement)
 }
