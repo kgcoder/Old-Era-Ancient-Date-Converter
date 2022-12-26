@@ -6,13 +6,12 @@
     "content_scripts": [
         {
             "matches": [
-                "https://en.wikipedia.org/*",
-                "https://timeline.oldera.org/*"
+                "<all_urls>"
             ],
             "js": [
                 "constants.js",
-                "patterns.js",
-                "patterns2.js",
+                "patternsInHtml.js",
+                "patternsInText.js",
                 "helpers.js",
                 "markupPatternProcessors.js",
                 "location.js",
@@ -40,8 +39,7 @@
         "activeTab"
     ],
     "host_permissions": [
-        "https://en.wikipedia.org/*",
-        "https://timeline.oldera.org/*"
+        "<all_urls>"
     ],
     "icons": {
         "16": "images/icon16.png",
