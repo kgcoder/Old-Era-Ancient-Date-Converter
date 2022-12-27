@@ -273,16 +273,16 @@ function processYearMonthRangePattern(text, replacementsArray) {
     let result;
     const reg = giRegForText(yearMonthRangePattern)
     while ((result = reg.exec(text))) {
-         const yearString = result[2] || ''
-         const middleWord = result[6] || ''
-         const monthName = result[15] || ''
-         const secondYearNakedString = result[16] || ''
-         if (monthName && middleWord.toLowerCase() === 'or') continue
-         const year = numberFromString(yearString)
-         const year2 = numberFromString(secondYearNakedString)
-         if(year <= year2)continue
-         if(year > 10000 || year === 0) continue
-         addIntermediaryReplacement(replacementsArray, 'year', yearString, result.index) 
+        const yearString = result[1] || ''
+        const middleWord = result[5] || ''
+        const monthName = result[10] || ''
+        const secondYearNakedString = result[14] || ''
+        if (monthName && middleWord.toLowerCase() === 'or') continue
+        const year = numberFromString(yearString)
+        const year2 = numberFromString(secondYearNakedString)
+        if(year <= year2)continue
+        if(year > 10000 || year === 0) continue
+        addIntermediaryReplacement(replacementsArray, 'year', yearString, result.index) 
     }
 }
 
