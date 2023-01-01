@@ -30,7 +30,7 @@ function ignoreSecondYearInRangeWithInnerSpansIfNeeded(html, replacementsArray) 
             year1 = numberFromString(substitute1 ? substitute1 : year1String)   
         }
 
-        if (year1 > 10000) {
+        if (year1 > firstYearOfOldEra) {
             let index = result.index + stringTillBeginingOfYear2Span.length + mainYear2SpanOpening.length
             addReplacement(replacementsArray, 'bc-ig', nakedYear2String, index, false)
             
@@ -68,7 +68,7 @@ function ignoreSecondYearInRangeWithoutInnerSpansIfNeeded(html, replacementsArra
             year1 = numberFromString(substitute1 ? substitute1 : year1String)   
         }
 
-        if (year1 === 0 || year1 > 10000) {
+        if (year1 === 0 || year1 > firstYearOfOldEra) {
             const index = result.index + stringTillBeginingOfYear2Span.length + mainYear2SpanOpening.length
             addReplacement(replacementsArray, 'bc-ig', year2String, index, false)
 
@@ -95,7 +95,7 @@ function ignoreSecondYearInRangeWhenOnlyFirstIsInMarkup(html, replacementsArray)
 
         const year1 = numberFromString(year1String)
 
-        if (year1 === 0 || year1 > 10000) {
+        if (year1 === 0 || year1 > firstYearOfOldEra) {
 
             let index = result.index + stringTillYear2.length
 
@@ -151,7 +151,7 @@ function createYearRangeReplacementsFromMarkup(html, replacementsArray) {
             
         }
 
-        if (year1 === 0 || year1 > 10000) {
+        if (year1 === 0 || year1 > firstYearOfOldEra) {
             let index = result.index + stringTillBeginingOfYear2Span.length + mainYear2SpanOpening.length
             addReplacement(replacementsArray, 'bc-ig', nakedYear2String, index, false)
             
@@ -247,7 +247,7 @@ function createYearReplacementsWithInnerSpansFromMarkup(html, replacementsArray)
 
         if (['year', 'impreciseYear'].includes(method)) {
             const year = numberFromString(target)
-            if (year === 0 || year > 10000) {
+            if (year === 0 || year > firstYearOfOldEra) {
                 method = 'bc-ig'
             }
         }
@@ -290,7 +290,7 @@ function createReplacementsFromMarkup(html, replacementsArray) {
 
         if (['year', 'impreciseYear'].includes(method)) {
             const year = numberFromString(target)
-            if (year === 0 || year > 10000) {
+            if (year === 0 || year > firstYearOfOldEra) {
                 method = 'bc-ig'
             }
         }

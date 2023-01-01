@@ -9,12 +9,18 @@ let pageHasIssues = false
 
 function updateTranslation() {
 
-    chrome.storage.local.get(['isExtensionOff', 'shouldTranslateYearsPrecisely', 'shouldTranslateDatesInBookTitles', 'shouldTranslateDatesInQuotes'], function (result) {
+    chrome.storage.local.get(['isExtensionOff', 'shouldTranslateYearsPrecisely', 'shouldTranslateDatesInBookTitles', 'shouldTranslateDatesInQuotes','firstYearOfOldEra','lastTranslatedYearWithLabel','timelineName','ofTimeline','abbreviatedTimelineName'], function (result) {
         isExtensionOff = !!result.isExtensionOff
         shouldTranslateYearsPrecisely = !!result.shouldTranslateYearsPrecisely
         shouldTranslateDatesInBookTitles = !!result.shouldTranslateDatesInBookTitles
         shouldTranslateDatesInQuotes = !!result.shouldTranslateDatesInQuotes
 
+        firstYearOfOldEra = result.firstYearOfOldEra
+        lastTranslatedYearWithLabel = result.lastTranslatedYearWithLabel
+
+        timelineName = result.timelineName
+        ofTimeline = result.ofTimeline
+        abbreviatedTimelineName = result.abbreviatedTimelineName
 
         updateDates()
     })

@@ -19,6 +19,21 @@ let currentDomain = ''
 
 //let lastOkVersion = ''
 
+const firstYearOfOldEra_default = 10000
+const lastTranslatedYearWithLabel_default = 6000
+const timelineName_default = "Old Era"
+const ofTimeline_default = "of the Old Era"
+const abbreviatedTimelineName_default = "OE"
+
+let firstYearOfOldEra = firstYearOfOldEra_default
+let lastTranslatedYearWithLabel = lastTranslatedYearWithLabel_default
+let timelineName = timelineName_default
+let ofTimeline = ofTimeline_default
+let abbreviatedTimelineName = abbreviatedTimelineName_default
+
+
+
+
 
 chrome.runtime.onMessage.addListener(function (message) {
     if(message === 'pageMetadataIsReady'){
@@ -27,8 +42,71 @@ chrome.runtime.onMessage.addListener(function (message) {
 })
 
 
+
+
 document.addEventListener('DOMContentLoaded', function () {
 
+ 
+    const startingYearInput = document.getElementById("startingYearInput")
+    const lastTranslatedYearWithLabelInput = document.getElementById("lastTranslatedYearWithLabelInput")
+    const timelineNameInput = document.getElementById("timelineNameInput")
+    const ofTimelineInput = document.getElementById("ofTimelineInput")
+    const abbreviatedTimelineNameInput = document.getElementById("abbreviatedTimelineNameInput")
+    
+    const saveSettingsButton = document.getElementById("saveSettingsButton")
+    const cancelSettingsEditButton = document.getElementById("cancelSettingsEditButton")
+    const restoreDefaultsButton = document.getElementById("restoreDefaultsButton")
+
+
+
+
+    function updateButtons(){
+        const saveSettingsButton = document.getElementById("saveSettingsButton")
+    
+        saveSettingsButton.className = didAnythingChangeInAdvancedSettings() && !isSomeFieldEmpty() ? "" : "disabledLink"
+       
+        const cancelSettingsEditButton = document.getElementById("cancelSettingsEditButton")
+        cancelSettingsEditButton.className = didAnythingChangeInAdvancedSettings() ? "" : "disabledLink"
+    
+    
+        const restoreDefaultsButton = document.getElementById("restoreDefaultsButton")
+        restoreDefaultsButton.className = areAdvancedSettingsDifferentFromDefaults() ? "" : "disabledLink"
+        
+    
+    
+    }
+    
+    function isSomeFieldEmpty(){
+        return !startingYearInput.value || 
+            !lastTranslatedYearWithLabelInput.value || 
+            !timelineNameInput.value ||
+            !ofTimelineInput.value ||
+            !abbreviatedTimelineNameInput.value
+    }
+    
+    function didAnythingChangeInAdvancedSettings(){
+        return startingYearInput.value != firstYearOfOldEra || 
+        lastTranslatedYearWithLabelInput.value != lastTranslatedYearWithLabel ||
+        timelineNameInput.value != timelineName ||
+        ofTimelineInput.value != ofTimeline ||
+        abbreviatedTimelineNameInput.value != abbreviatedTimelineName
+    }
+    
+    function areAdvancedSettingsDifferentFromDefaults(){
+    
+        return firstYearOfOldEra != firstYearOfOldEra_default || 
+        lastTranslatedYearWithLabel != lastTranslatedYearWithLabel_default ||
+        timelineName != timelineName_default ||
+        ofTimeline != ofTimeline_default ||
+        abbreviatedTimelineName != abbreviatedTimelineName_default
+    
+    
+    }
+
+
+
+
+    
     const aboutLink = document.getElementById("aboutLink")
 
     aboutLink.addEventListener('click', function () {
@@ -88,9 +166,138 @@ document.addEventListener('DOMContentLoaded', function () {
         })
     })
 
-    chrome.storage.local.get(['isExtensionOff', 'shouldNotUseServer', 'shouldTranslateYearsPrecisely', 'shouldTranslateDatesInBookTitles', 'shouldTranslateDatesInQuotes','sitesData'], function (result) {
+    //input listeners=========
+
+    startingYearInput.addEventListener('input', function () {
+        const reg = new RegExp('[^\\d]','g')
+        const text = startingYearInput.value
+        startingYearInput.value = text.replace(reg,'')
+        if(startingYearInput.value == "0")startingYearInput.value = ""
+
+       updateButtons()
+
+    })
+
+    lastTranslatedYearWithLabelInput.addEventListener('input', function () {
+        const reg = new RegExp('[^\\d]','g')
+        const text = lastTranslatedYearWithLabelInput.value
+        lastTranslatedYearWithLabelInput.value = text.replace(reg,'')
+        if(lastTranslatedYearWithLabelInput.value == "0")lastTranslatedYearWithLabelInput.value = ""
+
+        updateButtons()
+
+
+    })
+
+
+    timelineNameInput.addEventListener('input', function () {
+       updateButtons()
+    })
+
+    ofTimelineInput.addEventListener('input', function () {
+        updateButtons()
+     })
+
+    abbreviatedTimelineNameInput.addEventListener('input', function () {
+        updateButtons()
+    })
+
+
+
+    //===================
+
+
+    
+    saveSettingsButton.addEventListener('click', function () {
+        
+        if(isSomeFieldEmpty())return 
+        
+        firstYearOfOldEra = parseInt(startingYearInput.value,10)
+        lastTranslatedYearWithLabel = parseInt(lastTranslatedYearWithLabelInput.value,10)
+
+        timelineName = timelineNameInput.value
+        ofTimeline = ofTimelineInput.value
+        abbreviatedTimelineName = abbreviatedTimelineNameInput.value
+
+
+        updateButtons()
+        
+        chrome.storage.local.set({ firstYearOfOldEra, lastTranslatedYearWithLabel, timelineName, ofTimeline, abbreviatedTimelineName }, function () {
+            sendMessageToPage('advancedSettingsChanged')
+        })
+    
+    })
+
+
+    cancelSettingsEditButton.addEventListener('click', function () {
+        updateInputTexts()
+        updateButtons()
+    })
+
+
+
+    restoreDefaultsButton.addEventListener('click', function () {
+        firstYearOfOldEra = firstYearOfOldEra_default
+        lastTranslatedYearWithLabel = lastTranslatedYearWithLabel_default
+
+        timelineName = timelineName_default
+        ofTimeline = ofTimeline_default
+        abbreviatedTimelineName = abbreviatedTimelineName_default
+
+        updateInputTexts()
+        updateButtons()
+
+        chrome.storage.local.set({ firstYearOfOldEra, lastTranslatedYearWithLabel, timelineName, ofTimeline, abbreviatedTimelineName }, function () {
+            sendMessageToPage('advancedSettingsChanged')
+        })
+
+    })
+
+
+
+
+
+    function updateInputTexts(){
+        const startingYearInput = document.getElementById("startingYearInput")
+        const lastTranslatedYearWithLabelInput = document.getElementById("lastTranslatedYearWithLabelInput")
+        const timelineNameInput = document.getElementById("timelineNameInput")
+        const ofTimelineInput = document.getElementById("ofTimelineInput")
+        const abbreviatedTimelineNameInput = document.getElementById("abbreviatedTimelineNameInput")
+        
+      
+        startingYearInput.value = `${firstYearOfOldEra}`
+        lastTranslatedYearWithLabelInput.value = `${lastTranslatedYearWithLabel}`
+        timelineNameInput.value = timelineName
+        ofTimelineInput.value = ofTimeline
+        abbreviatedTimelineNameInput.value = abbreviatedTimelineName
+
+
+
+    }
+
+
+
+    chrome.storage.local.get(['isExtensionOff', 'shouldNotUseServer', 'shouldTranslateYearsPrecisely', 'shouldTranslateDatesInBookTitles', 'shouldTranslateDatesInQuotes','sitesData','firstYearOfOldEra','lastTranslatedYearWithLabel','timelineName','ofTimeline','abbreviatedTimelineName'], function (result) {
         
         isExtensionOff = !!result.isExtensionOff
+
+        if(result.firstYearOfOldEra){
+            firstYearOfOldEra = result.firstYearOfOldEra
+        }
+
+        if(result.lastTranslatedYearWithLabel){
+            lastTranslatedYearWithLabel = result.lastTranslatedYearWithLabel
+        }
+
+        if(result.timelineName){
+            timelineName = result.timelineName
+        }
+        if(result.ofTimeline){
+            ofTimeline = result.ofTimeline
+        }
+        if(result.abbreviatedTimelineName){
+            abbreviatedTimelineName = result.abbreviatedTimelineName
+        }
      
         updatePageInfoVisibility(!isExtensionOff)
 
@@ -111,6 +318,14 @@ document.addEventListener('DOMContentLoaded', function () {
         
         shouldTranslateDatesInQuotes = !!result.shouldTranslateDatesInQuotes
         document.getElementById('TranslateInQuotesCheckbox').checked = shouldTranslateDatesInQuotes
+
+        document.getElementById('startingYearInput').value = `${firstYearOfOldEra}`
+        document.getElementById('lastTranslatedYearWithLabelInput').value = `${lastTranslatedYearWithLabel}`
+
+
+        updateInputTexts()
+        updateButtons()
+
     })
 
     document.getElementById('UseOnThisSiteCheckbox').addEventListener('click', () => {
@@ -140,6 +355,16 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('TranslateInQuotesCheckbox').addEventListener('click', () => {
         toggleTranslationsInQuotes()
     }, false)
+
+
+    const advancedSettingsButton = document.getElementById('ShowHideAdvancedSettingsButton')
+    advancedSettingsButton.addEventListener('click', () => {
+        const div = document.getElementById("AdvancedSettings")
+        div.hidden = !div.hidden
+        advancedSettingsButton.innerHTML = div.hidden ? "Show" : "Hide"
+        
+    }, false)
+
 
     getPageMetadata()
 
@@ -285,3 +510,5 @@ function updatePageInfoVisibility(visible){
     const currentPageInfoDiv = document.getElementById("currentPageInfo")
     currentPageInfoDiv.style.display = visible ? 'flex' : 'none'
 }
+
+

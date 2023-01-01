@@ -58,16 +58,51 @@ let images = []
 let editsArray = []
 let domain = ''
 
+const firstYearOfOldEra_default = 10000
+const lastTranslatedYearWithLabel_default = 6000
+const timelineName_default = "Old Era"
+const ofTimeline_default = "of the Old Era"
+const abbreviatedTimelineName_default = "OE"
 
+
+      
+let firstYearOfOldEra = firstYearOfOldEra_default
+let lastTranslatedYearWithLabel = lastTranslatedYearWithLabel_default
+let timelineName = timelineName_default
+let ofTimeline = ofTimeline_default
+let abbreviatedTimelineName = abbreviatedTimelineName_default
 
 
 function getConfigFromLocalStorage(callback){
-        chrome.storage.local.get(['isExtensionOff', 'shouldNotUseServer', 'shouldTranslateYearsPrecisely', 'shouldTranslateDatesInBookTitles', 'shouldTranslateDatesInQuotes','sitesData'], function (result) {
+        chrome.storage.local.get(['isExtensionOff', 'shouldNotUseServer', 
+        'shouldTranslateYearsPrecisely', 'shouldTranslateDatesInBookTitles', 
+        'shouldTranslateDatesInQuotes','sitesData',
+        'firstYearOfOldEra','lastTranslatedYearWithLabel',
+        'timelineName','ofTimeline','abbreviatedTimelineName'], function (result) {
         isExtensionOff = !!result.isExtensionOff
         shouldNotUseServer = !!result.shouldNotUseServer
         shouldTranslateYearsPrecisely = !!result.shouldTranslateYearsPrecisely
         shouldTranslateDatesInBookTitles = !!result.shouldTranslateDatesInBookTitles
         shouldTranslateDatesInQuotes = !!result.shouldTranslateDatesInQuotes
+        
+        if(result.firstYearOfOldEra){
+            firstYearOfOldEra = result.firstYearOfOldEra
+        }
+
+        if(result.lastTranslatedYearWithLabel){
+            lastTranslatedYearWithLabel = result.lastTranslatedYearWithLabel
+        }
+
+
+        if(result.timelineName){
+            timelineName = result.timelineName
+        }
+        if(result.ofTimeline){
+            ofTimeline = result.ofTimeline
+        }
+        if(result.abbreviatedTimelineName){
+            abbreviatedTimelineName = result.abbreviatedTimelineName
+        }
 
         if(result.sitesData){
             const sitesData = JSON.parse(result.sitesData)
@@ -88,7 +123,9 @@ function getConfigFromLocalStorage(callback){
 
 getConfigFromLocalStorage(function(){
     updateIcon()
-    startRequest()
+    if(!shouldNotUseServer && currentLocation.includes("en.wikipedia.org")){
+        startRequest()
+    }
 })
 
 
@@ -106,7 +143,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
                 updateTranslation()
                 replaceImages(images)
                 chrome.runtime.sendMessage('pageMetadataIsReady') //message for the popup script  
-            } else if (currentLocation) {
+            } else if (currentLocation && !shouldNotUseServer && currentLocation.includes("en.wikipedia.org")) {
                 startRequest()
             }
             
@@ -134,6 +171,10 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         window.open(link)
     }
 
+    if(message === 'advancedSettingsChanged'){
+
+        updateTranslation()
+    }
     
 
     if (message === 'updateTranslation') {
@@ -777,14 +818,14 @@ function getReplacementStrings(text, originalSubstitute, method) {
         case 'oneDigitYear': {
             const year = originalNumber
             if (isNaN(year)) return null
-            const translatedYear = 10001 - year
+            const translatedYear = translateYearPrecisely(year)
             const translatedYearString = `${translatedYear % 10}`
             return [translatedYearString, `${year} BC`,`${translatedYear}`]
         }
         case 'twoDigitYear': {
             const year = originalNumber
             if (isNaN(year)) return null
-            const translatedYear = 10001 - year
+            const translatedYear = translateYearPrecisely(year)
             const translatedYearString = `${translatedYear % 100}`
             return [`${translatedYear % 100 < 10 ? '0' : ''}${translatedYearString}`, `${year} BC`, `${translatedYear}`]
         }
@@ -802,12 +843,21 @@ function getReplacementStrings(text, originalSubstitute, method) {
             const decadeWord = method === 'bc-sd' ? '' : method === 'bc-dp' ? ' decades' :' decade'
             const decade = originalNumber
             if (isNaN(decade)) return null
-            const baseYear = 9990 - decade
-            const firstYear = baseYear + 2
-            let lastYear = (baseYear + 11)
-            if (lastYear === 10001) lastYear = 10000
-            const lastYearShort = lastYear % 100
-            const translated = `${firstYear}/${lastYearShort < 10 ? lastYear : lastYearShort}${decadeWord}`
+
+            const secondYear = decade
+            const firstYear = secondYear + 9
+
+            const translatedFirstYear = translateYearPrecisely(firstYear)
+            const translatedSecondYear = translateYearPrecisely(secondYear)
+
+            if (translatedSecondYear === lastTranslatedYearWithLabel + 1) translatedSecondYear = lastTranslatedYearWithLabel
+            const secondYearShort = translatedSecondYear % 100
+            let translated = ""
+            if(translatedFirstYear % 10 === 0){
+                translated = `${translatedFirstYear}s`
+            }else{
+                translated = `${translatedFirstYear}/${secondYearShort < 10 ? translatedSecondYear : secondYearShort}${decadeWord}`
+            }
             
             return [translated, `${numberFromString(text, 10)}s BC`, translated]
         }
@@ -817,18 +867,44 @@ function getReplacementStrings(text, originalSubstitute, method) {
             if (isNaN(century)) {
                 century = numbersFromWords[text.toLowerCase()]
             }
-            const translatedCentury = 101 - century
-            const translatedCenturyWithEnding = `${translatedCentury}${numberSuffix(translatedCentury)}`
+            const secondYear = (century - 1) * 100 + 1
+            const firstYear = secondYear + 99
+
+            const translatedFirstYear = translateYearPrecisely(firstYear)
+            const translatedSecondYear = translateYearPrecisely(secondYear)
+
+            let translatedCenturyString = ""
+           if(translatedFirstYear % 100 !== 1){
+               translatedCenturyString = `${translatedFirstYear}/${translatedSecondYear}`
+           }else{
+                const translatedCentury = translatedSecondYear / 100
+                translatedCenturyString = `${translatedCentury}${numberSuffix(translatedCentury)}`
+                
+            }
             const originalCenturyWithEnding = `${century}${numberSuffix(century)}`
 
-            return [translatedCenturyWithEnding, `${originalCenturyWithEnding} century BC`, `${translatedCenturyWithEnding} century`]
+            return [translatedCenturyString, `${originalCenturyWithEnding} century BC`, `${translatedCenturyString} century`]
         }
 
         case '00s': {
             const x00s = originalNumber
             if (isNaN(x00s)) return null
-            const translated = `${9900 - x00s}s`
-            return [translated, `${numberFromString(text, 10)}s BC`, translated]
+
+            const secondYear = x00s
+            const firstYear = secondYear + 99
+
+            const translatedFirstYear = translateYearPrecisely(firstYear)
+            const translatedSecondYear = translateYearPrecisely(secondYear)
+
+
+            let translated00sString = ""
+            if(translatedFirstYear % 100 !== 2){
+                translated00sString = `${translatedFirstYear}/${translatedSecondYear}`
+            }else{
+                translated00sString = `${translatedFirstYear - 2}s`
+            }
+
+            return [translated00sString, `${numberFromString(text, 10)}s BC`, translated00sString]
         }
 
         case 'millennium': {
@@ -836,10 +912,23 @@ function getReplacementStrings(text, originalSubstitute, method) {
             if (isNaN(millennium)) {
                 millennium = numbersFromWords[text.toLowerCase()]
             }
-            const translatedMillennium = 11 - millennium
-            const translatedMillenniumWithEnding = `${translatedMillennium}${numberSuffix(translatedMillennium)}`
+
+            const secondYear = (millennium - 1) * 1000 + 1
+            const firstYear = secondYear + 999
+
+            const translatedFirstYear = translateYearPrecisely(firstYear)
+            const translatedSecondYear = translateYearPrecisely(secondYear)
+
+            let translatedMillenniumString = ""
+           if(translatedFirstYear % 1000 !== 1){
+               translatedMillenniumString = `${translatedFirstYear}/${translatedSecondYear}`
+           }else{
+                const translatedMillennium = translatedSecondYear / 1000
+                translatedMillenniumString = `${translatedMillennium}${numberSuffix(translatedMillennium)}` 
+            }
+
             const originalMillenniumWithEnding = `${millennium}${numberSuffix(millennium)}`
-            return [translatedMillenniumWithEnding, `${originalMillenniumWithEnding} millennium BC`, `${translatedMillenniumWithEnding} millennium`]
+            return [translatedMillenniumString, `${originalMillenniumWithEnding} millennium BC`, `${translatedMillenniumString} millennium`]
         }
 
 
@@ -847,8 +936,22 @@ function getReplacementStrings(text, originalSubstitute, method) {
         case '000s': {
             const x000s = originalNumber
             if (isNaN(x000s)) return null
-            const translated = `${9000 - x000s}s`
-            return [translated, `${numberFromString(text, 10)}s BC`, translated]
+
+            const secondYear = x000s
+            const firstYear = secondYear + 999
+
+            const translatedFirstYear = translateYearPrecisely(firstYear)
+            const translatedSecondYear = translateYearPrecisely(secondYear)
+
+
+            let translated000sString = ""
+            if(translatedFirstYear % 1000 !== 2){
+                translated000sString = `${translatedFirstYear}/${translatedSecondYear}`
+            }else{
+                translated000sString = `${translatedFirstYear - 2}s`
+            }
+
+            return [translated000sString, `${numberFromString(text)}s BC`, translated000sString]
         }
 
         case 'remove': {
@@ -856,20 +959,25 @@ function getReplacementStrings(text, originalSubstitute, method) {
         }
 
         case 'OE': {
-            return ["Old Era", "", ""]
+            return [timelineName, "", ""]
         }
 
         case 'ofOE': {
-            return ["of the Old Era", "", ""]
+            return [ofTimeline, "", ""]
         }
             
         case 'abbreviatedTimeline': {
-            return ["OE", "", ""]
+            return [abbreviatedTimelineName, "", ""]
         }
 
         default:
             return [originalText, "", ""]
     }
+}
+
+
+function translateYearPrecisely(year){
+    return firstYearOfOldEra + 1 - year
 }
 
 function getYearString(translatedYear, label, shortened = false){
@@ -894,7 +1002,7 @@ function getYearString(translatedYear, label, shortened = false){
 
 function getYearReplacementString(year,label, shortened = false){
     if (isNaN(year)) return null
-    const translatedYear = `${10001 - year}`
+    const translatedYear = `${translateYearPrecisely(year)}`
     const translatedYearString = getYearString(translatedYear,label, shortened)
   
     return [translatedYearString, `${year} BC`, translatedYearString]
@@ -903,7 +1011,7 @@ function getYearReplacementString(year,label, shortened = false){
 
 function getImpreciseYearReplacementString(year,label, shortened = false){
     if (isNaN(year)) return null
-    let translatedYear = `${(shouldTranslateYearsPrecisely ? 10001 : 10000) - year}`
+    let translatedYear = `${firstYearOfOldEra + (shouldTranslateYearsPrecisely ? 1 : 0) - year}`
     if(translatedYear == 0)translatedYear = 1
     const translatedYearString = getYearString(translatedYear,label, shortened)
 
@@ -913,9 +1021,9 @@ function getImpreciseYearReplacementString(year,label, shortened = false){
 
 function resolveLabel(label, translatedYear){
     if(label === 'any'){
-        return translatedYear <= 6000 ? '\u00A0OE' : ''
+        return translatedYear <= lastTranslatedYearWithLabel ? `\u00A0${abbreviatedTimelineName}` : ''
     }else if(label === 'OE'){
-        return '\u00A0OE'
+        return `\u00A0${abbreviatedTimelineName}`
     }else if(label === '-'){
         return ''
     }

@@ -37,7 +37,7 @@ function processLongYearListPattern(text, replacementsArray, pageData) {
              const target = yearResult[0]
             
              const year = numberFromString(target)
-             if (year > 10000 || year === 0) return
+             if (year > firstYearOfOldEra || year === 0) return
              instances.push({index,target})
          }
          instances.pop()
@@ -139,6 +139,7 @@ function processYearRangePattern(text,replacementsArray, pageData){
 
         if(yearA1String && !yearB1String){
             let index = result.index + partTillYearB2.length
+            method = methodForYear(yearB2, pageData)
             addIntermediaryReplacement(replacementsArray, method, yearB2String, index, true, 'normal', yearB2Substitute)
             index = result.index + partTillSpace.length
             if(space.length){
@@ -164,15 +165,15 @@ function processYearRangePattern(text,replacementsArray, pageData){
 
 
 
-        if(yearA2 > 10000 && yearB2 > 10000){
+        if(yearA2 > firstYearOfOldEra && yearB2 > firstYearOfOldEra){
             method1 = 'bc-ig'
             method2 = 'bc-ig'
-        }else if(yearA2 > 10000 && yearB2 <= 10000){
+        }else if(yearA2 > firstYearOfOldEra && yearB2 <= firstYearOfOldEra){
             method1 = 'bc-ybc'
             method2 = method2 === 'impreciseYear' ? 'bc-ioe' : 'bc-yoe'
-        }else if (yearA2 <= 10000 && yearB2 < yearA2){
+        }else if (yearA2 <= firstYearOfOldEra && yearB2 < yearA2){
             method1 = method1 === 'year' ? 'bc-y_' : 'bc-i_'
-            if(yearB2 >= 4000){
+            if(yearB2 >= firstYearOfOldEra - lastTranslatedYearWithLabel){//4000 (10000 - 6000)
                 method2 = method2 ===  'impreciseYear' ? 'bc-ioe' : 'bc-yoe' 
             }
             if(shouldUseDotNotation && Math.floor(yearA2/100) === Math.floor(yearB2/100)){
@@ -281,7 +282,7 @@ function processYearMonthRangePattern(text, replacementsArray) {
         const year = numberFromString(yearString)
         const year2 = numberFromString(secondYearNakedString)
         if(year <= year2)continue
-        if(year > 10000 || year === 0) continue
+        if(year > firstYearOfOldEra || year === 0) continue
         addIntermediaryReplacement(replacementsArray, 'year', yearString, result.index) 
     }
 }

@@ -5,3 +5,9 @@
 .MenuTitle{
     font-weight: bold;
 }
+
+
+a.disabledLink{
+    pointer-events: none; 
+    color:lightgray;
+}

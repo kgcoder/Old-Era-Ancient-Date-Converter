@@ -49,6 +49,30 @@
             <label class="CheckboxLabel" for="TranslateInQuotesCheckbox">translate dates in quotes</label>
         </div>
         <br />
+
+        <div>
+            <span class="MenuTitle">Advanced settings</span> [<a id="ShowHideAdvancedSettingsButton" href="#">Show</a>]</div>
+            <br />
+            <div id="AdvancedSettings" hidden>
+                Year BC that should be year 1<br />
+                <input id="startingYearInput" style="width:200px;"/><br/><br/>
+
+                Last translated year that should have era label<br />
+                <input id="lastTranslatedYearWithLabelInput" style="width:200px;"/><br/><br/>
+
+                Name of the timeline<br />
+                <input id="timelineNameInput" style="width:200px;"/><br/><br/>
+
+                "Of the timeline" string<br />
+                <input id="ofTimelineInput" style="width:200px;"/><br/><br/>
+
+                Abbreviated name of the timeline<br />
+                <input id="abbreviatedTimelineNameInput" style="width:200px;"/><br/><br/>
+                
+                [<a id="saveSettingsButton" class="disabledLink" href=#>Save</a>] [<a class="disabledLink" id="cancelSettingsEditButton" href=#>Cancel</a>] [<a id="restoreDefaultsButton" class="disabledLink" href=#>Restore defaults</a>]
+                <br/><br/>
+            </div>
+
         <div id="currentPageInfo" style="display:flex; flex-direction:column;">
             <span class="MenuTitle">Current page status</span>
             <span id="pageStatusLine"></span>
