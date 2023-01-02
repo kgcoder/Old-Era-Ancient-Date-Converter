@@ -8,7 +8,6 @@ function ignoreSecondYearInRangeWithInnerSpansIfNeeded(html, replacementsArray) 
     let result;
     const reg = giRegForHtml(yearRangeInMarkupWithInnerSpansPattern)
     while ((result = reg.exec(html))) {
-        //console.log('ignoreSecondYearInRangeWithInnerSpansIfNeeded',result)
         const stringTillBeginingOfYear2Span = result[1] || ''
         const year1StringWithoutMarkup = result[3] || ''
         let method1 = result[5] || ''
@@ -32,13 +31,13 @@ function ignoreSecondYearInRangeWithInnerSpansIfNeeded(html, replacementsArray) 
 
         if (year1 > firstYearOfOldEra) {
             let index = result.index + stringTillBeginingOfYear2Span.length + mainYear2SpanOpening.length
-            addReplacement(replacementsArray, 'bc-ig', nakedYear2String, index, false)
+            addReplacement(replacementsArray, 'bc-ig', nakedYear2String, '', index, false)
             
             index += nakedYear2String.length + spanOpening.length
-            addReplacement(replacementsArray, 'bc-ig', spanSpace, index, false)
+            addReplacement(replacementsArray, 'bc-ig', spanSpace, index, '', false)
 
             index += spanSpace.length + spanClosing.length
-            addReplacement(replacementsArray, 'bc-ig', nakedBC, index, false)
+            addReplacement(replacementsArray, 'bc-ig', nakedBC, index,'', false)
 
         }
     }
@@ -49,7 +48,6 @@ function ignoreSecondYearInRangeWithoutInnerSpansIfNeeded(html, replacementsArra
     let result;
     const reg = giRegForHtml(yearRangeInMarkupPattern)
     while ((result = reg.exec(html))) {
-        //console.log('ignoreSecondYearInRangeWithoutInnerSpansIfNeeded',result)
 
         const stringTillBeginingOfYear2Span = result[1] || ''
         const year1StringWithoutMarkup = result[2] || ''
@@ -70,7 +68,7 @@ function ignoreSecondYearInRangeWithoutInnerSpansIfNeeded(html, replacementsArra
 
         if (year1 === 0 || year1 > firstYearOfOldEra) {
             const index = result.index + stringTillBeginingOfYear2Span.length + mainYear2SpanOpening.length
-            addReplacement(replacementsArray, 'bc-ig', year2String, index, false)
+            addReplacement(replacementsArray, 'bc-ig', year2String,'', index, false)
 
         }
     }
@@ -81,7 +79,6 @@ function ignoreSecondYearInRangeWhenOnlyFirstIsInMarkup(html, replacementsArray)
     let result;
     const reg = giRegForHtml(yearRangeWithFirstYearInMarkupPattern)
     while ((result = reg.exec(html))) {
-        //console.log('ignoreSecondYearInRangeWhenOnlyFirstIsInMarkup',result)
         const stringTillYear2 = result[1] || ''
         const year1String = result[8] || ''
         const year2FullString = result[17] || ''
@@ -100,19 +97,19 @@ function ignoreSecondYearInRangeWhenOnlyFirstIsInMarkup(html, replacementsArray)
             let index = result.index + stringTillYear2.length
 
             if (!sup && !spanOpening) {
-                addReplacement(replacementsArray, 'bc-ig', year2FullString, index, false)
+                addReplacement(replacementsArray, 'bc-ig', year2FullString,'', index, false)
             } else {
-                addReplacement(replacementsArray, 'bc-ig', year2NakedString, index, false)
+                addReplacement(replacementsArray, 'bc-ig', year2NakedString,'', index, false)
 
                 index += year2NakedString.length + sup.length
                 if (!spanOpening) {
-                    addReplacement(replacementsArray, 'bc-ig', fullBC, index, false)
+                    addReplacement(replacementsArray, 'bc-ig', fullBC,'', index, false)
                 } else {
                     index += spanOpening.length
-                    addReplacement(replacementsArray, 'bc-ig', spanSpace, index, false)
+                    addReplacement(replacementsArray, 'bc-ig', spanSpace,'', index, false)
 
                     index += spanSpace.length + spanClosing.length
-                    addReplacement(replacementsArray, 'bc-ig', nakedBC, index, false)
+                    addReplacement(replacementsArray, 'bc-ig', nakedBC,'', index, false)
                 }
             }
         }
@@ -153,13 +150,13 @@ function createYearRangeReplacementsFromMarkup(html, replacementsArray) {
 
         if (year1 === 0 || year1 > firstYearOfOldEra) {
             let index = result.index + stringTillBeginingOfYear2Span.length + mainYear2SpanOpening.length
-            addReplacement(replacementsArray, 'bc-ig', nakedYear2String, index, false)
+            addReplacement(replacementsArray, 'bc-ig', nakedYear2String,'', index, false)
             
             index += nakedYear2String.length + spanOpening.length
-            addReplacement(replacementsArray, 'bc-ig', spanSpace, index, false)
+            addReplacement(replacementsArray, 'bc-ig', spanSpace,'', index, false)
 
             index += spanSpace.length + spanClosing.length
-            addReplacement(replacementsArray, 'bc-ig', nakedBC, index, false)
+            addReplacement(replacementsArray, 'bc-ig', nakedBC,'', index, false)
 
 
         }
@@ -201,24 +198,24 @@ function createCenturiesAndMillenniaReplacementsFromMarkup(html, replacementsArr
    
 
         const index = result.index + spanOpening.length
-        addReplacement(replacementsArray, method, centuryString, index , false, type)
+        addReplacement(replacementsArray, method, centuryString,'', index , false, type)
 
         if(smallTag){
             let index = result.index + stringTillBC.length
-            addReplacement(replacementsArray, 'remove', spaceBeforeSmallTag, index, false, type)
+            addReplacement(replacementsArray, 'remove', spaceBeforeSmallTag,'', index, false, type)
             
             index += spaceBeforeSmallTag.length + smallTag.length
-            addReplacement(replacementsArray, 'remove', smallBC, index, false, type)
+            addReplacement(replacementsArray, 'remove', smallBC,'',index, false, type)
 
         }else if (bcSpanOpening.length) {
             let index = result.index + stringTillBC.length + bcSpanOpening.length
-            addReplacement(replacementsArray, 'remove', space, index, false, type)
+            addReplacement(replacementsArray, 'remove', space,'', index, false, type)
             
             index = result.index + stringTillBC.length + totalBCSpan.length
-            addReplacement(replacementsArray, 'remove', nakedBC, index , false, type)
+            addReplacement(replacementsArray, 'remove', nakedBC,'', index , false, type)
         } else {
             const index = result.index + stringTillBC.length
-            addReplacement(replacementsArray, 'remove', bc, index , false, type)
+            addReplacement(replacementsArray, 'remove', bc,'', index , false, type)
         }
     }
 }
@@ -256,15 +253,15 @@ function createYearReplacementsWithInnerSpansFromMarkup(html, replacementsArray)
         type = convertTypeFromMakup(type)
         
         let index = result.index + spanOpening.length
-        addReplacement(replacementsArray, method, target, index, true, type, substitute)
+        addReplacement(replacementsArray, method, target,'', index, true, type, substitute)
 
         let removingMethod = method === 'bc-ig' ? 'bc-ig' : 'remove'
 
         index += target.length + bcSpanOpening.length
-        addReplacement(replacementsArray, removingMethod, space, index, true, type, substitute)
+        addReplacement(replacementsArray, removingMethod, space,'', index, true, type, substitute)
 
         index += space.length + bcSpanClosing.length
-        addReplacement(replacementsArray, removingMethod, bc, index, true, type, substitute)
+        addReplacement(replacementsArray, removingMethod, bc,'', index, true, type, substitute)
 
 
     }
@@ -295,7 +292,7 @@ function createReplacementsFromMarkup(html, replacementsArray) {
             }
         }
 
-        addReplacement(replacementsArray, method, target, index, true, type, substitute)
+        addReplacement(replacementsArray, method, target,'', index, true, type, substitute)
 
     }
 }
@@ -350,7 +347,7 @@ function processOneHeadline(headline, html, replacementsArray){
         
         const index = mainIndex + localIndex
 
-        addReplacement(replacementsArray, method,target,index, false, type, originalSubstitute)
+        addReplacement(replacementsArray, method,target,'',index, false, type, originalSubstitute)
     }
 
 }

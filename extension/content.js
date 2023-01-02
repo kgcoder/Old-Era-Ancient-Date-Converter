@@ -470,17 +470,20 @@ function resolveReplacements(replacementsArray, repsFromServer) {
                 if(isServerMethodAYearMethod){
                     const localMethod = sameLocalRep.edit.method
                     let properMethod = serverMethod
-                    const shouldForceShowOELabel = localMethod === 'bc-yoe' || localMethod === 'bc-ioe'
-                    const shouldForceShowBCLabel = localMethod === 'bc-ybc'
-                    const shouldForceHideOELabel = localMethod === 'bc-y_' || localMethod === 'bc-i_'
-
-                    if(shouldForceShowBCLabel){
-                        properMethod = 'bc-ybc'
-                    }else if(shouldForceShowOELabel){
-                        properMethod = serverMethod === 'year' ? 'bc-yoe' : 'bc-ioe'
-                    }else if(shouldForceHideOELabel){
-                        properMethod = serverMethod === 'year' ? 'bc-y_' : 'bc-i_'
+                    if(localMethod === 'bc-y-r1' || localMethod === 'bc-y-r2' || localMethod === 'bc-i-r1' || localMethod === 'bc-i-r2'){
+                        properMethod = localMethod
                     }
+                    // const shouldForceShowOELabel = localMethod === 'bc-yoe' || localMethod === 'bc-ioe'
+                    // const shouldForceShowBCLabel = localMethod === 'bc-ybc'
+                    // const shouldForceHideOELabel = localMethod === 'bc-y_' || localMethod === 'bc-i_'
+
+                    // if(shouldForceShowBCLabel){
+                    //     properMethod = 'bc-ybc'
+                    // }else if(shouldForceShowOELabel){
+                    //     properMethod = serverMethod === 'year' ? 'bc-yoe' : 'bc-ioe'
+                    // }else if(shouldForceHideOELabel){
+                    //     properMethod = serverMethod === 'year' ? 'bc-y_' : 'bc-i_'
+                    // }
 
                     const edit = repFromServer.edit
                     edit["method"] = properMethod
@@ -644,10 +647,11 @@ function updateDates(){
 function updateDataInSpan(span){
     const originalText = span.getAttribute("o")
     const originalSubstitute = span.getAttribute("s")
+    const otherNumberStringInRange = span.getAttribute("other-number")
     const method = span.getAttribute("m")
     const type = span.getAttribute("t")
 
-    const translations = getReplacementStrings(originalText,originalSubstitute,method)
+    const translations = getReplacementStrings(originalText,originalSubstitute,otherNumberStringInRange,method)
 
     if(!translations)return
 
@@ -712,10 +716,9 @@ function getImageNameFromUrl(url){
 
 function replaceTextInNodeIfNeeded(oldNodes, sourceText) {
     const occurrences = []
-    const pattern = new RegExp('\\{\\{(.*?)\\|(.*?)\\|(.*?)\\|(.*?)\\}\\}', 'g')
+    const pattern = new RegExp('\\{\\{(.*?)\\|(.*?)\\|(.*?)\\|(.*?)\\|(.*?)\\}\\}', 'g')
     while ((result = pattern.exec(sourceText))) {
-        
-        const obj = { index: result.index, length: result[0].length, method: result[1], originalText: result[2], type: result[3], originalSubstitute: result[4] }
+        const obj = { index: result.index, length: result[0].length, method: result[1], originalText: result[2], type: result[3], originalSubstitute: result[4], otherNumberStringInRange: result[5] }
         occurrences.push(obj)
     }
     if (!occurrences.length) return oldNodes
@@ -738,7 +741,8 @@ function replaceTextInNodeIfNeeded(oldNodes, sourceText) {
             firstNode = precedingTextNode
         }
 
-        const replacementNode = getDateCaseNode(obj.originalText, obj.originalSubstitute, obj.method, obj.type)
+
+        const replacementNode = getDateCaseNode(obj.originalText, obj.originalSubstitute,obj.otherNumberStringInRange, obj.method, obj.type)
 
         if (replacementNode) {
             firstOldNode.parentNode.insertBefore(replacementNode, firstOldNode)
@@ -767,10 +771,12 @@ function replaceTextInNodeIfNeeded(oldNodes, sourceText) {
 
 
 
-function getDateCaseNode(originalText, originalSubstitute, method, type = 'normal'){
+function getDateCaseNode(originalText, originalSubstitute, otherNumberStringInRange, method, type = 'normal'){
     const span = document.createElement('span')
+
     span.setAttribute("o",originalText)
     span.setAttribute("s",originalSubstitute)
+    span.setAttribute("other-number",otherNumberStringInRange)
     span.setAttribute("m",method)
     span.setAttribute("t",type)
     span.className = "rt-commentedText oedatecase"
@@ -781,40 +787,42 @@ function getDateCaseNode(originalText, originalSubstitute, method, type = 'norma
 }
 
 
-function getReplacementStrings(text, originalSubstitute, method) {
+function getReplacementStrings(text, originalSubstitute,otherNumberStringInRange, method) {
     const originalText = text
     text = text.replace(',','')
    
     const originalNumber = originalSubstitute ? numberFromString(originalSubstitute, 10) : numberFromString(text, 10)
     switch (method) {
-
-        case 'bc-ybc':{
-            return [originalText + '\u00A0BC', "", ""]
-        }
-        case 'bc-yoe':{
-            return getYearReplacementString(originalNumber,'OE')
-        }
-        case 'bc-y_':{
-            return getYearReplacementString(originalNumber,'-')
-        }
+   
         case 'year': {
-            return getYearReplacementString(originalNumber,'any')
+            return getYearReplacementString(text,originalNumber)
         }
-        case 'yearShort': {
-            return getYearReplacementString(originalNumber,'any',true)
+        case 'bc-y-r1': {
+            return getFirstYearInRangeReplacementString(originalText,originalNumber,otherNumberStringInRange)
         }
-        case 'bc-ioe':{
-            return getImpreciseYearReplacementString(originalNumber,'OE')
+        case 'bc-y-r2':{
+            return getSecondYearInRangeReplacementString(originalText,originalNumber,otherNumberStringInRange)
         }
-        case 'bc-i_':{
-            return getImpreciseYearReplacementString(originalNumber,'-')
-        }
+        // case 'yearShort': {
+        //     return getYearReplacementString(text,originalNumber,false,true)
+        // }
+
+
         case 'impreciseYear': {
-            return getImpreciseYearReplacementString(originalNumber,'any')
+            return getYearReplacementString(text, originalNumber,true)
         }
-        case 'impreciseYearShort': {
-            return getImpreciseYearReplacementString(originalNumber,'any',true)
+        case 'bc-i-r1': {
+            return getFirstYearInRangeReplacementString(originalText,originalNumber,otherNumberStringInRange,true)
         }
+        case 'bc-i-r2': {
+            return getSecondYearInRangeReplacementString(originalText,originalNumber,otherNumberStringInRange,true)
+        }
+
+
+
+        //case 'impreciseYearShort': {
+        //     return getImpreciseYearReplacementString(originalNumber,'any',true)
+        // }
         case 'oneDigitYear': {
             const year = originalNumber
             if (isNaN(year)) return null
@@ -833,7 +841,7 @@ function getReplacementStrings(text, originalSubstitute, method) {
         case 'bc-i2': {
             const year = originalNumber
             if (isNaN(year)) return null
-            const translatedYear = 10000 - year
+            const translatedYear = firstYearOfOldEra - year
             const translatedYearString = `${translatedYear % 100}`
             return [`${translatedYear % 100 < 10 ? '0' : ''}${translatedYearString}`, `${year} BC`, `${translatedYear}`]
         }
@@ -980,6 +988,12 @@ function translateYearPrecisely(year){
     return firstYearOfOldEra + 1 - year
 }
 
+function translateYearImprecisely(year){
+    let translatedYear = `${firstYearOfOldEra + (shouldTranslateYearsPrecisely ? 1 : 0) - year}`
+    if(translatedYear == 0)translatedYear = 1
+    return translatedYear
+}
+
 function getYearString(translatedYear, label, shortened = false){
     label = resolveLabel(label, translatedYear)
 
@@ -1000,16 +1014,62 @@ function getYearString(translatedYear, label, shortened = false){
     
 }
 
-function getYearReplacementString(year,label, shortened = false){
+function getFirstYearInRangeReplacementString(originalText,year,otherNumberStringInRange = "",isImprecise = false){
     if (isNaN(year)) return null
-    const translatedYear = `${translateYearPrecisely(year)}`
-    const translatedYearString = getYearString(translatedYear,label, shortened)
+
+    const secondYear = parseInt(otherNumberStringInRange,10)
+   
+    if(year > firstYearOfOldEra && secondYear > firstYearOfOldEra){
+        return [originalText, '', '']
+    }
+    if(year > firstYearOfOldEra && secondYear <= firstYearOfOldEra){
+        return [`${year} BC`, '', '']
+    }
+    const translatedYearString = `${isImprecise ? translateYearImprecisely(year) : translateYearPrecisely(year)}`  
+    return [translatedYearString, `${year} BC`, translatedYearString]
+}
+
+function getSecondYearInRangeReplacementString(originalText,year,otherNumberStringInRange = "", isImprecise = false){
+    if (isNaN(year)) return null
+
+    const firstYear = parseInt(otherNumberStringInRange,10)
+
+    if(year > firstYearOfOldEra){
+        return [originalText, '', '']
+    }
+    const translatedYear = `${isImprecise ? translateYearImprecisely(year) : translateYearPrecisely(year)}`
+    
+    if((year <= firstYearOfOldEra && firstYear > firstYearOfOldEra) || translatedYear <= lastTranslatedYearWithLabel){
+        const translatedYearString = `${translatedYear} ${abbreviatedTimelineName}`
+        return [translatedYearString, `${year} BC`, translatedYearString]
+    }
+
+    const translatedYearString = translatedYear
   
     return [translatedYearString, `${year} BC`, translatedYearString]
 }
 
 
-function getImpreciseYearReplacementString(year,label, shortened = false){
+function getYearReplacementString(originalText, year, isImprecise = false, shortened = false){
+    if (isNaN(year)) return null
+    const translatedYear = `${isImprecise ? translateYearImprecisely(year) : translateYearPrecisely(year)}`
+
+    if(year > firstYearOfOldEra){
+        return [originalText, '', '']
+    }
+
+    let translatedYearString = ''
+    if(translatedYear <= lastTranslatedYearWithLabel){
+        translatedYearString = `${translatedYear} ${abbreviatedTimelineName}`
+    }else{
+        translatedYearString = `${translatedYear}`
+    }
+    return [translatedYearString, `${year} BC`, translatedYearString]
+  
+}
+
+
+function getImpreciseYearReplacementString(year,label, shortened = false,otherNumberStringInRange = ""){
     if (isNaN(year)) return null
     let translatedYear = `${firstYearOfOldEra + (shouldTranslateYearsPrecisely ? 1 : 0) - year}`
     if(translatedYear == 0)translatedYear = 1
@@ -1030,8 +1090,8 @@ function resolveLabel(label, translatedYear){
     return ''
 }
 
-function createMarker(text, method, type = 'normal', originalSubstitute = '') {
-    return `{{${method}|${text}|${type}|${originalSubstitute}}}`
+function createMarker(text, method, type = 'normal', originalSubstitute = '',otherNumberStringInRange = '') {
+    return `{{${method}|${text}|${type}|${originalSubstitute}|${otherNumberStringInRange}}}`
 }
 
 

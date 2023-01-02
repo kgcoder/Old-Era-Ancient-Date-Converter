@@ -123,10 +123,10 @@ const methodConversions = {
     'bc-at': 'abbreviatedTimeline', //OE
 
     //the following classes should not be used in markup
-    'bc-ybc': 'bc-ybc',// add BC to year before 10,000 BC
-    'bc-yoe': 'bc-yoe',// add OE to year no matter what
-    'bc-ioe': 'bc-ioe',// add OE to year no matter what
-    'bc-y_': 'bc-y_',// don't use label no matter what
-    'bc-i_': 'bc-i_'// don't use label no matter what
+    'bc-y-r1':'bc-y-r1',//first year in range
+    'bc-y-r2':'bc-y-r2',//second year in range
+    'bc-i-r1':'bc-i-r1',//first year in range
+    'bc-i-r2':'bc-i-r2',//second year in range
+
 }
 

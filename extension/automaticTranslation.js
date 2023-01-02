@@ -66,11 +66,15 @@ function createAutomaticReplacements(html, replacementsArray, pageData) {
     processMillenniumPattern(text,intermediaryReplacementsArray)
 
 
+
     intermediaryReplacementsArray = intermediaryReplacementsArray.sort((a,b) => a.index - b.index)
 
 
     moveReplacementsFromTextToHtml(text,html,intermediaryReplacementsArray, rawReplacementsInHtmlArray, insertions)
+
+
     const normalReplacementsInHtml = mergeReplacements(rawReplacementsInHtmlArray)
+
 
     addNewReplacementsToArray(normalReplacementsInHtml,replacementsArray)
 
@@ -196,9 +200,9 @@ function moveReplacementsFromTextToHtml(text,html,replacementsInTextArray,finalR
                 }
 
 
-                const {target, index, method, length, originalSubstitute} = currentReplacementInText
+                const {target,otherNumberStringInRange, index, method, length, originalSubstitute} = currentReplacementInText
 
-                addReplacement(finalReplacementsArray,method,target,indexInHtml,true,'normal',originalSubstitute)
+                addReplacement(finalReplacementsArray,method,target,otherNumberStringInRange,indexInHtml,true,'normal',originalSubstitute)
 
 
                 indexInText += targetLength
@@ -249,6 +253,7 @@ function mergeReplacements(rawReplacements){
         const group = groupsArray[i]
         const method = group[0].edit.method
         const originalSubstitute = group[0].edit.originalSubstitute
+        const otherNumberStringInRange = group[0].edit.otherNumberStringInRange
         const index = group[0].index 
         
         let targetString = ''
@@ -258,7 +263,7 @@ function mergeReplacements(rawReplacements){
 
 
 
-        addReplacement(resultArray,method,targetString,index,true,'normal',originalSubstitute)
+        addReplacement(resultArray,method,targetString,otherNumberStringInRange,index,true,'normal',originalSubstitute)
 
     }
 
@@ -270,13 +275,13 @@ function mergeReplacements(rawReplacements){
 
 function addNewReplacementsToArray(newReplacements,replacementsArray){
     newReplacements.forEach(rep => {
-        addReplacement(replacementsArray,rep.edit.method,rep.edit.target,rep.index,true,'normal',rep.edit.originalSubstitute)
+        addReplacement(replacementsArray,rep.edit.method,rep.edit.target,rep.edit.otherNumberStringInRange,rep.index,true,'normal',rep.edit.originalSubstitute)
 
     })
 }
 
 
-function addIntermediaryReplacement(replacementsArray, method,targetString, index, checkIfExists = true, type = 'normal', originalSubstitute = '') {
+function addIntermediaryReplacement(replacementsArray, method,targetString, otherNumberStringInRange = '', index, checkIfExists = true, type = 'normal', originalSubstitute = '') {
     
     if (checkIfExists) {
         const indexOfExistingReplacement = replacementsArray.findIndex(rep => rep.index === index)
@@ -290,12 +295,13 @@ function addIntermediaryReplacement(replacementsArray, method,targetString, inde
         index:index,
         length:targetString.length,
         originalSubstitute,
+        otherNumberStringInRange
     }
     replacementsArray.push(replacement)
 }
 
 
-function addReplacement(replacementsArray, method,targetString, index, checkIfExists = true, type = 'normal', originalSubstitute = '') {
+function addReplacement(replacementsArray, method,targetString, otherNumberStringInRange = '', index, checkIfExists = true, type = 'normal', originalSubstitute = '') {
     
     if (checkIfExists) {
         const indexOfExistingReplacement = replacementsArray.findIndex(rep => rep.index === index)
@@ -306,15 +312,17 @@ function addReplacement(replacementsArray, method,targetString, index, checkIfEx
         target: targetString,
         originalSubstitute,
         method,
-        type
+        type,
+        otherNumberStringInRange
     }
+
     
     const replacement = {
         isBroken: false,
         edit,
         index:index,
         length:targetString.length,
-        replacement: createMarker(targetString, method, type, originalSubstitute)
+        replacement: createMarker(targetString, method, type, originalSubstitute,otherNumberStringInRange)
     }
 
     replacementsArray.push(replacement)
