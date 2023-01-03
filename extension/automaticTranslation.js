@@ -104,26 +104,46 @@ function extractTextFromHtml(html){
     let result = ''
     let previousCharacter = ''
     let isPreviousCharacterNumber = false
+    let isPreviousCharacterB = false
+    let isPreviousCharacterC = false
     const insertions = []
     const numReg = new RegExp('[0-9]')
+    const bReg = new RegExp('b','i')
+    const cReg = new RegExp('c','i')
+    const eReg = new RegExp('e','i')
+
+    
     for(let index = 0;index < html.length; index++){
         const character = html.slice(index,index + 1)
+
         if(character === '<'){
             isIgnoring = true
             previousCharacter = html.slice(index - 1,index)
             if(previousCharacter.match(numReg)){
                 isPreviousCharacterNumber = true
             }
+            if(previousCharacter.match(bReg)){
+                isPreviousCharacterB = true
+            }
+            if(previousCharacter.match(cReg)){
+                isPreviousCharacterC = true
+            }
             continue;
         }else if(character === '>'){
             isIgnoring = false
             let nextCharacter = html.slice(index + 1,index + 2)
-            if(isPreviousCharacterNumber && nextCharacter.match(numReg)){
+            if((isPreviousCharacterNumber && nextCharacter.match(numReg)) ||
+            (isPreviousCharacterB && nextCharacter.match(cReg))||
+            (isPreviousCharacterC && nextCharacter.match(eReg)) ){
                 result += '@'
-                const indexOfInsetion = result.length - 1
-                insertions.push(indexOfInsetion)
+                const indexOfInsertion = result.length - 1
+                insertions.push(indexOfInsertion)
             }
-            isPreviousCharacterNumber = false
+            if(nextCharacter != '<'){
+                isPreviousCharacterNumber = false
+                isPreviousCharacterB = false
+                isPreviousCharacterC = false
+            }
             continue;
         }
 

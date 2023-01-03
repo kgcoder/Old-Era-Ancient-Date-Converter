@@ -100,6 +100,9 @@ function checkIfSecondYearIsShortened(year1, year2) {
 
         if ((lastDigit === 2 && year2 === 1) || (lastDigit === 1 && year2 === 0)) {
             const realYear = year1 - 1
+            if((realYear - 1) % 100 == 0){
+                return { numberOfDigits: 4, realYear }
+            }
             return { numberOfDigits: 2, realYear }
         }
         if (lastDigit > year2) {

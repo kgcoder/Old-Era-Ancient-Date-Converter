@@ -465,6 +465,7 @@ function resolveReplacements(replacementsArray, repsFromServer) {
                 sameLocalRep["duplicate"] = true
 
                 const serverMethod = repFromServer.edit.method
+
                 
                 const isServerMethodAYearMethod = serverMethod === 'year' || serverMethod === 'impreciseYear'
                 if(isServerMethodAYearMethod){
@@ -473,17 +474,11 @@ function resolveReplacements(replacementsArray, repsFromServer) {
                     if(localMethod === 'bc-y-r1' || localMethod === 'bc-y-r2' || localMethod === 'bc-i-r1' || localMethod === 'bc-i-r2'){
                         properMethod = localMethod
                     }
-                    // const shouldForceShowOELabel = localMethod === 'bc-yoe' || localMethod === 'bc-ioe'
-                    // const shouldForceShowBCLabel = localMethod === 'bc-ybc'
-                    // const shouldForceHideOELabel = localMethod === 'bc-y_' || localMethod === 'bc-i_'
-
-                    // if(shouldForceShowBCLabel){
-                    //     properMethod = 'bc-ybc'
-                    // }else if(shouldForceShowOELabel){
-                    //     properMethod = serverMethod === 'year' ? 'bc-yoe' : 'bc-ioe'
-                    // }else if(shouldForceHideOELabel){
-                    //     properMethod = serverMethod === 'year' ? 'bc-y_' : 'bc-i_'
-                    // }
+                    if(serverMethod === 'impreciseYear' ){
+                        if(localMethod === 'bc-y-r1')properMethod = 'bc-i-r1'
+                        if(localMethod === 'bc-y-r2')properMethod = 'bc-i-r2'
+                    }
+                 
 
                     const edit = repFromServer.edit
                     edit["method"] = properMethod
