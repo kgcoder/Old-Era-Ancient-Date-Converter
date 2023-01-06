@@ -106,6 +106,8 @@ function extractTextFromHtml(html){
     let isPreviousCharacterNumber = false
     let isPreviousCharacterB = false
     let isPreviousCharacterC = false
+    let isPreviousCharacterE = false
+
     const insertions = []
     const numReg = new RegExp('[0-9]')
     const bReg = new RegExp('b','i')
@@ -128,11 +130,17 @@ function extractTextFromHtml(html){
             if(previousCharacter.match(cReg)){
                 isPreviousCharacterC = true
             }
+            if(previousCharacter.match(eReg)){
+                isPreviousCharacterE = true
+            }
             continue;
         }else if(character === '>'){
             isIgnoring = false
             let nextCharacter = html.slice(index + 1,index + 2)
             if((isPreviousCharacterNumber && nextCharacter.match(numReg)) ||
+            (isPreviousCharacterB && nextCharacter == '.') ||
+            (isPreviousCharacterC && nextCharacter == '.') ||
+            (isPreviousCharacterE && nextCharacter == '.') ||
             (isPreviousCharacterB && nextCharacter.match(cReg))||
             (isPreviousCharacterC && nextCharacter.match(eReg)) ){
                 result += '@'
@@ -143,6 +151,7 @@ function extractTextFromHtml(html){
                 isPreviousCharacterNumber = false
                 isPreviousCharacterB = false
                 isPreviousCharacterC = false
+                isPreviousCharacterE = false
             }
             continue;
         }
