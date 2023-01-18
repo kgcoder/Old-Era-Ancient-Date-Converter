@@ -351,7 +351,7 @@ function processCenturyOrMillenniumCategoryPattern(html,replacementsArray, metho
         const targetString = result[6] || ''
         if(method === 'millennium' && parseInt(targetString,10) > 10) continue
         const index = result.index + stringTillTarget.length
-        addReplacement(replacementsArray, method, targetString, index)
+        addReplacement(replacementsArray, method, targetString,'', index)
     }
 
     const additionalPattern = `(<b>)(${nakedCenturyPattern}( BCE?)?)</b></li>`
@@ -364,7 +364,7 @@ function processCenturyOrMillenniumCategoryPattern(html,replacementsArray, metho
         if(method === 'millennium' && parseInt(targetString,10) > 10) return
         const index = additionalResult.index + stringTillTarget.length
 
-        addReplacement(replacementsArray, method, targetString, index)
+        addReplacement(replacementsArray, method, targetString,'', index)
 
     }
 
@@ -383,7 +383,7 @@ function processDecadeCategoryPattern(html, replacementsArray){
          const stringTillTarget = result[1] || ''
          const targetString = result[2] || ''
          const index = result.index + stringTillTarget.length
-         addReplacement(replacementsArray, 'bc-sd', targetString, index)
+         addReplacement(replacementsArray, 'bc-sd', targetString,'', index)
 
     }
 
@@ -395,7 +395,7 @@ function processDecadeCategoryPattern(html, replacementsArray){
         const targetString = additionalResult[2] || ''
        
         const index = additionalResult.index + stringTillTarget.length
-        addReplacement(replacementsArray, 'bc-sd', targetString, index)
+        addReplacement(replacementsArray, 'bc-sd', targetString,'', index)
     }
 
     const additionalPattern2 = `(<li><b>)(${nakedDecadePattern})</b></li>`
@@ -405,7 +405,7 @@ function processDecadeCategoryPattern(html, replacementsArray){
         const stringTillTarget = additionalResult2[1] || ''
         const targetString = additionalResult2[2] || ''
         const index = additionalResult2.index + stringTillTarget.length
-        addReplacement(replacementsArray, 'bc-sd', targetString, index)
+        addReplacement(replacementsArray, 'bc-sd', targetString,'', index)
     }
 
     processCenturyOrMillenniumCategoryPattern(html, replacementsArray, 'century')

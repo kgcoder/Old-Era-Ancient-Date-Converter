@@ -345,11 +345,13 @@ function translateEverything(r) {
     
     let html = new XMLSerializer().serializeToString(document.body)
 
+
     currentVersion = getPageVersionFromHtml(html)
 
     let htmlWithMarkers
 
     const { htmlWithIgParts, ignoredParts } = htmlWithIgnoredParts(html)
+
 
     let replacementsArray = []
     getLocalReplacements(htmlWithIgParts, replacementsArray, currentPageData)
@@ -369,7 +371,6 @@ function translateEverything(r) {
     editsArray = replacementsArray.map(item => item.edit)
     
     htmlWithMarkers = createHTMLWithMarkers(replacementsArray, htmlWithIgParts, ignoredParts)
-
 
 
     //getSample(37,58409,htmlWithMarkers)
