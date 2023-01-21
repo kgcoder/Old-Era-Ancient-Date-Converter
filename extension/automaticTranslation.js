@@ -82,6 +82,7 @@ function createAutomaticReplacements(html, replacementsArray, pageData) {
 
 
 
+
   
 
 
@@ -113,6 +114,8 @@ function extractTextFromHtml(html){
     const bReg = new RegExp('b','i')
     const cReg = new RegExp('c','i')
     const eReg = new RegExp('e','i')
+
+    const mergedCEReg = new RegExp('^(c[a-df-z0-9].*?|ce[a-z0-9].*?)','i')
 
     
     for(let index = 0;index < html.length; index++){
@@ -160,6 +163,14 @@ function extractTextFromHtml(html){
 
         if(!isIgnoring){
             result += character
+            if(character.match(bReg)){
+                const next4Characters = html.slice(index + 1,index + 5)
+                if(next4Characters.match(mergedCEReg)){
+                    result += '@'
+                    const indexOfInsertion = result.length - 1
+                    insertions.push(indexOfInsertion)
+                }
+            }
         }
 
     }
