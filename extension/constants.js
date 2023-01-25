@@ -100,6 +100,44 @@ const monthNames = [
     'october',
     'november',
     'december',
+
+    'jan',
+    'feb',
+    'mar',
+    'apr',
+    'may',
+    'jun',
+    'jul',
+    'aug',
+    'sep',
+    'sept',
+    'oct',
+    'nov',
+    'dec',
+
+    'jan.',
+    'feb.',
+    'mar.',
+    'apr.',
+
+    'jun.',
+    'jul.',
+    'aug.',
+    'sep.',
+    'sept.',
+    'oct.',
+    'nov.',
+    'dec.',
+
+   
+]
+
+const seasons = [
+    'spring',
+    'summer',
+    'autumn',
+    'fall',
+    'winter'
 ]
  
 
