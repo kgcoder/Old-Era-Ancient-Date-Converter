@@ -5,8 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 const bcPattern = `(${spacePattern}|-)?((b\\.(${spacePattern})?c\\.?|bc)e?)`
-const rangePattern = `(${spacePattern})?(—|−|–|-|\\&#8211;|\\&ndash;|\\&#8212;|\\&mdash;|or|to|to late|to early|to the|and|and late|and early|-to-|until|till|through)(${spacePattern})?`
-const dashPattern = `(${spacePattern})?(—|−|–|-|\\&#8211;|\\&ndash;|\\&#8212;|\\&mdash;)(${spacePattern})?`
+const rangePattern = `(${spacePattern})?(—|−|–|-|— early|− early|– early|- early|— late|− late|– late|- late|\\&#8211;|\\&ndash;|\\&#8212;|\\&mdash;|\\&#8211; early|\\&ndash; early|\\&#8212; early|\\&mdash; early|\\&#8211; late|\\&ndash; late|\\&#8212; late|\\&mdash; late|or|to|to late|to early|to the|and|and late|and early|or late|or early|-to-|until|till|through)(${spacePattern})?`
+//const dashPattern = `(${spacePattern})?(—|−|–|-|\\&#8211;|\\&ndash;|\\&#8212;|\\&mdash;)(${spacePattern})?`
 const supPattern = '\\[\\d*?\\]'
 const circaPattern = 'c\\.|circa|circa\\.'
 
