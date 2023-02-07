@@ -109,7 +109,7 @@ function getConfigFromLocalStorage(callback){
             allowedSites = sitesData.allowedSites
 
         }else{
-            allowedSites = ['en.wikipedia.org','britannica.com']
+            allowedSites = ['en.wikipedia.org']
             chrome.storage.local.set({ sitesData: JSON.stringify({allowedSites}) }).then(() => {
                // console.log("Value is set");
             });
@@ -973,6 +973,7 @@ function getReplacementStrings(text, originalSubstitute,otherNumberStringInRange
         case 'abbreviatedTimeline': {
             return [abbreviatedTimelineName, "", ""]
         }
+        
 
         default:
             return [originalText, "", ""]
