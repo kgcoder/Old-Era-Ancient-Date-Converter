@@ -83,51 +83,64 @@ function processYearRangePattern(text,replacementsArray, pageData){
         
         let yearA2Substitute = ''
         let yearB2Substitute = ''
-        let method = methodForYear(yearA2, pageData)
-        
+    
 
+        
         if (yearA1String) {
             const { numberOfDigits, realYear } = checkIfSecondYearIsShortened(yearA1, yearA2)
+            
+            let methodA1 = methodForYear(yearA1, pageData)
+            
+            let methodA2 = methodForYear(realYear, pageData)
+            
+            
             if (numberOfDigits !== 0) {
                 yearA2Substitute = `${realYear}`    
             }
             if (numberOfDigits === 1) {
-                method = 'oneDigitYear'
-
+                methodA2 = 'oneDigitYear'
+                
             } else if (numberOfDigits === 2) {
-                method = 'twoDigitYear'     
+                methodA2 = methodA2 == 'impreciseYear' ? 'bc-i2' : 'twoDigitYear'     
             }
+            
 
-            addIntermediaryReplacement(replacementsArray, 'year', yearA1String,'', result.index)
+            addIntermediaryReplacement(replacementsArray, methodA1, yearA1String,'', result.index)
             const index = result.index + partTillYearA2.length
-            addIntermediaryReplacement(replacementsArray, method, yearA2String,'', index, true, 'normal', yearA2Substitute)
+            addIntermediaryReplacement(replacementsArray, methodA2, yearA2String,'', index, true, 'normal', yearA2Substitute)
             
         }
 
         if (yearB1String) {
 
             if(!yearA1String){
+                let methodA2 = methodForYear(yearA2, pageData)
                 const index = result.index + partTillYearA2.length
-                addIntermediaryReplacement(replacementsArray, 'year', yearA2String,'', index)
+                addIntermediaryReplacement(replacementsArray, methodA2, yearA2String,'', index)
                 
             }
-
+            let methodB1 = methodForYear(yearB1, pageData)
+            
             const { numberOfDigits, realYear } = checkIfSecondYearIsShortened(yearB1, yearB2)
+            
+            let methodB2 = methodForYear(realYear, pageData)
+            
             if (numberOfDigits !== 0) {
                 yearB2Substitute = `${realYear}`    
             }
             if (numberOfDigits === 1) {
-                method = 'oneDigitYear'
+                methodB2 = 'oneDigitYear'
 
             } else if (numberOfDigits === 2) {
-                method = 'twoDigitYear'      
+                methodB2 = methodB2 == 'impreciseYear' ? 'bc-i2' : 'twoDigitYear'      
             }
+
 
          
             let index = result.index + partTillYearB1.length
-            addIntermediaryReplacement(replacementsArray, 'year', yearB1String,'', result.index)
+            addIntermediaryReplacement(replacementsArray, methodB1, yearB1String,'', index)
             index = result.index + partTillYearB2.length
-            addIntermediaryReplacement(replacementsArray, method, yearB2String,'', index, true, 'normal', yearB2Substitute)
+            addIntermediaryReplacement(replacementsArray, methodB2, yearB2String,'', index, true, 'normal', yearB2Substitute)
             index = result.index + partTillSpace.length
             if(space.length){
                 addIntermediaryReplacement(replacementsArray, 'remove', space,'', index)
@@ -139,8 +152,8 @@ function processYearRangePattern(text,replacementsArray, pageData){
 
         if(yearA1String && !yearB1String){
             let index = result.index + partTillYearB2.length
-            method = methodForYear(yearB2, pageData)
-            addIntermediaryReplacement(replacementsArray, method, yearB2String,'', index, true, 'normal', yearB2Substitute)
+            let  methodB2 = methodForYear(yearB2, pageData)
+            addIntermediaryReplacement(replacementsArray, methodB2, yearB2String,'', index, true, 'normal', yearB2Substitute)
             index = result.index + partTillSpace.length
             if(space.length){
                 addIntermediaryReplacement(replacementsArray, 'remove', space,'', index)
