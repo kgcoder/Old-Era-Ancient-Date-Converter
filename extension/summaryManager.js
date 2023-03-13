@@ -46,6 +46,11 @@ const observer = new MutationObserver(function(mutations) {
                     }
                     else if(node.className && node.className.includes("ra-read-more")){
                         editSummaryIfNeeded(node);
+                    }else if(node.className && node.className.includes("mw-mmv-wrapper")){
+                        setTimeout(() => {
+                            editSummaryIfNeeded(node);
+                        },500)
+                
                     }
 
                  })
@@ -93,7 +98,7 @@ async function editSummaryIfNeeded(node){
 
     const htmlWithMarkers = createHTMLWithMarkers(replacementsArray, htmlWithIgParts, ignoredParts)
 
-         if (!htmlWithMarkers) return
+    if (!htmlWithMarkers) return
 
 
     const parser = new DOMParser();
@@ -147,7 +152,10 @@ function doReplacementsInSummary() {
     const reg = new RegExp('\\s|\\&nbsp;|\\&#160;|\\&#8201;','gi')
     const newTextNodesArray = []
     let j = 0
+    let lastIndexInNodes = 0;
+
     for (let i = 0; i < summaryTextsArray.length; i++) {
+        let j = lastIndexInNodes;
         const text = summaryTextsArray[i]
         let nodes;
         let cleanText = getTextWithoutMarkup(text)?.replace(reg, ' ');
@@ -166,6 +174,7 @@ function doReplacementsInSummary() {
                     j++;
                     continue;
                 }else{
+                    lastIndexInNodes = j + 1;
                     var pair = replaceTextInNodeIfNeeded(nodes, text);
                     newTextNodesArray.push(pair);
                     break;
@@ -178,6 +187,8 @@ function doReplacementsInSummary() {
     }
     summaryTextNodesArray = newTextNodesArray
 }
+
+
 
 function updateDatesInSummary(node){
     const spans = Array.from(node.getElementsByClassName('oedatecase'))
