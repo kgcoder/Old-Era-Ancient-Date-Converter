@@ -228,50 +228,44 @@ function processYearPattern(text, replacementsArray,pageData) {
         const space = result[7] || ''
         const bc = result[8] || ''
 
+        let year2Substitute = ''
+        let method1 = 'year'
+        let method2 = 'year'
 
-
-         let year2Substitute = ''
-         let method = 'year'
-
-         const year1 = numberFromString(year1String)
-         const year2 = numberFromString(nakedYear2String)
-        
+        const year1 = numberFromString(year1String)
+        const year2 = numberFromString(nakedYear2String)
+    
          if(nakedYear2String === '000') continue
 
          if (year1String) {
             const { numberOfDigits, realYear } = checkIfSecondYearIsShortened(year1, year2)
+
+            method1 = methodForYear(year1, pageData)
+            method2 = methodForYear(realYear, pageData)
+
             if (numberOfDigits !== 0) {
                 year2Substitute = `${realYear}`    
             }
             if (numberOfDigits === 1) {
-                method = 'oneDigitYear'
-
+                method2 = 'oneDigitYear'
+                
             } else if (numberOfDigits === 2) {
-                method = 'twoDigitYear'      
+                method2 = method2 == 'impreciseYear' ? 'bc-i2' : 'twoDigitYear'     
             }
-      
-            let yearMethod = 'year'
-            if (method === 'year') {
-                yearMethod = methodForYear(year1,pageData)
-            }
-            addIntermediaryReplacement(replacementsArray, yearMethod, year1String,'', result.index) 
-        }
 
-        if (method === 'year') {
-            method = methodForYear(year2,pageData)
+
+            addIntermediaryReplacement(replacementsArray, method1, year1String,'', result.index) 
+
         }
 
         let index = result.index + partTillYear2.length
-        addIntermediaryReplacement(replacementsArray, method, nakedYear2String,'', index, true, 'normal', year2Substitute)       
+        addIntermediaryReplacement(replacementsArray, method2, nakedYear2String,'', index, true, 'normal', year2Substitute)
         index = result.index + partTillSpace.length
         if(space.length){
             addIntermediaryReplacement(replacementsArray, 'remove', space,'', index)
         }
         index += space.length
         addIntermediaryReplacement(replacementsArray, 'remove', bc,'', index)
-
-
-
 
      }
 }
