@@ -21,6 +21,11 @@ const roundYearrangePattern = `((${roundnakedYearPattern})(${rangePattern})(${ci
 
 const yearRangePattern = `((((${nakedYearPattern}(${supPattern})?/)?${nakedYearPattern}(${supPattern})?${rangePattern}(${circaPattern})?(${spacePattern})?)(${nakedYearPattern}(${supPattern})?/)?)${nakedYearPattern}(${supPattern})?)${bcPattern}`
 
+const yearToDecadePattern = `(${nakedYearPattern}(${supPattern})?/)?${nakedYearPattern}(${supPattern})?${rangePattern}(${circaPattern})?(${spacePattern})?(${nakedDecadePattern})${bcPattern}`
+const decadeToYearPattern = `(${nakedDecadePattern})(${supPattern})?${rangePattern}(${circaPattern})?(${spacePattern})?(${nakedYearPattern}(${supPattern})?/)?${nakedYearPattern}(${supPattern})?${bcPattern}`
+
+
+
 const yearMonthRangePattern = `${nakedYearPattern}(${supPattern})?(${rangePattern})((${nakedDatePattern})(${spacePattern}))?(${monthNames.join('|')}|${seasons.join('|')})(/(${monthNames.join('|')}))?(${spacePattern})${nakedYearPattern}(${supPattern})?${bcPattern}`
 
 const yearPattern = `((${nakedYearPattern}(${supPattern})?/)?${nakedYearPattern}(${supPattern})?)${bcPattern}`

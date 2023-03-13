@@ -213,7 +213,59 @@ function processYearRangePattern(text,replacementsArray, pageData){
 
 
 
+function processYearToDecadePattern(text,replacementsArray, pageData){
 
+    let result;
+    const reg = giRegForText(yearToDecadePattern)
+    while ((result = reg.exec(text))) {
+
+        const partTillYearA2 = result[1] || ''
+        const yearA1String = result[2] || ''
+        const yearA2String = result[4] || ''
+
+        let yearA2Substitute = ''
+        let methodA1 = 'year'
+        let methodA2 = 'year'
+
+        const yearA1 = numberFromString(yearA1String)
+        const yearA2 = numberFromString(yearA2String)
+
+        if (yearA1String) {
+            const { numberOfDigits, realYear } = checkIfSecondYearIsShortened(yearA1, yearA2)
+
+            methodA1 = methodForYear(yearA1, pageData)
+            methodA2 = methodForYear(realYear, pageData)
+
+            if (numberOfDigits !== 0) {
+                yearA2Substitute = `${realYear}`    
+            }
+            if (numberOfDigits === 1) {
+                methodA2 = 'oneDigitYear'
+                
+            } else if (numberOfDigits === 2) {
+                methodA2 = methodA2 == 'impreciseYear' ? 'bc-i2' : 'twoDigitYear'     
+            }
+
+            addIntermediaryReplacement(replacementsArray, methodA1, yearA1String,'', result.index) 
+
+        }
+
+        let index = result.index + partTillYearA2.length
+        addIntermediaryReplacement(replacementsArray, methodA2, yearA2String,'', index, true, 'normal', yearA2Substitute)
+
+    }
+
+}
+
+
+function processDecadeToYearPattern(text,replacementsArray){
+    let result;
+    const reg = giRegForText(decadeToYearPattern)
+    while ((result = reg.exec(text))) {
+        const nakedDecade = result[1] || ''
+        addIntermediaryReplacement(replacementsArray, 'decade', nakedDecade,'', result.index)
+    }
+}
 
 
 function processYearPattern(text, replacementsArray,pageData) {

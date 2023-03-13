@@ -52,6 +52,8 @@ function createAutomaticReplacements(html, replacementsArray, pageData) {
 
 
     processYearRangePattern(text,intermediaryReplacementsArray, pageData)
+    processYearToDecadePattern(text,intermediaryReplacementsArray, pageData)
+    processDecadeToYearPattern(text,intermediaryReplacementsArray)
     processListWithMonthNamePattern(text, intermediaryReplacementsArray)
     processLongYearListPattern(text, intermediaryReplacementsArray, pageData)
     processYearMonthRangePattern(text, intermediaryReplacementsArray)
