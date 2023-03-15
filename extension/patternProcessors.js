@@ -248,6 +248,8 @@ function processYearToDecadePattern(text,replacementsArray, pageData){
 
             addIntermediaryReplacement(replacementsArray, methodA1, yearA1String,'', result.index) 
 
+        }else{
+            methodA2 = methodForYear(yearA2, pageData)
         }
 
         let index = result.index + partTillYearA2.length
@@ -307,9 +309,11 @@ function processYearPattern(text, replacementsArray,pageData) {
 
 
             addIntermediaryReplacement(replacementsArray, method1, year1String,'', result.index) 
-
+            
+        }else{
+            method2 = methodForYear(year2, pageData)
         }
-
+        
         let index = result.index + partTillYear2.length
         addIntermediaryReplacement(replacementsArray, method2, nakedYear2String,'', index, true, 'normal', year2Substitute)
         index = result.index + partTillSpace.length
