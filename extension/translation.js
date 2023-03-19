@@ -15,12 +15,22 @@ function updateTranslation() {
         shouldTranslateDatesInBookTitles = !!result.shouldTranslateDatesInBookTitles
         shouldTranslateDatesInQuotes = !!result.shouldTranslateDatesInQuotes
 
-        firstYearOfOldEra = result.firstYearOfOldEra
-        lastTranslatedYearWithLabel = result.lastTranslatedYearWithLabel
+        if(result.firstYearOfOldEra){
+            firstYearOfOldEra = result.firstYearOfOldEra;
+        }
+        if(result.lastTranslatedYearWithLabel){
+            lastTranslatedYearWithLabel = result.lastTranslatedYearWithLabel
+        }
 
-        timelineName = result.timelineName
-        ofTimeline = result.ofTimeline
-        abbreviatedTimelineName = result.abbreviatedTimelineName
+        if(result.timelineName){
+            timelineName = result.timelineName
+        }
+        if(result.ofTimeline){
+            ofTimeline = result.ofTimeline
+        }
+        if(result.abbreviatedTimelineName){
+            abbreviatedTimelineName = result.abbreviatedTimelineName
+        }
 
         updateDates()
     })
