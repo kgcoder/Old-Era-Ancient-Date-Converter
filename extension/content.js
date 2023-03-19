@@ -107,7 +107,6 @@ function getConfigFromLocalStorage(callback){
         if(result.sitesData){
             const sitesData = JSON.parse(result.sitesData)
             allowedSites = sitesData.allowedSites
-
         }else{
             allowedSites = ['en.wikipedia.org']
             chrome.storage.local.set({ sitesData: JSON.stringify({allowedSites}) }).then(() => {
@@ -120,13 +119,6 @@ function getConfigFromLocalStorage(callback){
         callback()
     })
 }
-
-getConfigFromLocalStorage(function(){
-    updateIcon()
-    if(!shouldNotUseServer && currentLocation.includes("en.wikipedia.org")){
-        startRequest()
-    }
-})
 
 
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
@@ -239,24 +231,28 @@ window.onload = () => {
 
     pageIsLoaded = true
 
-    getConfigFromLocalStorage(() => null)
+    getConfigFromLocalStorage(function(){
+        updateIcon()
 
-    const index = allowedSites.findIndex(site => currentLocation.includes(site))
-
-    isThisSiteAllowed = index !== -1
-
-    if(!isThisSiteAllowed){
-        chrome.runtime.sendMessage('pageMetadataIsReady') //message for the popup script
-        return
-    }
-
-    if (!isExtensionOff && currentLocation) {
-        if (!shouldNotUseServer && currentLocation.includes("en.wikipedia.org")) {
-            startRequest()  
-        } else {
-            translateEverything(null)
+        const index = allowedSites.findIndex(site => currentLocation.includes(site))
+    
+        isThisSiteAllowed = index !== -1
+    
+        if(!isThisSiteAllowed){
+            chrome.runtime.sendMessage('pageMetadataIsReady') //message for the popup script
+            return
         }
-    }
+    
+        if (!isExtensionOff && currentLocation) {
+            if (!shouldNotUseServer && currentLocation.includes("en.wikipedia.org")) {
+                startRequest()  
+            } else {
+                translateEverything(null)
+            }
+        }
+      
+    })
+
 
     
 }
@@ -296,7 +292,6 @@ function getPageVersionFromHtml(html) {
 function startRequest() {
     if(!pageIsLoaded || requestHasStarted)return
     requestHasStarted = true
-    //getConfigFromLocalStorage(function(){})
     const encodedUrl = encodeURIComponent(currentLocation)
   
 
@@ -633,10 +628,6 @@ function updateDates(){
         updateDataInSpan(span)
       })
 
-
-
-
-
 }
 
 
@@ -740,6 +731,7 @@ function replaceTextInNodeIfNeeded(oldNodes, sourceText) {
 
         const replacementNode = getDateCaseNode(obj.originalText, obj.originalSubstitute,obj.otherNumberStringInRange, obj.method, obj.type)
 
+      //  console.log('replacementNode',replacementNode)
         if (replacementNode) {
             firstOldNode.parentNode.insertBefore(replacementNode, firstOldNode)
 
@@ -788,6 +780,7 @@ function getReplacementStrings(text, originalSubstitute,otherNumberStringInRange
     text = text.replace(',','')
    
     const originalNumber = originalSubstitute ? numberFromString(originalSubstitute, 10) : numberFromString(text, 10)
+        
     switch (method) {
    
         case 'year': {

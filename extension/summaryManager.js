@@ -15,38 +15,46 @@ const observer = new MutationObserver(function(mutations) {
      mutations.forEach(function(mutation) {
          if(mutation.addedNodes.length){
              mutation.addedNodes.forEach(node => {
-                // console.log('node added',node.className)
-                // if(node.className && node.className.includes("loaded-infinite-scroll-container")){
-                //     console.log('node contents',node.innerHTML)
-                // }
-                if(node.className && node.className.includes("mw-mmv-final-image")) {
+                 
+                 if(!node.className)return
+                 if(typeof node.className !== "string")return
+                 
+                 // console.log('node added',node.className)
+                 // if(node.className.includes("loaded-infinite-scroll-container")){
+                 //     console.log('node contents',node.innerHTML)
+                 // }
+
+                if(node.className.includes("mw-mmv-final-image")) {
                     const img = node
                     replaceSrcInImage(img)
                 }
                  chrome.storage.local.get(['isExtensionOff'], function (result) {
                     isExtensionOff = result.isExtensionOff ? result.isExtensionOff : false
 
+                    if(isExtensionOff)return
 
-                    if (node.className && node.className.includes("mwe-popups")) {
+                 
+
+                    if (node.className.includes("mwe-popups")) {
                         editSummaryIfNeeded(node);
                     }
-                    else if (node.className && node.className.includes("CategoryTreeSection")) {
+                    else if (node.className.includes("CategoryTreeSection")) {
                         editSummaryIfNeeded(node);
                     }
-                    else if(node.className && node.className.includes("cdx-menu-item__text__description")){
+                    else if(node.className.includes("cdx-menu-item__text__description")){
                         editSummaryIfNeeded(node.parentElement);
                     }
-                    else if (node.className && node.className.includes("mw-ui-icon")) {
+                    else if (node.className.includes("mw-ui-icon")) {
                         if(node.parentElement && node.parentElement.className && node.parentElement.className.includes("page-summary")){
                             editSummaryIfNeeded(node.parentElement);
                         }
                     }
-                    else if (node.className && node.className.includes("cdx-menu-item")) {
+                    else if (node.className.includes("cdx-menu-item")) {
                         editSummaryIfNeeded(node);
                     }
-                    else if(node.className && node.className.includes("ra-read-more")){
+                    else if(node.className.includes("ra-read-more")){
                         editSummaryIfNeeded(node);
-                    }else if(node.className && node.className.includes("mw-mmv-wrapper")){
+                    }else if(node.className.includes("mw-mmv-wrapper")){
                         setTimeout(() => {
                             editSummaryIfNeeded(node);
                         },500)

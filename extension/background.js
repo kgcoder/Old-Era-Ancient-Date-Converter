@@ -12,7 +12,9 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
    
     if (message === 'updateIcon') {
         const tabs = await chrome.tabs.query({ currentWindow: true, active: true })
-        updateIcon(tabs[0].id)
+        if(tabs && tabs.length && tabs[0].id){
+            updateIcon(tabs[0].id)
+        }
     }
   
 });
