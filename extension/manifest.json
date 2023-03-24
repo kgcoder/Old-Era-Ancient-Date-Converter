@@ -13,6 +13,7 @@
                 "patternsInHtml.js",
                 "patternsInText.js",
                 "helpers.js",
+                "editor/helpers.js",
                 "markupPatternProcessors.js",
                 "location.js",
                 "translation.js",
@@ -20,6 +21,8 @@
                 "patternProcessors.js",
                 "pageChecker.js",
                 "summaryManager.js",
+                "editor/history.js",
+                "editor/editorContent.js",
                 "content.js"
             ],
             "css": [

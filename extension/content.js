@@ -58,6 +58,8 @@ let images = []
 let editsArray = []
 let domain = ''
 
+let isEditingMode = false
+
 const firstYearOfOldEra_default = 10000
 const lastTranslatedYearWithLabel_default = 6000
 const timelineName_default = "Old Era"
@@ -74,12 +76,13 @@ let abbreviatedTimelineName = abbreviatedTimelineName_default
 
 
 function getConfigFromLocalStorage(callback){
-        chrome.storage.local.get(['isExtensionOff', 'shouldNotUseServer', 
+        chrome.storage.local.get(['isExtensionOff', 'isEditingMode', 'shouldNotUseServer', 
         'shouldTranslateYearsPrecisely', 'shouldTranslateDatesInBookTitles', 
         'shouldTranslateDatesInQuotes','sitesData',
         'firstYearOfOldEra','lastTranslatedYearWithLabel',
         'timelineName','ofTimeline','abbreviatedTimelineName'], function (result) {
         isExtensionOff = !!result.isExtensionOff
+        isEditingMode = !!result.isEditingMode
         shouldNotUseServer = !!result.shouldNotUseServer
         shouldTranslateYearsPrecisely = !!result.shouldTranslateYearsPrecisely
         shouldTranslateDatesInBookTitles = !!result.shouldTranslateDatesInBookTitles
@@ -177,6 +180,14 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         window.location.reload()
     }
 
+    if(message === 'editingModeOn'){
+        window.location.reload()
+    }
+
+    if(message === 'editingModeOff'){
+        window.location.reload()
+    }
+
     if(message === 'toggleSiteUsage'){
         window.location.reload()
     }
@@ -243,12 +254,17 @@ window.onload = () => {
             return
         }
     
-        if (!isExtensionOff && currentLocation) {
+        if (!isExtensionOff && !isEditingMode && currentLocation) {
             if (!shouldNotUseServer && currentLocation.includes("en.wikipedia.org")) {
                 startRequest()  
             } else {
+                console.log('onload before translateEverything')
                 translateEverything(null)
             }
+        }
+
+        if(isEditingMode){
+            onEditorLoad()
         }
       
     })
@@ -302,6 +318,7 @@ function startRequest() {
     }).then(r => {
 
         editsArray = r.edits
+        console.log('r.edits',r.edits)
         pageHasIssues = r.hasIssues 
         pageId = r.id
         
@@ -316,13 +333,18 @@ function startRequest() {
 
         images = r.images
 
+        console.log('got data from server')
+        try{
+            translateEverything(r)
+        }catch(e){
+            console.log(e)
 
-        translateEverything(r)
+        }
 
 
 
     }).catch(error => {
-       // console.log(error)
+        console.log(error)
         translateEverything(null)
     })
 
@@ -330,6 +352,7 @@ function startRequest() {
 
 
 function translateEverything(r) {
+    console.log('inside translateEverything')
     findIfPageIsMillenniumOrCenturyCategory()
     findIfPageIsDecadeCategory()
     findIfPageIsAboutEarlyCenturyOrMillennium()
@@ -541,7 +564,9 @@ function findIfPageIsDecadeCategory(){
 
 
 function findIfPageIsAboutEarlyCenturyOrMillennium(){
+    console.log('inside findIfPageIsAboutEarlyCenturyOrMillennium')
     const title = getPageTitle()
+
 
     const reg = new RegExp(`^${nakedCenturyPattern} (millennium|century)( BCE?)$`)
     const matches = title.match(reg)
@@ -1096,6 +1121,7 @@ function numberSuffix(number) {
     return 'th'
 }
 
-function escapeText(text) {
-    return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
+// function escapeText(text) {
+//     return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+// }

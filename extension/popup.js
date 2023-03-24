@@ -5,6 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 let isExtensionOff = false
+let isEditingMode = false
 
 let shouldTranslateYearsPrecisely = false
 let shouldTranslateDatesInBookTitles = false
@@ -60,7 +61,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-    function updateButtons(){
+    function updateSettingsButtons(){
         const saveSettingsButton = document.getElementById("saveSettingsButton")
     
         saveSettingsButton.className = didAnythingChangeInAdvancedSettings() && !isSomeFieldEmpty() ? "" : "disabledLink"
@@ -174,7 +175,7 @@ document.addEventListener('DOMContentLoaded', function () {
         startingYearInput.value = text.replace(reg,'')
         if(startingYearInput.value == "0")startingYearInput.value = ""
 
-       updateButtons()
+       updateSettingsButtons()
 
     })
 
@@ -184,22 +185,22 @@ document.addEventListener('DOMContentLoaded', function () {
         lastTranslatedYearWithLabelInput.value = text.replace(reg,'')
         if(lastTranslatedYearWithLabelInput.value == "0")lastTranslatedYearWithLabelInput.value = ""
 
-        updateButtons()
+        updateSettingsButtons()
 
 
     })
 
 
     timelineNameInput.addEventListener('input', function () {
-       updateButtons()
+       updateSettingsButtons()
     })
 
     ofTimelineInput.addEventListener('input', function () {
-        updateButtons()
+        updateSettingsButtons()
      })
 
     abbreviatedTimelineNameInput.addEventListener('input', function () {
-        updateButtons()
+        updateSettingsButtons()
     })
 
 
@@ -220,7 +221,7 @@ document.addEventListener('DOMContentLoaded', function () {
         abbreviatedTimelineName = abbreviatedTimelineNameInput.value
 
 
-        updateButtons()
+        updateSettingsButtons()
         
         chrome.storage.local.set({ firstYearOfOldEra, lastTranslatedYearWithLabel, timelineName, ofTimeline, abbreviatedTimelineName }, function () {
             sendMessageToPage('advancedSettingsChanged')
@@ -231,7 +232,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     cancelSettingsEditButton.addEventListener('click', function () {
         updateInputTexts()
-        updateButtons()
+        updateSettingsButtons()
     })
 
 
@@ -245,7 +246,7 @@ document.addEventListener('DOMContentLoaded', function () {
         abbreviatedTimelineName = abbreviatedTimelineName_default
 
         updateInputTexts()
-        updateButtons()
+        updateSettingsButtons()
 
         chrome.storage.local.set({ firstYearOfOldEra, lastTranslatedYearWithLabel, timelineName, ofTimeline, abbreviatedTimelineName }, function () {
             sendMessageToPage('advancedSettingsChanged')
@@ -277,9 +278,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-    chrome.storage.local.get(['isExtensionOff', 'shouldNotUseServer', 'shouldTranslateYearsPrecisely', 'shouldTranslateDatesInBookTitles', 'shouldTranslateDatesInQuotes','sitesData','firstYearOfOldEra','lastTranslatedYearWithLabel','timelineName','ofTimeline','abbreviatedTimelineName'], function (result) {
+    chrome.storage.local.get(['isExtensionOff','isEditingMode', 'shouldNotUseServer', 'shouldTranslateYearsPrecisely', 'shouldTranslateDatesInBookTitles', 'shouldTranslateDatesInQuotes','sitesData','firstYearOfOldEra','lastTranslatedYearWithLabel','timelineName','ofTimeline','abbreviatedTimelineName'], function (result) {
         
         isExtensionOff = !!result.isExtensionOff
+        isEditingMode = !!result.isEditingMode
 
         if(result.firstYearOfOldEra){
             firstYearOfOldEra = result.firstYearOfOldEra
@@ -324,9 +326,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
         updateInputTexts()
-        updateButtons()
+        updateSettingsButtons()
+        updateEditingModeButton()
 
     })
+
+    document.getElementById('toggleEditingMode').addEventListener('click', () => {
+        toggleEditingMode()
+    }, false)
 
     document.getElementById('UseOnThisSiteCheckbox').addEventListener('click', () => {
         toggleWebsiteUsage()
@@ -455,6 +462,23 @@ function toggleExtension() {
 }
 
 
+function toggleEditingMode() {
+    isEditingMode = !isEditingMode
+    updateEditingModeButton()
+    chrome.storage.local.set({ isEditingMode }, function () {
+        updatePageInfoVisibility(!isEditingMode)
+        updateLinksSectionVisibility(!isEditingMode)
+        sendMessageToPage(isEditingMode ? 'editingModeOn' : 'editingModeOff')
+
+    })
+}
+
+function updateEditingModeButton(){
+    const a = document.getElementById("toggleEditingMode")
+    a.innerText = isEditingMode ? "Stop editing" : "Edit"
+}
+
+
 function toggleWebsiteUsage() {
     isCurrentSiteAllowed = !isCurrentSiteAllowed
     if(!isCurrentSiteAllowed){
@@ -467,6 +491,9 @@ function toggleWebsiteUsage() {
     chrome.storage.local.set({ sitesData:JSON.stringify({allowedSites}) })
     sendMessageToPage('toggleSiteUsage')
 }
+
+
+
 
 function toggleUsageOfServer() {
     shouldNotUseServer = !shouldNotUseServer
@@ -509,6 +536,11 @@ function sendMessageToPage(message) {
 function updatePageInfoVisibility(visible){
     const currentPageInfoDiv = document.getElementById("currentPageInfo")
     currentPageInfoDiv.style.display = visible ? 'flex' : 'none'
+}
+
+function updateLinksSectionVisibility(visible){
+    const div = document.getElementById("LinksSection")
+    div.style.display = visible ? 'flex' : 'none'
 }
 
 
