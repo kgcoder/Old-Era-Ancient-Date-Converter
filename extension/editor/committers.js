@@ -63,7 +63,7 @@ function replaceMarkers(className, color) {
     setBodyFromCurrentHTML()
     addToHistory(currentHTML)
 
-    // addListenersToSelections()
+    addListenersToSelections()
 
 
 }

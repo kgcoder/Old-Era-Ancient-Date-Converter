@@ -1,4 +1,4 @@
-let isTestingMode = false
+//let isTestingMode = false
 let selectionMode = 'markerMode'
 let isServerDataReady = false
 
@@ -45,11 +45,13 @@ function addListenersToEditorButtons(){
 
 
 
-function sendMsg(message) {
+async function sendMsg(message) {
     if (message === 'test') {
-  
-        chrome.runtime.sendMessage('toggleTestingMode',(response) => {
-            isTestingMode = response.isTestingMode
+        console.log('test clicked')
+       // await chrome.runtime.sendMessage('toggleTestingMode',(response) => {
+       //     console.log('resonse',response)
+       //     console.log('error',chrome.runtime.lastError)
+            isTestingMode = !isTestingMode
             updateButtons()
             if (!isTestingMode) message = 'backToEditing'
 
@@ -57,7 +59,7 @@ function sendMsg(message) {
                 chrome.tabs.sendMessage(tabs[0].id, message)
             })
 
-        })
+      //  })
         return
     }
     if (message === 'markerMode' || message === 'bookTitleMode' || message === 'quoteMode') {
@@ -68,7 +70,29 @@ function sendMsg(message) {
         })
     }
     console.log('message before sending', message)
-    chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
+     chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
         chrome.tabs.sendMessage(tabs[0].id, message)
+    })
+}
+
+
+function updateButtons() {
+    buttonIDs.forEach(id => {
+        const button = document.getElementById(id)
+        if(id === 'loadFromServer' || id === 'loadFromServerOnlyFixed' || id === 'loadFromServerWithoutFixed'){
+            button.disabled = isTestingMode || !isServerDataReady
+        }else if (id === 'test') {
+            button.innerHTML = isTestingMode ? 'Back to editing' : 'Test'
+        } else if (id === 'sendToServer') {
+            button.disabled = !isTestingMode
+        } else if (isTestingMode) {
+            button.disabled = true
+        } else if (id === 'markerMode' || id === 'bookTitleMode' || id === 'quoteMode') {
+            button.disabled = (id === 'markerMode' && selectionMode === 'markerMode') ||
+                (id === 'bookTitleMode' && selectionMode === 'bookTitleMode') ||
+                (id === 'quoteMode' && selectionMode === 'quoteMode')
+        } else {
+            button.disabled = false
+        }
     })
 }

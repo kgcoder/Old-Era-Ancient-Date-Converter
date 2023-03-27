@@ -11,10 +11,15 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
   
    
     if (message === 'updateIcon') {
-        const tabs = await chrome.tabs.query({ currentWindow: true, active: true })
-        if(tabs && tabs.length && tabs[0].id){
-            updateIcon(tabs[0].id)
-        }
+
+        getActiveTab((tabId)=> {
+            if(tabId)updateIcon(tabId)
+        })
+        // const tabs = await chrome.tabs.query({ currentWindow: true, active: true })
+        // if(tabs && tabs.length && tabs[0].id){
+        //     updateIcon(tabs[0].id)
+        // }
+
     }
 
     //for editor
@@ -22,18 +27,18 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
         sendMsg('giveMeCurrentState',({isTestingMode, selectionMode}) => {
             sendResponse({isTestingMode, selectionMode})
         })
-        return true
     } else if (message === 'toggleTestingMode') {
         sendMsg('toggleTestingMode',({isTestingMode}) => {
+            console.log('testing mode',isTestingMode)
             sendResponse({isTestingMode})
         })
-        return true
     } else if (message === 'markerMode' || message === 'bookTitleMode' || message === 'quoteMode') {
         sendMsg(message,({selectionMode}) => {
             sendResponse({selectionMode})
         })
-        return true
     }
+
+    return true
   
 });
 
@@ -51,6 +56,14 @@ chrome.tabs.onActivated.addListener(async function (activeInfo) {
     updateIcon(activeInfo.tabId)
 
 });
+
+async function getActiveTab(callback){
+    const tabs = await chrome.tabs.query({ currentWindow: true, active: true })
+    if(tabs && tabs.length && tabs[0].id){
+        callback(tabs[0].id)
+    }
+    callback(null)
+}
 
 
 function updateIcon(tabId){

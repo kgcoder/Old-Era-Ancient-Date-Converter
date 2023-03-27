@@ -13,6 +13,11 @@ let isTestingMode = false
 let selectionMode = 'markerMode'
 //let isServerDataReady = false
 
+let originalHTML = ''
+
+let htmlBeforeTesting = ''
+
+
 let instructions = []
 let texts = []
 let tags = []
@@ -26,11 +31,96 @@ function onEditorLoad() {
 //     if(!isEditingMode)return
      console.log('editing mode')
 //     //disableAllLinks()
-//    // setInitialHtml()
-     addToHistory(currentHTML)
+     setInitialHtml()
+    // addToHistory(currentHTML)
 //    // getPageData()
 
+    editsFromServer = editsArray
+
+
     loadEdits(editsFromServer,true,false)
+
+    openAllWikipediaDropDowns()
+
+    if (document.addEventListener) {
+        console.log('addeventlistener')
+        document.addEventListener('click', interceptClickEvent);
+    }
+    //  else if (document.attachEvent) {
+    //     console.log('attachevent')
+    //     document.attachEvent('onclick', interceptClickEvent);
+    // }
+}
+
+
+function setInitialHtml() {
+
+    let currentLocation = window.location.toString()
+ 
+    const inner = document.body.innerHTML
+    console.log('inner', inner)
+
+    if (currentLocation.includes('localhost')) {
+        // const p = document.getElementsByClassName('p')
+        // console.log('PPP', p)
+        originalHTML = document.body.innerHTML
+    } else {
+        originalHTML = new XMLSerializer().serializeToString(document.body)
+    }
+
+  //  originalHTML = removeProblematicPartsFromHtml(originalHTML)
+
+    currentHTML = originalHTML
+
+}
+
+function openAllWikipediaDropDowns(){
+    if(!currentLocation || !currentLocation.includes('en.wikipedia.org'))return
+    console.log('we are on wikipedia')
+
+    setTimeout(() => {
+        const links = document.getElementsByClassName('mw-collapsible-text')
+        console.log('links',links)
+    
+        console.log('links.length',Array.from(links).length)
+    
+    
+        // links.forEach(link => {
+        //     console.log('link:',link)
+    
+        // })
+    
+     
+    
+        Array.prototype.forEach.call(links, link => {
+            if(link.innerHTML == "show"){
+                console.log('link:',link)
+                link.click()
+            }      
+        });
+
+    },1000)
+
+}
+
+
+
+function interceptClickEvent(e) {
+    const target = e.target || e.srcElement;
+    if (target.tagName === 'A' || target.tagName === 'SELECTION') {
+        href = target.getAttribute('href');
+
+        
+
+        if(isEditingMode){
+            //tell the browser not to respond to the link click
+            e.preventDefault();
+        }
+
+    }else{
+        console.log('target.tagName',target.tagName)
+      //  e.preventDefault();
+    }
 }
 
 
@@ -164,9 +254,11 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         case 'giveMeCurrentState':
             sendResponse({isTestingMode,selectionMode})
             break
-        case 'toggleTestingMode':
+        case 'toggleTestingMode':{
+            console.log('toggleTestingMode')
             isTestingMode = !isTestingMode
             sendResponse({isTestingMode})
+        }
             break
         case 'markerMode':
             selectionMode = 'markerMode'
@@ -183,6 +275,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         default:
         //do nothing
     }
+    return true
 })
 
 
@@ -190,11 +283,12 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 
 
 function loadEdits(edits,shouldFixBrokenEdits = false,showOnlyFixed = false){
-    if (currentIndexInHistory !== 0) {
+    if (currentIndexInHistory !== -1) {
         alert("can't load after edits")
         return
     }
-    currentHTML = currentHTML.replace(/mw-collapsed/g, 'mw-expanded')
+  //  currentHTML = currentHTML.replace(/mw-collapsed/g, 'mw-expanded')
+
 
 
 
@@ -206,7 +300,7 @@ function loadEdits(edits,shouldFixBrokenEdits = false,showOnlyFixed = false){
 
     
 
-    currentHTML = currentHTML.replace(/mw-collapsed/g, 'mw-expanded')
+   // currentHTML = currentHTML.replace(/mw-collapsed/g, 'mw-expanded')
 
     console.log('html after download',currentHTML)
 
@@ -285,14 +379,18 @@ function createHTMLWithMarkersForEditor(editsArray,shouldFixBrokenEdits = false,
     console.log('local replacements', localReplacementsArray)
     localReplacementsArray = localReplacementsArray.map(item => {
         item.edit.targetIndex = item.index
+        if(['bc-y','bc-y-r1','bc-y-r2'].includes(item.edit.method))item.edit.method = 'year'
+        if(['bc-i','bc-i-r1','bc-i-r2'].includes(item.edit.method))item.edit.method = 'impreciseYear'
         return item
     })
 
+    console.log('replacmenents from server',replacements)
     replacements = resolveReplacements(localReplacementsArray, replacements)
 
     replacements = replacements.sort((a, b) => a.edit.targetIndex - b.edit.targetIndex)
 
 
+    console.log('local replacements',localReplacementsArray)
     console.log('number of replacements',replacements.length)
   
 
@@ -455,8 +553,9 @@ function addListenersToSelections() {
                     console.log('yes')
                     return
                 }
-                if (sel.className !== 'year' && sel.className !== 'impreciseYear') return
-                const newClassName = sel.className === 'year' ? 'impreciseYear' : 'year'
+                console.log('className',sel.className)
+                if (!['year','impreciseYear'].includes(sel.className)) return
+                const newClassName = ['year',].includes(sel.className) ? 'impreciseYear' : 'year'
                 const color = newClassName === 'year' ? 'green' : 'pink'
                 sel.outerHTML = `<selection class="${newClassName}" data-t="${sel.outerHTML.includes('data-t="true"') ? 'true' : '' }" style="background-color:${color};">` + sel.innerHTML + '</selection>'
             }
@@ -485,4 +584,324 @@ function removeListeners(node) {
 
 function yearNumberClicked() {
     console.log('year number clicked')
+}
+
+
+function createInstructions() {
+    console.log('createInstructions')
+
+    const occurrencesOfRawStrings = []
+
+
+    const pattern = new RegExp(`<selection class="(${allClassesString.replace('marker|', '')})" data-t="(.*?)".*?:(.*?);">(.*?)</selection>`, 'gm')  //(<span.*?>.*?</span>)?
+
+
+    const { htmlWithIgParts: ignHtml } = htmlWithIgnoredParts(currentHTML)
+
+
+    const text = extractTextFromHtml(ignHtml)
+    
+
+
+    console.log('ignHtml before creating instructions', ignHtml)
+
+    console.log('clean text',text)
+
+    while ((result = pattern.exec(ignHtml))) {
+        console.log('result',result)
+        const fromTemplate = result[2]
+        const color = result[3]
+
+        console.log('color', color)
+        let type = 'normal'
+        if (color === 'blue') type = 'bookTitle'
+        if (color === 'violet') type = 'quote'
+
+        const target = result[4]
+        const chunks = target.split('_substitute_')
+       // console.log('result[0]', result[0])
+      //  console.log('target', target)
+      //  console.log('chunks', chunks)
+        const text = chunks[0]
+        let substitute = ''
+        if (chunks.length === 2) {
+            substitute = chunks[1]
+        }
+        console.log('substitute', substitute)
+
+        const obj = { index: result.index, length: result[0].length, method: result[1], text, type, substitute, fromTemplate }
+
+
+        occurrencesOfRawStrings.push(obj)
+
+
+
+    }
+    console.log('indexes of raw strings', occurrencesOfRawStrings)
+
+
+
+
+
+
+
+    const cleanTexts = []
+    let lastIndex = 0
+
+    let indexInOriginalText = 0
+    occurrencesOfRawStrings.forEach(obj => {
+        const fillerText = ignHtml.substr(lastIndex, obj.index - lastIndex)
+        lastIndex = obj.index + obj.length
+        const targetText = obj.text
+        indexInOriginalText += fillerText.length
+
+     
+
+        cleanTexts.push({ text: fillerText, method: 'text' })
+        cleanTexts.push({ text: targetText, method: obj.method, index: indexInOriginalText, type: obj.type, originalSubstitute: obj.substitute, fromTemplate:obj.fromTemplate })
+
+        indexInOriginalText += targetText.length
+
+    })
+    const fillerText = ignHtml.substr(lastIndex, ignHtml.length - lastIndex)
+    cleanTexts.push({ text: fillerText, method: 'text' })
+
+    console.log('cleanTexts', cleanTexts)
+
+    let cleanHTML = ''
+    cleanTexts.forEach(obj => {
+        cleanHTML += obj.text
+    })
+
+
+    const instructions = []
+
+    cleanTexts.forEach((cleanTextObj, index) => {
+        if (cleanTextObj.method === 'text') {
+            // currentIndex += cleanTextObj.text.length
+        } else {
+            // console.log('currentIndex', currentIndex)
+
+            const left = getLeftSide(cleanTexts, index)
+            const right = getRightSide(cleanTexts, index)
+
+
+            const targetIndex = cleanTextObj.index
+            //console.log('target index', targetIndex)
+            const bigStringIndex = targetIndex - left.length
+
+            //console.log('string index', bigStringIndex)
+
+
+
+
+
+            // console.log('left', left)
+            // console.log('right', right)
+            const bigLine = left + cleanTextObj.text + right
+            const stringOccurrences = getOccurrences2(cleanHTML, bigLine)
+
+            let numberOfOccurrence = 1
+
+            if (stringOccurrences.length !== 1) {
+                //console.log('line to find:', bigLine)
+                numberOfOccurrence = getNumberOfOccurrence(stringOccurrences, bigStringIndex)
+            }
+
+            if(!cleanTextObj.text)return
+
+            const targetOccurrences = getOccurrences2(bigLine, cleanTextObj.text)
+            let numberOfTargetOccurrence = 1
+            if (targetOccurrences.length !== 1) {
+                const relTargetIndex = left.length
+                numberOfTargetOccurrence = getNumberOfOccurrence(targetOccurrences, relTargetIndex)
+            }
+
+
+            //console.log('cleanTextObj', cleanTextObj)
+
+           
+            // console.log('bigLine: ', bigLine)
+            // console.log('target', cleanTextObj.text)
+            // console.log('calculated target index', cleanTextObj.index)
+
+            // console.log('string occurrences', stringOccurrences.length)
+            // console.log('needed index', bigStringIndex)
+            // console.log('numberOfOccurrence', numberOfOccurrence)
+
+            // console.log('number of target occurrences', targetOccurrences.length)
+            // console.log('numberOfTargetOccurrence', numberOfTargetOccurrence)
+
+
+
+            const order = `${stringOccurrences.length}.${numberOfOccurrence}.${targetOccurrences.length}.${numberOfTargetOccurrence}`
+
+            const instruction = {
+                string: bigLine,
+                target: cleanTextObj.text,
+                method: cleanTextObj.method,
+            }
+            if (order !== '1.1.1.1') instruction['order'] = order
+            if (cleanTextObj.type !== 'normal') instruction['type'] = cleanTextObj.type
+            if (cleanTextObj.originalSubstitute) instruction['originalSubstitute'] = cleanTextObj.originalSubstitute
+            if(cleanTextObj.fromTemplate)instruction['fromTemplate'] = true
+
+            instructions.push(instruction)
+
+
+        }
+    })
+
+    console.log('instructions', JSON.stringify(instructions))
+
+    return instructions
+
+
+}
+
+
+function getOccurrences2(string, target) {
+
+    
+    const pattern = new RegExp(escapeText(target), 'g')
+    const occurrences = []
+    
+    let result
+    while ((result = pattern.exec(string))) {
+        const obj = { index: result.index, length: result[0].length, text: result[0] }
+        occurrences.push(obj)
+    }
+
+    return occurrences
+}
+
+function getNumberOfOccurrence(allMatches, neededIndex) {
+    const index = allMatches.findIndex(item => item.index === neededIndex)
+    console.log('original index', index)
+    if (index >= 0) return index + 1
+
+    console.log('something wrong', allMatches, 'nIndex', neededIndex)
+    return index
+}
+
+
+function getLeftSide(array, index) {
+    if (index <= 0) return ''
+    let result = ''
+    while (index > 0) {
+        index--
+        const obj = array[index]
+        let text = obj.text
+        let shouldReturn = false
+        if (text.includes('<IgnoredPart>')) {
+            const chunks = text.split('<IgnoredPart>')
+            text = chunks[chunks.length - 1]
+            shouldReturn = true
+        }
+        result = text + result
+        if (result.length > 15) {
+            return result.substr(result.length - 15, 15)
+        }
+        if (shouldReturn) {
+            return result
+        }
+    }
+    return result
+}
+
+function getRightSide(array, index) {
+    if (index >= array.length - 1) return ''
+    let result = ''
+    while (index < array.length - 1) {
+        index++
+        const obj = array[index]
+        let text = obj.text
+        let shouldReturn = false
+        if (text.includes('<IgnoredPart>')) {
+            const chunks = text.split('<IgnoredPart>')
+            text = chunks[0]
+            shouldReturn = true
+        }
+        result = result + text
+        if (result.length > 15) {
+            return result.substr(0, 15)
+        }
+        if (shouldReturn) {
+            return result
+        }
+    }
+    return result
+}
+
+
+
+function test() {
+    console.log('test')
+    instructions = createInstructions()
+    console.log('instructions',instructions)
+
+    chrome.storage.local.set({ instructions }, function () {
+        console.log('instructions saved')
+    })
+
+    //  const originalWithOpenedViews = originalHTML.replace(/mw-collapsed/g, 'mw-expanded')
+    setBodyFromHTML(originalHTML)
+
+    const htmlWithMarkers = createHTMLWithMarkersForEditor(instructions)
+
+    console.log('htmlWithMarkers100',htmlWithMarkers)
+    const parser = new DOMParser();
+    const cleanHtml = removeAttributesFromTags(htmlWithMarkers)
+    const bodyDOM = parser.parseFromString(cleanHtml, "text/xml");
+
+    textsArray = []
+    getTextsArray(bodyDOM.documentElement)
+
+    textNodesArray = []
+    getTextNodesArray(document.body)
+
+    console.log('textsArray',textsArray)
+    console.log('textNodesArray',textNodesArray)
+
+
+    // const textInFirstNode = textNodesArray[1].firstNode.data
+  
+    // if(textNodesArray.length < textsArray.length){
+  
+    //     const index = textsArray.findIndex(item => {
+    //         return textInFirstNode === item
+    //     })
+
+       
+    //     if(index > 0){
+    //         textsArray.splice(0, index);
+    //     }
+    // }
+
+
+    doReplacements()
+    htmlBeforeTesting = currentHTML
+    currentHTML = new XMLSerializer().serializeToString(document.body)
+    currentHTML = removeProblematicPartsFromHtml(currentHTML)
+    //currentHTML = currentHTML.replace(/mw-collapsed/g, 'mw-expanded')
+    setBodyFromCurrentHTML()
+    openAllWikipediaDropDowns()
+   
+
+}
+
+
+function backToEditing() {
+    currentHTML = htmlBeforeTesting
+    setBodyFromCurrentHTML()
+    addListenersToSelections()
+}
+
+
+function doReplacements2() {
+    for (let i = 0; i < textsArray.length; i++) {
+        const text = textsArray[i]
+        const node = textNodesArray[i]
+        replaceTextInNodeIfNeeded(node, text)
+    }
 }

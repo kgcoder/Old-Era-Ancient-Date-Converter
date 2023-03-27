@@ -86,16 +86,29 @@ function escapeText(text) {
 
 
 function setBodyFromCurrentHTML() {
+    setBodyFromHTML(currentHTML)
     console.log('set from current')
+    // let currentLocation = window.location.toString()
+    // if (currentLocation.includes('localhost')) {
+    //     document.body.innerHTML = currentHTML
+    // } else {
+    //     const parser = new DOMParser();
+    //     const bodyDOM = parser.parseFromString(currentHTML, "text/xml");
+    //     document.body = bodyDOM.documentElement
+    // }
+
+}
+
+function setBodyFromHTML(html) {
     let currentLocation = window.location.toString()
     if (currentLocation.includes('localhost')) {
-        document.body.innerHTML = currentHTML
+        document.body.innerHTML = html
     } else {
         const parser = new DOMParser();
-        const bodyDOM = parser.parseFromString(currentHTML, "text/xml");
+        const bodyDOM = parser.parseFromString(html, "text/xml");
         document.body = bodyDOM.documentElement
-    }
 
+    }
 }
 
 function splitUpTagsAndTexts() {
@@ -229,7 +242,7 @@ function markTextsMatchingRegExp(reg, matchNumber) {
         return left + inner.replace(/<selection.*?>/gm, '').replace(/<\/selection>/gm, '') + right
     })
 
-    currentHTML = currentHTML.replace(/mw-collapsed/g, 'mw-expanded')
+    //currentHTML = currentHTML.replace(/mw-collapsed/g, 'mw-expanded')
 
 
 

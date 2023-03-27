@@ -7,6 +7,9 @@
 let isExtensionOff = false
 let isEditingMode = false
 
+let isTestingMode = false
+
+
 let shouldTranslateYearsPrecisely = false
 let shouldTranslateDatesInBookTitles = false
 let shouldTranslateDatesInQuotes = false

@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-let originalTextsArray = []
+//let originalTextsArray = []
 let textsArray = []
 let textNodesArray = []
 let targets = []
@@ -208,6 +208,8 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         const link = `https://en.wikipedia.org/w/index.php?title=${titleInURL}&oldid=${translatedForVersion}`
         window.open(link, "_self")
     }
+
+    return true
    
 })
 
@@ -258,7 +260,7 @@ window.onload = () => {
             return
         }
     
-        if (!isExtensionOff && !isEditingMode && currentLocation) {
+        if (!isExtensionOff  && currentLocation) {
             if (!shouldNotUseServer && currentLocation.includes("en.wikipedia.org")) {
                 startRequest()  
             } else {
@@ -267,9 +269,9 @@ window.onload = () => {
             }
         }
 
-        if(isEditingMode){
-            onEditorLoad()
-        }
+        // if(isEditingMode){
+        //     onEditorLoad()
+        // }
       
     })
 
@@ -283,14 +285,14 @@ window.onload = () => {
 
 
 
-function getTextsArray(node, isOriginalHTML) {
+function getTextsArray(node) {
     if (node.nodeType === 3) {
-        isOriginalHTML ?
-            originalTextsArray.push(node.data) :
+      //  isOriginalHTML ?
+           // originalTextsArray.push(node.data) :
             textsArray.push(node.data)
     }
     if (node = node.firstChild) do {
-        getTextsArray(node, isOriginalHTML);
+        getTextsArray(node);
     } while (node = node.nextSibling);
 }
 
@@ -339,7 +341,13 @@ function startRequest() {
 
         console.log('got data from server')
         try{
-            translateEverything(r)
+            if(isEditingMode){
+                console.log('calling onEditorLoad')
+                onEditorLoad()
+            }else{
+                translateEverything(r)
+            }
+
         }catch(e){
             console.log(e)
 
@@ -406,10 +414,10 @@ function translateEverything(r) {
 
 
         textsArray = []
-        getTextsArray(bodyDOM.documentElement, false)
+        getTextsArray(bodyDOM.documentElement)
 
-        originalTextsArray = []
-        getTextsArray(originalBodyDOM.documentElement, true)
+        // originalTextsArray = []
+        // getTextsArray(originalBodyDOM.documentElement, true)
 
         textNodesArray = []
         getTextNodesArray(document.body)
@@ -631,6 +639,7 @@ function doReplacements() {
                     // console.log('something is wrong while replacing')
                     // console.log('clean text:',cleanText)
                     // console.log('text in node',textInNode)
+                    // console.log('i',i)
                     j++;
                     continue;
                 }else{
@@ -1109,7 +1118,11 @@ function resolveLabel(label, translatedYear){
     return ''
 }
 
-function createMarker(text, method, type = 'normal', originalSubstitute = '',otherNumberStringInRange = '') {
+function createMarker(text, method, type = 'normal', originalSubstitute = '',otherNumberStringInRange = '') { 
+    if(isEditingMode){
+        if(['bc-y-r1','bc-y-r2'].includes(method))method = 'year'
+        if(['bc-i-r1','bc-i-r2'].includes(method))method = 'impreciseYear'
+    }
     return `{{${method}|${text}|${type}|${originalSubstitute}|${otherNumberStringInRange}}}`
 }
 
