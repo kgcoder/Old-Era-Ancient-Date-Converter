@@ -141,6 +141,7 @@ const seasons = [
 ]
  
 
+
 const methodConversions = {
     'bc-y': 'year',
     'bc-y1': 'oneDigitYear',
@@ -167,4 +168,29 @@ const methodConversions = {
     'bc-i-r2':'bc-i-r2',//second year in range
 
 }
+
+//for editor
+const allClasses = [
+    'marker',
+    'year',
+    'ad-y',
+    'oneDigitYear',
+    'twoDigitYear',
+    'impreciseYear',
+    'remove',
+    'decade',
+    'century',
+    '00s',
+    'millennium',
+    '000s',
+    'remove',
+    'OE',
+    'ofOE',
+    'bc-ig',
+    'bc-y-r1',
+    'bc-y-r2',
+    'bc-i-r1',
+    'bc-i-r2'
+    
+]
 

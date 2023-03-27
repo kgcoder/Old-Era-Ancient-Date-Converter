@@ -9,6 +9,18 @@
 let currentHTML = ''
 let editsFromServer = []
 
+let isTestingMode = false
+let selectionMode = 'markerMode'
+//let isServerDataReady = false
+
+let instructions = []
+let texts = []
+let tags = []
+
+
+const allClassesString = allClasses.join('|')
+
+
 
 function onEditorLoad() {
 //     if(!isEditingMode)return
@@ -20,6 +32,160 @@ function onEditorLoad() {
 
     loadEdits(editsFromServer,true,false)
 }
+
+
+chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+    console.log('message',message)
+    if(!isEditingMode)return
+    switch (message) {
+
+        case 'giveMePageMetadata':
+        //    sendResponse({isServerDataReady: editsFromServer && editsFromServer.length > 0 ? true : false})
+            break
+        case 'goBackInHistory':
+            goBackInHistory()
+            break
+        case 'goForwardInHistory':
+            goForwardInHistory()
+            break
+        case 'loadFromTemplates':
+        //    loadFromTemplates()
+            break
+        case 'loadFromServer':
+         //   loadFromServer()
+            break
+        case 'loadFromServerOnlyFixed':
+       //     loadFromServerOnlyFixed()
+            break
+        case 'loadFromServerWithoutFixed':
+       //     loadFromServerWithoutFixed()
+            break
+        case 'loadFromStorage':
+        //    loadFromLocalStorage()
+            break
+        case 'find1DigitNumbers':
+            selectNumbers(1)
+            break
+        case 'find2DigitNumbers':
+            selectNumbers(2)
+            break
+        case 'find3DigitNumbers':
+            selectNumbers(3)
+            break
+        case 'find4DigitNumbers':
+            selectNumbers(4)
+            break
+        case 'findNumbersWithBCs':
+            selectNumbersWithBCs()
+            break
+        case 'findRoundYears':
+            findRoundYears()
+            break
+        case 'findDecades':
+            findDecades()
+            break
+        case 'findCenturiesMillennia':
+            findCenturiesMillennia()
+            break
+
+        case 'findNumberWords':
+            findNumberWords()
+            break
+        case 'markWordCentury':
+            markWordCentury()
+            break
+        case 'markWordMillennium':
+            markWordMillennium()
+            break
+
+        case 'findBCs':
+            findBCs()
+            break
+        case 'findBCsWithoutSpaces':
+            findBCsWithoutSpaces()
+            break
+        case 'selectRange':
+            selectRange()
+            break
+        case 'deselectRange':
+            clearSelection()
+            break
+        case 'roundYearsInRange':
+            roundYearsInRange()
+            break
+        case 'deleteInRange':
+            deleteInRange()
+            break
+        case 'commitYears':
+            commitYears()
+            break
+        case 'commitADYears':
+            commitADYears()
+            break
+        case 'commitDecades':
+            commitDecades()
+            break
+        case 'commitCenturies':
+            commitCenturies()
+            break
+        case 'commit00s':
+            commit00s()
+            break
+        case 'commitMillennia':
+            commitMillennia()
+            break
+        case 'commit000s':
+            commit000s()
+            break
+        case 'sendToServer':
+            sendToServer()
+            break
+        case 'toggleTestingModeFromShortcut':
+            toggleTestingModeFromShortcut()
+            break
+        case 'test':
+            test()
+            break
+        case 'backToEditing':
+            backToEditing()
+            break
+        case 'commitRemovals':
+            commitRemovals()
+            break
+        case 'commitOE':
+            commitOE()
+            break
+        case 'commitOfOE':
+            commitOfOE()
+            break
+        case 'commitIgnoredPart':
+            commitIgnoredPart()
+            break
+        case 'giveMeCurrentState':
+            sendResponse({isTestingMode,selectionMode})
+            break
+        case 'toggleTestingMode':
+            isTestingMode = !isTestingMode
+            sendResponse({isTestingMode})
+            break
+        case 'markerMode':
+            selectionMode = 'markerMode'
+            sendResponse({selectionMode})
+            break
+        case 'bookTitleMode':
+            selectionMode = 'bookTitleMode'
+            sendResponse({selectionMode})
+            break
+        case 'quoteMode':
+            selectionMode = 'quoteMode'
+            sendResponse({selectionMode})
+            break
+        default:
+        //do nothing
+    }
+})
+
+
 
 
 

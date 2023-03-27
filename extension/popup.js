@@ -59,6 +59,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const restoreDefaultsButton = document.getElementById("restoreDefaultsButton")
 
 
+    addListenersToEditorButtons()
 
 
     function updateSettingsButtons(){
@@ -308,6 +309,7 @@ document.addEventListener('DOMContentLoaded', function () {
             allowedSites = sitesData.allowedSites
         }
 
+
         shouldNotUseServer = !!result.shouldNotUseServer
         document.getElementById('DontUseServerCheckbox').checked = shouldNotUseServer
         
@@ -327,7 +329,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         updateInputTexts()
         updateSettingsButtons()
-        updateEditingModeButton()
+        updateUIInAccordanceWithMode()
 
     })
 
@@ -398,6 +400,7 @@ function updatePageMetadata(response){
     if (!response) {
         updatePageStatus('Wrong site, page doesn\'t exist in the database, or page update is needed')
         link1.style = link2.style = link3.style = "pointer-events: none; color:lightgray"
+        updateUIInAccordanceWithMode()
         return
     }
 
@@ -437,6 +440,7 @@ function updatePageMetadata(response){
     pageInfo.style.display = pageIsNotTranslatedYet ? 'none' : 'flex'
 
     updatePageInfoVisibility(!isExtensionOff)
+    updateUIInAccordanceWithMode()
 }
 
 
@@ -451,6 +455,7 @@ function updatePageStatus(message, color = 'black') {
 function toggleExtension() {
 
     isExtensionOff = !isExtensionOff
+    updateUIInAccordanceWithMode()
     chrome.storage.local.set({ isExtensionOff }, function () {
      
         if(isExtensionOff)updatePageInfoVisibility(false)
@@ -464,19 +469,35 @@ function toggleExtension() {
 
 function toggleEditingMode() {
     isEditingMode = !isEditingMode
-    updateEditingModeButton()
     chrome.storage.local.set({ isEditingMode }, function () {
-        updatePageInfoVisibility(!isEditingMode)
-        updateLinksSectionVisibility(!isEditingMode)
+       // updatePageInfoVisibility(!isEditingMode)
+       // updateLinksSectionVisibility(!isEditingMode)
+
+        updateUIInAccordanceWithMode()
+
         sendMessageToPage(isEditingMode ? 'editingModeOn' : 'editingModeOff')
 
     })
 }
 
-function updateEditingModeButton(){
+function updateUIInAccordanceWithMode(){
     const a = document.getElementById("toggleEditingMode")
     a.innerText = isEditingMode ? "Stop editing" : "Edit"
+
+    const editingButton = document.getElementById("editingModeButton")
+    editingButton.style.display = !isExtensionOff && isCurrentSiteAllowed ? 'flex' : 'none'
+
+
+
+    const mainMenu = document.getElementById("mainMenu")
+    mainMenu.style.display = isEditingMode  && isCurrentSiteAllowed  ? 'none' : 'flex'
+
+    const editingMenu = document.getElementById("editingMenu")
+    editingMenu.style.display = isEditingMode && isCurrentSiteAllowed ? 'flex' : 'none'
+
 }
+
+
 
 
 function toggleWebsiteUsage() {
@@ -488,8 +509,11 @@ function toggleWebsiteUsage() {
         allowedSites.push(currentDomain)
     }
 
+    updateUIInAccordanceWithMode()
+
     chrome.storage.local.set({ sitesData:JSON.stringify({allowedSites}) })
     sendMessageToPage('toggleSiteUsage')
+
 }
 
 

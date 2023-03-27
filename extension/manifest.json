@@ -23,6 +23,8 @@
                 "summaryManager.js",
                 "editor/history.js",
                 "editor/editorContent.js",
+                "editor/selectors.js",
+                "editor/committers.js",
                 "content.js"
             ],
             "css": [
@@ -49,5 +51,98 @@
         "32": "images/icon32.png",
         "48": "images/icon48.png",
         "128": "images/icon128.png"
+    },
+    "commands": {
+        "selectRange": {
+            "suggested_key": {
+                "default": "Ctrl+Z",
+                "mac": "MacCtrl+Z"
+            },
+            "description": "select range"
+        },
+        "deselectRange": {
+            "suggested_key": {
+                "default": "Alt+Z",
+                "mac": "Alt+Z"
+            },
+            "description": "deselect range"
+        },
+        "deleteInRange": {
+            "suggested_key": {
+                "default": "Alt+D",
+                "mac": "Alt+D"
+            },
+            "description": "delete in range"
+        },
+        "roundYearsInRange": {
+            "suggested_key": {
+                "default": "Ctrl+Q",
+                "mac": "Ctrl+Q"
+            },
+            "description": "round years in range"
+        },
+        "findRoundYears": {
+            "description": "find round years"
+        },
+        "findDecades": {
+            "description": "find decades"
+        },
+        "findCenturiesMillennia": {
+            "description": "find centuries/millennia"
+        },
+        "findBCs": {
+            "description": "find BCs"
+        },
+        "commitYears": {
+            "description": "commit years"
+        },
+        "commitDecades": {
+            "description": "commit decades"
+        },
+        "commitCenturies": {
+            "description": "commit centuries"
+        },
+        "commitMillennia": {
+            "description": "commit millennia"
+        },
+        "commitRemovals": {
+            "description": "commit removals"
+        },
+        "markerMode": {
+            "description": "marker mode"
+        },
+        "bookTitleMode": {
+            "description": "book title mode"
+        },
+        "quoteMode": {
+            "description": "quote mode"
+        },
+        "loadFromTemplates":{
+            "description": "load edits from templates"
+        },
+        "loadFromServerWithoutFixed":{
+            "description": "load edits from server (without fixed)"
+        },
+        "find1DigitNumbers":{
+            "description": "find 1 digit numbers"
+        },
+        "find2DigitNumbers":{
+            "description": "find 2 digit numbers"
+        },
+        "find3DigitNumbers":{
+            "description": "find 3 digit numbers"
+        },
+        "find4DigitNumbers":{
+            "description": "find 4 digit numbers"
+        },
+        "findNumbersWithBCs":{
+            "description": "find numbers with BCs"
+        },
+        "toggleTestingModeFromShortcut":{
+            "description": "toggle test mode"
+        },
+        "sendToServer":{
+            "description":"send to server"
+        }
     }
 }

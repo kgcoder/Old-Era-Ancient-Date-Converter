@@ -244,10 +244,14 @@ window.onload = () => {
 
     getConfigFromLocalStorage(function(){
         updateIcon()
-
-        const index = allowedSites.findIndex(site => currentLocation.includes(site))
+        console.log('currentLocation',currentLocation)
+        if(currentLocation){
+            const index = allowedSites.findIndex(site => currentLocation.includes(site))
+            isThisSiteAllowed = index !== -1
+        }else{
+            isThisSiteAllowed = false
+        }
     
-        isThisSiteAllowed = index !== -1
     
         if(!isThisSiteAllowed){
             chrome.runtime.sendMessage('pageMetadataIsReady') //message for the popup script

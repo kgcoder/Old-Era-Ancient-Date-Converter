@@ -98,6 +98,182 @@ function setBodyFromCurrentHTML() {
 
 }
 
+function splitUpTagsAndTexts() {
+    texts = []
+    tags = []
+
+    const commentReg = new RegExp('<!--[\\s\\S]*?-->', 'gm')
+    const html = currentHTML.replace(commentReg, (match) => {
+        console.log('comment', match)
+        return ''
+    })
+    const regex1 = new RegExp('<(?!(/)?span)[^>]*?>', 'gm');
+
+
+    let array
+
+    let startIndex = 0
+
+    while ((array = regex1.exec(html)) !== null) {
+
+        const index = array.index
+        const text = html.substr(startIndex, index - startIndex)
+
+        texts.push(text)
+        tags.push(array[0])
+
+        startIndex = regex1.lastIndex
+
+    }
+    const lastText = html.substr(startIndex, html.length - startIndex)
+
+    texts.push(lastText)
+
+
+    putStylesAndScriptsInTags()
+
+
+
+    // console.log('all texts', texts)
+    // console.log('all tags', tags)
+    // const index = tags.findIndex(tag => {
+    //     const result = tag.match(/<.*?<.*?>/)
+
+    //     //) console.log(result)
+    //     return result
+    // })
+    // console.log('index', index)
+    // if (index >= 0) {
+    //     console.log(tags[index])
+    // }
+}
+
+
+
+
+
+function putStylesAndScriptsInTags() {
+    const newTexts = []
+    const newTags = []
+    let megaTag = ''
+    for (let i = 0; i < tags.length; i++) {
+        const text = texts[i]
+        if (megaTag) {
+            megaTag = megaTag + text
+        } else {
+            newTexts.push(text)
+        }
+        const tag = tags[i]
+        if (tag.includes('<script') || tag.includes('<style') || tag.includes('shortdescription')) {
+            megaTag = tag
+        } else if (tag === '</script>' || tag === '</style>' || tag === '</div>') {
+            megaTag = megaTag + tag
+            newTags.push(megaTag)
+            megaTag = ''
+        }else if(megaTag){
+            megaTag = megaTag + tag
+        } else {
+            newTags.push(tag)
+        }
+    }
+    newTexts.push(texts[texts.length - 1])
+    texts = newTexts
+    tags = newTags
+}
+
+
+
+function markTextsMatchingRegExp(reg, matchNumber) {
+    const newTexts = texts.map((text, index) => {
+        if (index > 0) {
+            const precedingTag = tags[index - 1]
+            const pattern = new RegExp(`<selection.*?class="(${allClassesString})"(?!</selection>).*?>`)
+            const array = precedingTag.match(pattern)
+            if (array) return text
+
+        }
+        let replacementText = text.replace(reg, `{---{selection class="marker" data-t="" style="background-color: red;"}---}${matchNumber}{---{/selection}---}`)
+
+
+        const reg1 = new RegExp('<span.*?>', 'g')
+
+        const regBrackets = new RegExp('\\{---\\{.*?\\}---\\}', 'g')
+        replacementText = replacementText.replace(reg1, (match) => {
+            return match.replace(regBrackets, '')
+        })
+
+        replacementText = replacementText.replace(/\{---\{/g, '<').replace(/\}---\}/g, '>')
+
+
+
+        return replacementText
+    })
+
+    const bigArray = []
+    tags.forEach((tag, index) => {
+        bigArray.push(newTexts[index])
+        bigArray.push(tag)
+    })
+    bigArray.push(newTexts[length - 1])
+    currentHTML = bigArray.join('')
+
+    currentHTML = currentHTML.replace(/(<span class="tocnumber">)(.*?)(<\/span>)/gm, (match, left, inner, right) => {
+        return left + inner.replace(/<selection.*?>/gm, '').replace(/<\/selection>/gm, '') + right
+    })
+
+    currentHTML = currentHTML.replace(/(<div id="mw-hidden-catlinks".*?>)(.*?)(<\/div>)/gm, (match, left, inner, right) => {
+        return left + inner.replace(/<selection.*?>/gm, '').replace(/<\/selection>/gm, '') + right
+    })
+
+    currentHTML = currentHTML.replace(/(<a.*?Special:BookSources[^>]*?>)(.*?)(<\/a>)/gm, (match, left, inner, right) => {
+        return left + inner.replace(/<selection.*?>/gm, '').replace(/<\/selection>/gm, '') + right
+    })
+
+    currentHTML = currentHTML.replace(/mw-collapsed/g, 'mw-expanded')
+
+
+
+
+
+
+    fixInnerSpans()
+
+
+    console.log('currentHTML', currentHTML)
+    setBodyFromCurrentHTML()
+    addToHistory(currentHTML)
+
+
+}
+
+
+function fixInnerSpans() {
+    const pattern = new RegExp('(<selection class="marker".*?>)(?!</span>)(.*?)(</selection>)', 'gm')
+   // const innerPattern = new RegExp('^(.*?)(<span.*?>)(.*?)(</span>)(.*?)$')
+    currentHTML = currentHTML.replace(pattern, (match, markerStart, inner, markerEnd) => {
+
+        return splitSpan(markerStart, inner, markerEnd)
+    })
+}
+
+
+
+function splitSpan(markerStart, inner, markerEnd) {
+    const innerPattern = new RegExp('^(.*?)(<span.*?>)(.*?)(</span>)(.*?)$')
+    if (inner.includes('<span')) {
+        //   console.log('match', match)
+        const result = inner.match(innerPattern)
+        if (!result) return markerStart + inner + markerEnd
+        const [m, leftText, spanStart, middleText, spanEnd, rightText] = result
+        console.log('result', result)
+
+        return markerStart + leftText + markerEnd +
+            spanStart + markerStart + middleText + markerEnd + spanEnd +
+            markerStart + rightText + markerEnd
+    } else {
+        return markerStart + inner + markerEnd
+    }
+}
 
 //TODO:Remove this method
 function removeProblematicPartsFromHtml(html){
@@ -106,3 +282,7 @@ function removeProblematicPartsFromHtml(html){
     html = html.replace('</mw:tocplace>','')
     return html
 }
+
+
+
+

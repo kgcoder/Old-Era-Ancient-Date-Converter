@@ -16,6 +16,24 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
             updateIcon(tabs[0].id)
         }
     }
+
+    //for editor
+    if (message === 'giveMeCurrentState') {
+        sendMsg('giveMeCurrentState',({isTestingMode, selectionMode}) => {
+            sendResponse({isTestingMode, selectionMode})
+        })
+        return true
+    } else if (message === 'toggleTestingMode') {
+        sendMsg('toggleTestingMode',({isTestingMode}) => {
+            sendResponse({isTestingMode})
+        })
+        return true
+    } else if (message === 'markerMode' || message === 'bookTitleMode' || message === 'quoteMode') {
+        sendMsg(message,({selectionMode}) => {
+            sendResponse({selectionMode})
+        })
+        return true
+    }
   
 });
 
@@ -65,3 +83,22 @@ function updateIcon(tabId){
         }
     })
 }
+
+
+
+chrome.commands.onCommand.addListener(function (command) {
+    console.log('Command:', command);
+    sendMsg(command)
+
+
+});
+
+
+
+
+function sendMsg(message,callback = null) {
+    chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, message,callback)
+    })
+}
+

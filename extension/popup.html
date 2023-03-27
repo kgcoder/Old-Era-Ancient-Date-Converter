@@ -11,87 +11,90 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css" />
+    <script src="./editor/editorPopup.js"></script>
     <script src="./popup.js"></script>
 
     <title>Document</title>
 </head>
 
 <body>
-    <div style="display: flex;flex-direction: column;">
+    <div style="display: flex;flex-direction: column; width:250px;">
         <div style="display: flex; justify-content: space-between;">
             <a id="toggleOnOff" href="#">Toggle on/off</a>
-            <span>[<a id="toggleEditingMode" href="#">Edit</a>]</span>
+            <span id="editingModeButton" style="display: none;">[<a id="toggleEditingMode" href="#">Edit</a>]</span>
         </div>
         <br />
 
-        <div class="PopupItemDiv">
-            <input type="checkbox" id="UseOnThisSiteCheckbox">
-            <label class="CheckboxLabel" for="UseOnThisSiteCheckbox" id="DomainNameLabel">Use on this website</label>
-        </div>
-        <br />
+        <div id="mainMenu" style="display: flex; flex-direction: column;">
 
-        <span class="MenuTitle">Settings</span>
-        <div class="PopupItemDiv">
-            <input type="checkbox" id="DontUseServerCheckbox">
-            <label class="CheckboxLabel" for="DontUseServerCheckbox">don't use server (some dates and images will not be replaced)</label>
-        </div>
-        <div class="PopupItemDiv">
-            <input type="checkbox" id="TranslateYearsPreciselyCheckbox">
-            <label class="CheckboxLabel" for="TranslateYearsPreciselyCheckbox">always translate years precisely</label>
-        </div>
-
-        <div class="PopupItemDiv">
-            <input type="checkbox" id="TranslateInBookTitlesCheckbox">
-            <label class="CheckboxLabel" for="TranslateInBookTitlesCheckbox">translate dates in book titles</label>
-        </div>
-
-        <div class="PopupItemDiv">
-            <input type="checkbox" id="TranslateInQuotesCheckbox">
-            <label class="CheckboxLabel" for="TranslateInQuotesCheckbox">translate dates in quotes</label>
-        </div>
-        <br />
-
-        <div>
-            <span class="MenuTitle">Advanced settings</span> [<a id="ShowHideAdvancedSettingsButton" href="#">Show</a>]</div>
+            <div class="PopupItemDiv">
+                <input type="checkbox" id="UseOnThisSiteCheckbox">
+                <label class="CheckboxLabel" for="UseOnThisSiteCheckbox" id="DomainNameLabel">Use on this website</label>
+            </div>
             <br />
-            <div id="AdvancedSettings" hidden>
-                Year BC that should be year 1<br />
-                <input id="startingYearInput" style="width:200px;"/><br/><br/>
 
-                Last translated year that should have era label<br />
-                <input id="lastTranslatedYearWithLabelInput" style="width:200px;"/><br/><br/>
-
-                Name of the timeline<br />
-                <input id="timelineNameInput" style="width:200px;"/><br/><br/>
-
-                "Of the timeline" string<br />
-                <input id="ofTimelineInput" style="width:200px;"/><br/><br/>
-
-                Abbreviated name of the timeline<br />
-                <input id="abbreviatedTimelineNameInput" style="width:200px;"/><br/><br/>
-                
-                [<a id="saveSettingsButton" class="disabledLink" href=#>Save</a>] [<a class="disabledLink" id="cancelSettingsEditButton" href=#>Cancel</a>] [<a id="restoreDefaultsButton" class="disabledLink" href=#>Restore defaults</a>]
-                <br/><br/>
+            <span class="MenuTitle">Settings</span>
+            <div class="PopupItemDiv">
+                <input type="checkbox" id="DontUseServerCheckbox">
+                <label class="CheckboxLabel" for="DontUseServerCheckbox">don't use server (some dates and images will not be replaced)</label>
+            </div>
+            <div class="PopupItemDiv">
+                <input type="checkbox" id="TranslateYearsPreciselyCheckbox">
+                <label class="CheckboxLabel" for="TranslateYearsPreciselyCheckbox">always translate years precisely</label>
             </div>
 
-        <div id="currentPageInfo" style="display:flex; flex-direction:column;">
-            <span class="MenuTitle">Current page status</span>
-            <span id="pageStatusLine"></span>
-    
-            <div id="otherVersions" style="display: none;flex-direction: column;">
+            <div class="PopupItemDiv">
+                <input type="checkbox" id="TranslateInBookTitlesCheckbox">
+                <label class="CheckboxLabel" for="TranslateInBookTitlesCheckbox">translate dates in book titles</label>
+            </div>
+
+            <div class="PopupItemDiv">
+                <input type="checkbox" id="TranslateInQuotesCheckbox">
+                <label class="CheckboxLabel" for="TranslateInQuotesCheckbox">translate dates in quotes</label>
+            </div>
+            <br />
+
+            <div>
+                <span class="MenuTitle">Advanced settings</span> [<a id="ShowHideAdvancedSettingsButton" href="#">Show</a>]</div>
                 <br />
-                <span class="MenuTitle">Other versions</span>
-                <a id="okVersion" href="#">last version that seems OK</a>
-                <a id="verifiedVersion" href="#">verified version</a>
-    
-            </div>
-    
-            <div id="pageInfo" style="display: none;flex-direction: column;">
-                <br />
-                <span class="MenuTitle"><a id="seeEdits" href="#">Page info</a></span>
-    
-    
-            </div>
+                <div id="AdvancedSettings" hidden>
+                    Year BC that should be year 1<br />
+                    <input id="startingYearInput" style="width:200px;"/><br/><br/>
+
+                    Last translated year that should have era label<br />
+                    <input id="lastTranslatedYearWithLabelInput" style="width:200px;"/><br/><br/>
+
+                    Name of the timeline<br />
+                    <input id="timelineNameInput" style="width:200px;"/><br/><br/>
+
+                    "Of the timeline" string<br />
+                    <input id="ofTimelineInput" style="width:200px;"/><br/><br/>
+
+                    Abbreviated name of the timeline<br />
+                    <input id="abbreviatedTimelineNameInput" style="width:200px;"/><br/><br/>
+                    
+                    [<a id="saveSettingsButton" class="disabledLink" href=#>Save</a>] [<a class="disabledLink" id="cancelSettingsEditButton" href=#>Cancel</a>] [<a id="restoreDefaultsButton" class="disabledLink" href=#>Restore defaults</a>]
+                    <br/><br/>
+                </div>
+
+            <div id="currentPageInfo" style="display:flex; flex-direction:column;">
+                <span class="MenuTitle">Current page status</span>
+                <span id="pageStatusLine"></span>
+        
+                <div id="otherVersions" style="display: none;flex-direction: column;">
+                    <br />
+                    <span class="MenuTitle">Other versions</span>
+                    <a id="okVersion" href="#">last version that seems OK</a>
+                    <a id="verifiedVersion" href="#">verified version</a>
+        
+                </div>
+        
+                <div id="pageInfo" style="display: none;flex-direction: column;">
+                    <br />
+                    <span class="MenuTitle"><a id="seeEdits" href="#">Page info</a></span>
+        
+        
+                </div>
 
         </div>
 
@@ -104,6 +107,60 @@
                 <a id="timelineLink" href="#">Interactive timeline</a>
             </div>
 
+        </div>
+
+        </div>
+
+        <div id="editingMenu" style="display: none; flex-direction: column;">
+            <div style="display: flex;">
+                <button id="goBackInHistory" style="width: 50%;">&lt;</button>
+                <button id="goForwardInHistory" style="width: 50%;">&gt;</button>
+            </div>
+            <!-- <button id="loadFromTemplates">Load from templates</button>
+            <button id="loadFromServer">Load from server</button>
+            <div style="display: flex;">
+                <button id="loadFromServerOnlyFixed">Only fixed</button>
+                <button id="loadFromServerWithoutFixed">Without fixed</button>
+            </div>
+            <button id="loadFromStorage">Load from storage</button> -->
+            <div style="display: flex;">
+                <button id="find1DigitNumbers" style="width: 25%;">1</button>
+                <button id="find2DigitNumbers" style="width: 25%;">2</button>
+                <button id="find3DigitNumbers" style="width: 25%;">3</button>
+                <button id="find4DigitNumbers" style="width: 25%;">4</button>
+            </div>
+            <button id="findNumbersWithBCs">Numbers with BCs</button>
+            <button id="findRoundYears">Find round years</button>
+            <button id="findDecades">Find decades</button>
+            <button id="findCenturiesMillennia">Find centuries/millennia</button>
+            <button id="findNumberWords">Find number words</button>
+            <button id="markWordCentury">Mark word "century"</button>
+            <button id="markWordMillennium">Mark word "millennium"</button>
+            <button id="findBCs">Find BCs</button>
+            <button id="findBCsWithoutSpaces">Find BCs without spaces</button>
+            <button id="commitYears">Commit years</button>
+            <button id="commitADYears">Commit AD years</button>
+            <button id="commitDecades">Commit decades</button>
+            <div style="display: flex;">
+                <button id="commitCenturies" style="width: 50%;">Commit centuries</button>
+                <button id="commit00s" style="width: 50%;">00s</button>
+            </div>
+            <div style="display: flex;">
+                <button id="commitMillennia" style="width: 50%;">Commit millennia</button>
+                <button id="commit000s" style="width: 50%;">000s</button>
+            </div>
+            <button id="commitRemovals">Commit removals</button>
+            <div style="display: flex;">
+                <button id="commitOE" style="width: 50%;">Commit OE</button>
+                <button id="commitOfOE" style="width: 50%;">Cmt 'of OE'</button>
+            </div>
+            <button id="commitIgnoredPart">Commit Ignored part</button>
+            <button id="markerMode">Marker mode</button>
+            <button id="bookTitleMode">Book title mode</button>
+            <button id="quoteMode">Quote mode</button>
+            <button id="test">Test</button>
+            <button id="sendToServer">Send to server</button>
+    
         </div>
 
 
