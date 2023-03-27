@@ -32,7 +32,10 @@ function onEditorLoad() {
      console.log('editing mode')
 //     //disableAllLinks()
      setInitialHtml()
-    // addToHistory(currentHTML)
+     addToHistory(currentHTML)
+     openAllWikipediaDropDowns(()=>{
+
+ 
 //    // getPageData()
 
     editsFromServer = editsArray
@@ -40,16 +43,14 @@ function onEditorLoad() {
 
     loadEdits(editsFromServer,true,false)
 
-    openAllWikipediaDropDowns()
 
     if (document.addEventListener) {
         console.log('addeventlistener')
         document.addEventListener('click', interceptClickEvent);
     }
-    //  else if (document.attachEvent) {
-    //     console.log('attachevent')
-    //     document.attachEvent('onclick', interceptClickEvent);
-    // }
+
+    })
+ 
 }
 
 
@@ -68,13 +69,14 @@ function setInitialHtml() {
         originalHTML = new XMLSerializer().serializeToString(document.body)
     }
 
-    originalHTML = removeProblematicPartsFromHtml(originalHTML)
+
+   // originalHTML = removeProblematicPartsFromHtml(originalHTML)
 
     currentHTML = originalHTML
 
 }
 
-function openAllWikipediaDropDowns(){
+function openAllWikipediaDropDowns(callback){
     if(!currentLocation || !currentLocation.includes('en.wikipedia.org'))return
     console.log('we are on wikipedia')
 
@@ -98,6 +100,9 @@ function openAllWikipediaDropDowns(){
                 link.click()
             }      
         });
+
+
+        callback()
 
     },1000)
 
@@ -283,7 +288,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 
 
 function loadEdits(edits,shouldFixBrokenEdits = false,showOnlyFixed = false){
-    if (currentIndexInHistory !== -1) {
+    if (currentIndexInHistory !== 0) {
         alert("can't load after edits")
         return
     }
@@ -885,7 +890,7 @@ function test() {
     currentHTML = removeProblematicPartsFromHtml(currentHTML)
     //currentHTML = currentHTML.replace(/mw-collapsed/g, 'mw-expanded')
     setBodyFromCurrentHTML()
-    openAllWikipediaDropDowns()
+   // openAllWikipediaDropDowns()
    
 
 }
