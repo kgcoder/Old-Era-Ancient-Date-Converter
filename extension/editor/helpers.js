@@ -106,7 +106,8 @@ function setBodyFromHTML(html) {
     } else {
         const parser = new DOMParser();
         const bodyDOM = parser.parseFromString(html, "text/xml");
-        document.body = bodyDOM.documentElement
+        //document.body = bodyDOM.documentElement
+        document.body.innerHTML = html
 
     }
 }

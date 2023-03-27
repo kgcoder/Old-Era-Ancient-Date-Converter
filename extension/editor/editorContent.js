@@ -68,7 +68,7 @@ function setInitialHtml() {
         originalHTML = new XMLSerializer().serializeToString(document.body)
     }
 
-  //  originalHTML = removeProblematicPartsFromHtml(originalHTML)
+    originalHTML = removeProblematicPartsFromHtml(originalHTML)
 
     currentHTML = originalHTML
 
