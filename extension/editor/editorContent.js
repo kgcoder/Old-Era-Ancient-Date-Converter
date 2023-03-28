@@ -22,6 +22,8 @@ let instructions = []
 let texts = []
 let tags = []
 
+let localReplacementsArray = []
+
 
 const allClassesString = allClasses.join('|')
 
@@ -40,6 +42,7 @@ function onEditorLoad() {
 
     editsFromServer = editsArray
 
+    console.log('edits from server',editsFromServer)
 
     loadEdits(editsFromServer,true,false)
 
@@ -69,34 +72,18 @@ function setInitialHtml() {
         originalHTML = new XMLSerializer().serializeToString(document.body)
     }
 
-
-   // originalHTML = removeProblematicPartsFromHtml(originalHTML)
-
     currentHTML = originalHTML
 
 }
 
 function openAllWikipediaDropDowns(callback){
     if(!currentLocation || !currentLocation.includes('en.wikipedia.org'))return
-    console.log('we are on wikipedia')
 
     setTimeout(() => {
         const links = document.getElementsByClassName('mw-collapsible-text')
-        console.log('links',links)
-    
-        console.log('links.length',Array.from(links).length)
-    
-    
-        // links.forEach(link => {
-        //     console.log('link:',link)
-    
-        // })
-    
-     
-    
+   
         Array.prototype.forEach.call(links, link => {
             if(link.innerHTML == "show"){
-                console.log('link:',link)
                 link.click()
             }      
         });
@@ -287,51 +274,37 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 
 
 
-function loadEdits(edits,shouldFixBrokenEdits = false,showOnlyFixed = false){
+function loadEdits(editsFromServer,shouldFixBrokenEdits = false,showOnlyFixed = false){
     if (currentIndexInHistory !== 0) {
-        alert("can't load after edits")
+        alert("can't load after editsFromServer")
         return
     }
-  //  currentHTML = currentHTML.replace(/mw-collapsed/g, 'mw-expanded')
 
 
-
-
-    console.log('edits',edits)
-    console.log('shouldFixBrokenEdits',shouldFixBrokenEdits)
-    console.log('showOnlyFixed',showOnlyFixed)
-    const htmlWithMarkers = createHTMLWithMarkersForEditor(edits,shouldFixBrokenEdits,showOnlyFixed)
+    const htmlWithMarkers = createHTMLWithMarkersForEditor(editsFromServer,shouldFixBrokenEdits,showOnlyFixed)
     currentHTML = replaceCurlyBracesWithMarkup(htmlWithMarkers)
 
     
-
-   // currentHTML = currentHTML.replace(/mw-collapsed/g, 'mw-expanded')
-
-    console.log('html after download',currentHTML)
 
 
     setBodyFromCurrentHTML()
     addToHistory(currentHTML)
 
-    instructions = edits
+    instructions = editsFromServer
 }
 
 
 
 
-function createHTMLWithMarkersForEditor(editsArray,shouldFixBrokenEdits = false,showOnlyFixed = false) {
+function createHTMLWithMarkersForEditor(editsFromServer,shouldFixBrokenEdits = false,showOnlyFixed = false) {
 
     let html = new XMLSerializer().serializeToString(document.body)
     html = removeProblematicPartsFromHtml(html)
 
     const { htmlWithIgParts, ignoredParts } = htmlWithIgnoredParts(html)
 
-    console.log('htmlwithig length',htmlWithIgParts.length)
-    console.log('ig parts length',ignoredParts.length)
-
-    let replacements = getReplacementsFromEdits(editsArray,htmlWithIgParts)
+    let replacements = getReplacementsFromEdits(editsFromServer,htmlWithIgParts)
    
-    console.log('replacements from edits',replacements)
     let currentGap = null
     let lastGoodEdit = null
     const gaps = []
@@ -361,7 +334,6 @@ function createHTMLWithMarkersForEditor(editsArray,shouldFixBrokenEdits = false,
     pageHasIssues = filteredEdits.length !== replacements.length
     replacements = filteredEdits
 
-    console.log('filtered replacements',replacements)
 
     if(shouldFixBrokenEdits){
         const fixedEdits = fixBrokenEdits(gaps,htmlWithIgParts)
@@ -372,16 +344,14 @@ function createHTMLWithMarkersForEditor(editsArray,shouldFixBrokenEdits = false,
         }
     }
 
-    console.log('replacements after fixing',replacements)
 
 
-    let localReplacementsArray = []
+    localReplacementsArray = []
 
     findIfPageIsAboutEarlyCenturyOrMillennium(html)
 
 
     getLocalReplacements(htmlWithIgParts, localReplacementsArray, currentPageData)
-    console.log('local replacements', localReplacementsArray)
     localReplacementsArray = localReplacementsArray.map(item => {
         item.edit.targetIndex = item.index
         if(['bc-y','bc-y-r1','bc-y-r2'].includes(item.edit.method))item.edit.method = 'year'
@@ -389,14 +359,12 @@ function createHTMLWithMarkersForEditor(editsArray,shouldFixBrokenEdits = false,
         return item
     })
 
-    console.log('replacmenents from server',replacements)
+
     replacements = resolveReplacements(localReplacementsArray, replacements)
 
     replacements = replacements.sort((a, b) => a.edit.targetIndex - b.edit.targetIndex)
 
 
-    console.log('local replacements',localReplacementsArray)
-    console.log('number of replacements',replacements.length)
   
 
 
@@ -497,10 +465,7 @@ function replaceCurlyBracesWithMarkup(html) {
         } else if (type === 'bookTitle') {
             color = 'blue'
         }
-        // console.log('target', target)
-        // console.log('method', method)
-        // console.log('type', type)
-
+     
 
         return `<selection class="${method}" data-t="${fromTemplate}" style="background-color:${color};">${target}</selection>`
     })
@@ -512,11 +477,11 @@ function replaceCurlyBracesWithMarkup(html) {
 
 function addListenersToSelections() {
     const selections = document.getElementsByTagName('selection') 
-    console.log('selection', selections[0])
     for (let i = 0; i < selections.length; i++) {
         let sel = selections[i]
         sel = removeListeners(sel)
         sel.addEventListener('click', (e) => {
+            console.log('selection', sel)
             //  e.preventDefault()
             document.getSelection().removeAllRanges();
             console.log('clicked', e)
@@ -604,18 +569,19 @@ function createInstructions() {
     const { htmlWithIgParts: ignHtml } = htmlWithIgnoredParts(currentHTML)
 
 
-    const text = extractTextFromHtml(ignHtml)
+    //const text = extractTextFromHtml(ignHtml)
     
 
 
-    console.log('ignHtml before creating instructions', ignHtml)
+   // console.log('ignHtml before creating instructions', ignHtml)
 
-    console.log('clean text',text)
+   // console.log('clean text',text)
 
     while ((result = pattern.exec(ignHtml))) {
         console.log('result',result)
         const fromTemplate = result[2]
         const color = result[3]
+
 
         console.log('color', color)
         let type = 'normal'
@@ -642,7 +608,9 @@ function createInstructions() {
 
 
     }
+
     console.log('indexes of raw strings', occurrencesOfRawStrings)
+    console.log('local replacements',localReplacementsArray)
 
 
 
@@ -849,7 +817,6 @@ function test() {
         console.log('instructions saved')
     })
 
-    //  const originalWithOpenedViews = originalHTML.replace(/mw-collapsed/g, 'mw-expanded')
     setBodyFromHTML(originalHTML)
 
     const htmlWithMarkers = createHTMLWithMarkersForEditor(instructions)
@@ -884,7 +851,7 @@ function test() {
     // }
 
 
-    doReplacements()
+    doReplacements2()
     htmlBeforeTesting = currentHTML
     currentHTML = new XMLSerializer().serializeToString(document.body)
     currentHTML = removeProblematicPartsFromHtml(currentHTML)
@@ -907,6 +874,6 @@ function doReplacements2() {
     for (let i = 0; i < textsArray.length; i++) {
         const text = textsArray[i]
         const node = textNodesArray[i]
-        replaceTextInNodeIfNeeded(node, text)
+        replaceTextInNodeIfNeededForEditor(node, text)
     }
 }

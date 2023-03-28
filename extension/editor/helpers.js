@@ -7,10 +7,10 @@
 
 
 function getReplacementsFromEdits(edits, htmlWithIgParts){
-
-    console.log('all edits',edits)
     
-    return edits.map((edit) => {
+    const myNewReplacements = edits.map((edit) => {
+
+    
 
         let { string, target, method, order, type, originalSubstitute, fromTemplate } = edit
         if (!order) order = '1.1.1.1'
@@ -57,10 +57,14 @@ function getReplacementsFromEdits(edits, htmlWithIgParts){
 
         const length = target.length
 
-        return { isBroken:false, edit, index, length, replacement: createMarker(target, method, type, originalSubstitute, fromTemplate) }
+       
+      return { isBroken:false, edit, index, length, replacement: createMarkerForEditor(target, method, type, originalSubstitute, fromTemplate) }
 
 
     })
+
+
+    return myNewReplacements
 }
 
 
@@ -78,6 +82,166 @@ function findIndexOfSubstringOccurrence(parentString, substring, occurrenceNumbe
     return indices[occurrenceNumber - 1]
 }
 
+function createMarkerForEditor(text, method, type = 'normal', originalSubstitute = '',fromTemplate = '') {
+    return `{{${method}|${text}|${type}|${originalSubstitute}|${fromTemplate}}}`
+}
+
+
+function replaceTextInNodeIfNeededForEditor(node, sourceText) {
+    const occurrences = []
+    const pattern = new RegExp('\\{\\{(.*?)\\|(.*?)\\|(.*?)\\|(.*?)\\|(.*?)\\}\\}', 'g')
+    while ((result = pattern.exec(sourceText))) {
+
+        const obj = { index: result.index, length: result[0].length, method: result[1], originalText: result[2], originalSubstitute: result[4],fromTemplate:result[5] }
+        occurrences.push(obj)
+    }
+    if (!occurrences.length) return
+
+
+    let lastIndex = 0
+    for (let obj of occurrences) {
+        const precedingTextNode = document.createTextNode(
+            sourceText.substr(lastIndex, obj.index - lastIndex)
+        );
+
+        node.parentNode.insertBefore(precedingTextNode, node)
+
+        const replacementNode = getReplacementNodeForEditor(obj.originalText, obj.method, obj.originalSubstitute,obj.fromTemplate)
+
+        if (replacementNode) {
+            node.parentNode.insertBefore(replacementNode, node)
+        }
+
+        lastIndex = obj.index + obj.length
+
+    }
+
+    const lastNode = document.createTextNode(
+        sourceText.substr(lastIndex, sourceText.length - lastIndex)
+    );
+
+    node.parentNode.insertBefore(lastNode, node)
+
+    node.parentNode.removeChild(node);
+}
+
+
+
+function getReplacementNodeForEditor(text, method, originalSubstitute,fromTemplate) {
+    console.log(`text: ${text}, method: ${method}, originalSubstitute: ${originalSubstitute}`)
+    text = text.replace(',','')
+    const originalNumber = originalSubstitute ? parseInt(originalSubstitute, 10) : parseInt(text, 10)
+    console.log('originalNumber', originalNumber)
+    const type = 'normal'
+    switch (method) {
+
+        case 'remove':
+            return null
+        case 'year': {
+            const year = originalNumber
+            if (isNaN(year)) return null
+            const translatedYear = `${10001 - year}`
+
+            return textWithComment(text, `${year} BCE`, translatedYear, type)
+        }
+
+        case 'ad-y': {
+            const year = originalNumber
+            if (isNaN(year)) return null
+            const translatedYear = (5214 + year)//.toLocaleString()
+
+            return textWithComment(text, `${year}`, translatedYear, type)
+        }
+        case 'impreciseYear': {
+            const year = originalNumber
+            if (isNaN(year)) return null
+            const translatedYear = `${10000 - year}`
+            return textWithComment(text, `${year} BCE`, translatedYear, type)
+        }
+        case 'oneDigitYear': {
+            const year = originalNumber
+            const translatedYear = `${(10001 - year) % 10}`
+            return textWithComment(text, `${year} BCE`, translatedYear, type)
+        }
+        case 'twoDigitYear': {
+            const year = originalNumber
+            const translatedYear = `${(10001 - year) % 100}`
+            return textWithComment(text, `${year} BCE`, `${translatedYear < 10 ? '0' : ''}${translatedYear}`, type)
+        }
+        case 'decade': {
+            const decade = originalNumber
+            if (isNaN(decade)) return document.createTextNode('')
+            const baseYear = 9990 - decade
+            const firstYear = baseYear + 2
+            let lastYear = (baseYear + 11)
+            if (lastYear === 10001) lastYear = 10000
+            const lastYearShort = lastYear % 100
+            const translated = `${firstYear}/${lastYearShort < 10 ? lastYear : lastYearShort} decade`
+            return textWithComment(text, `${decade}s BCE`, translated, type)
+
+        }
+        case 'century': {
+            let century = originalNumber
+            if (isNaN(century)) {
+                century = numbersFromWords[text.toLowerCase()]
+            }
+            const translatedCentury = 101 - century
+            const translatedCenturyWithEnding = `${translatedCentury}${numberSuffix(translatedCentury)}`
+            return textWithComment(text, `${text} century BCE`, translatedCenturyWithEnding, type)
+        }
+
+        case '00s': {
+            const x00s = originalNumber
+            if (isNaN(x00s)) return emptySpan()
+            const translated = `${9900 - x00s}s`
+            return textWithComment(text, `${parseInt(text, 10)}s BCE`, translated, type)
+        }
+
+
+        case 'millennium': {
+            let millennium = originalNumber
+            if (isNaN(millennium)) {
+                millennium = numbersFromWords[text.toLowerCase()]
+            }
+            const translatedMillennium = 11 - millennium
+            const translatedMillenniumWithEnding = `${translatedMillennium}${numberSuffix(translatedMillennium)}`
+            return textWithComment(text, `${text} millennium BCE`, translatedMillenniumWithEnding, type)
+        }
+
+        case '000s': {
+            const x000s = originalNumber
+            if (isNaN(x000s)) return emptySpan()
+            const translated = `${9000 - x000s}s`
+            return textWithComment(text, `${parseInt(text, 10)}s BCE`, translated, type)
+        }
+
+        case 'OE': {
+            return textWithComment(text, text, 'Old Era', type)
+        }
+
+        case 'ofOE': {
+            return textWithComment(text, text, 'of the Old Era', type)
+        }
+
+
+        default:
+            return document.createTextNode(text)
+    }
+}
+
+
+function textWithComment(originalText, toast, translatedText, type = 'normal') {
+
+    const span = document.createElement('span')
+    const mainText = translatedText
+    if(toast){
+        span.title = toast
+    }
+    span.className = "rt-commentedText"
+    const textNode = document.createTextNode(mainText)
+    span.appendChild(textNode)
+    return span
+}
 
 
 function escapeText(text) {
@@ -243,7 +407,6 @@ function markTextsMatchingRegExp(reg, matchNumber) {
         return left + inner.replace(/<selection.*?>/gm, '').replace(/<\/selection>/gm, '') + right
     })
 
-    //currentHTML = currentHTML.replace(/mw-collapsed/g, 'mw-expanded')
 
 
 

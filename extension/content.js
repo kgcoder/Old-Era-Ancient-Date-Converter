@@ -139,7 +139,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
                 replaceImages(images)
                 chrome.runtime.sendMessage('pageMetadataIsReady') //message for the popup script  
             } else if (currentLocation && !shouldNotUseServer && currentLocation.includes("en.wikipedia.org")) {
-                startRequest()
+                isEditingMode ? startRequestForEditor() : startRequest()
             }
             
         })
@@ -262,10 +262,9 @@ window.onload = () => {
     
         if (!isExtensionOff  && currentLocation) {
             if (!shouldNotUseServer && currentLocation.includes("en.wikipedia.org")) {
-                startRequest()  
+                isEditingMode ? startRequestForEditor() : startRequest()
             } else {
-                console.log('onload before translateEverything')
-                translateEverything(null)
+                if(!isEditingMode)translateEverything(null)
             }
         }
 
@@ -324,7 +323,6 @@ function startRequest() {
     }).then(r => {
 
         editsArray = r.edits
-        console.log('r.edits',r.edits)
         pageHasIssues = r.hasIssues 
         pageId = r.id
         
@@ -339,12 +337,8 @@ function startRequest() {
 
         images = r.images
 
-        console.log('got data from server')
         try{
-            if(isEditingMode){
-                console.log('calling onEditorLoad')
-                onEditorLoad()
-            }else{
+            if(!isEditingMode){
                 translateEverything(r)
             }
 
@@ -362,9 +356,39 @@ function startRequest() {
 
 }
 
+function startRequestForEditor(){
+
+    if(!pageIsLoaded || requestHasStarted)return
+    requestHasStarted = true
+    const encodedUrl = encodeURIComponent(currentLocation)
+
+    fetch(`http://localhost:3200/api/modify/getPageForParser/${encodedUrl}`).then(r => {
+        // console.log('response',r)
+         if(r.status !== 200)return {}
+         return r.json()
+     }).then(r => {
+ 
+        editsArray = r.edits
+         try{
+             if(isEditingMode){
+                 onEditorLoad()
+             }
+ 
+         }catch(e){
+             console.log(e)
+ 
+         }
+ 
+ 
+ 
+     }).catch(error => {
+         console.log(error)
+        // translateEverything(null)
+     })
+}
+
 
 function translateEverything(r) {
-    console.log('inside translateEverything')
     findIfPageIsMillenniumOrCenturyCategory()
     findIfPageIsDecadeCategory()
     findIfPageIsAboutEarlyCenturyOrMillennium()
@@ -403,7 +427,6 @@ function translateEverything(r) {
     htmlWithMarkers = createHTMLWithMarkers(replacementsArray, htmlWithIgParts, ignoredParts)
 
 
-    //getSample(37,58409,htmlWithMarkers)
 
     if (htmlWithMarkers) {
 
@@ -416,30 +439,11 @@ function translateEverything(r) {
         textsArray = []
         getTextsArray(bodyDOM.documentElement)
 
-        // originalTextsArray = []
-        // getTextsArray(originalBodyDOM.documentElement, true)
-
+   
         textNodesArray = []
         getTextNodesArray(document.body)
 
-        // console.log('textsArray',textsArray)
-        // console.log('textNodesArray',textNodesArray.map(node => node.firstNode.data))
-
-        // console.log('textsArray',textsArray)
-        // console.log('originalTextsArray',originalTextsArray)
-        // console.log('textNodesArray',textNodesArray)
-
-
-        // textsArray.forEach((text,index) => {
-        //     if(textNodesArray.length - 1 < index)return
-        //     const textInFirstNode = textNodesArray[index].firstNode.data
-        //     if(text !== textInFirstNode){
-        //         console.log('failed at index:',index)
-        //         console.log('text:',text)
-        //         console.log('textInFirstNode:',textInFirstNode)
-
-        //     }
-        // })
+  
 
         const textInFirstNode = textNodesArray[1].firstNode.data
   
@@ -502,10 +506,10 @@ function resolveReplacements(replacementsArray, repsFromServer) {
                 if(isServerMethodAYearMethod){
                     const localMethod = sameLocalRep.edit.method
                     let properMethod = serverMethod
-                    if(localMethod === 'bc-y-r1' || localMethod === 'bc-y-r2' || localMethod === 'bc-i-r1' || localMethod === 'bc-i-r2'){
+                    if(!isEditingMode && localMethod === 'bc-y-r1' || localMethod === 'bc-y-r2' || localMethod === 'bc-i-r1' || localMethod === 'bc-i-r2'){
                         properMethod = localMethod
                     }
-                    if(serverMethod === 'impreciseYear' ){
+                    if(!isEditingMode && serverMethod === 'impreciseYear' ){
                         if(localMethod === 'bc-y-r1')properMethod = 'bc-i-r1'
                         if(localMethod === 'bc-y-r2')properMethod = 'bc-i-r2'
                     }
@@ -517,10 +521,13 @@ function resolveReplacements(replacementsArray, repsFromServer) {
                     const {
                         target,
                         originalSubstitute,
-                        type
+                        type,
+                        fromTemplate
                     } = edit
                     repFromServer["edit"] = edit
-                    repFromServer["replacement"] = createMarker(target,properMethod,type,originalSubstitute)
+                    repFromServer["replacement"] = isEditingMode ?
+                    createMarkerForEditor(target, properMethod, type, originalSubstitute,fromTemplate) :
+                    createMarker(target,properMethod,type,originalSubstitute)
                 }
          
 

@@ -77,7 +77,6 @@ function createAutomaticReplacements(html, replacementsArray, pageData) {
 
     const normalReplacementsInHtml = mergeReplacements(rawReplacementsInHtmlArray)
 
-
     addNewReplacementsToArray(normalReplacementsInHtml,replacementsArray)
 
 
@@ -355,7 +354,8 @@ function addReplacement(replacementsArray, method,targetString, otherNumberStrin
         originalSubstitute,
         method,
         type,
-        otherNumberStringInRange
+        otherNumberStringInRange,
+        
     }
 
     
@@ -364,8 +364,11 @@ function addReplacement(replacementsArray, method,targetString, otherNumberStrin
         edit,
         index:index,
         length:targetString.length,
-        replacement: createMarker(targetString, method, type, originalSubstitute,otherNumberStringInRange)
+        replacement: isEditingMode ?
+        createMarkerForEditor(targetString, method, type, originalSubstitute) :
+        createMarker(targetString, method, type, originalSubstitute,otherNumberStringInRange)
     }
+
 
     replacementsArray.push(replacement)
 }
