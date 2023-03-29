@@ -37,6 +37,13 @@ const observer = new MutationObserver(function(mutations) {
 
                     if (node.className.includes("mwe-popups")) {
                         editSummaryIfNeeded(node);
+
+                        if(isEditingMode){
+                            setTimeout(()=> {
+                                node.parentElement.removeChild(node)
+                            },5000)
+
+                        }
                     }
                     else if (node.className.includes("CategoryTreeSection")) {
                         editSummaryIfNeeded(node);

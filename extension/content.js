@@ -264,7 +264,12 @@ window.onload = () => {
             if (!shouldNotUseServer && currentLocation.includes("en.wikipedia.org")) {
                 isEditingMode ? startRequestForEditor() : startRequest()
             } else {
-                if(!isEditingMode)translateEverything(null)
+                if(isEditingMode){
+                    editsArray = []
+                    onEditorLoad()
+                }else{
+                    translateEverything(null)
+                }
             }
         }
 
@@ -388,7 +393,7 @@ function startRequestForEditor(){
 }
 
 
-function translateEverything(r) {
+function translateEverything(r,instrucstions = []) {
     findIfPageIsMillenniumOrCenturyCategory()
     findIfPageIsDecadeCategory()
     findIfPageIsAboutEarlyCenturyOrMillennium()
@@ -412,8 +417,10 @@ function translateEverything(r) {
     replacementsArray = replacementsArray.sort((a, b) => a.index - b.index)
  
 
-    if (isTranslated) {
-        const repsFromServer = getReplacementsFromServer(editsArray, htmlWithIgParts)
+
+    if (isTranslated || instrucstions.length) {
+        const editsToUse = instrucstions.length ? instrucstions : editsArray
+        const repsFromServer = getReplacementsFromServer(editsToUse, htmlWithIgParts)
         replacementsArray = resolveReplacements(replacementsArray, repsFromServer)
     }
 
@@ -1126,10 +1133,6 @@ function resolveLabel(label, translatedYear){
 }
 
 function createMarker(text, method, type = 'normal', originalSubstitute = '',otherNumberStringInRange = '') { 
-    if(isEditingMode){
-        if(['bc-y-r1','bc-y-r2'].includes(method))method = 'year'
-        if(['bc-i-r1','bc-i-r2'].includes(method))method = 'impreciseYear'
-    }
     return `{{${method}|${text}|${type}|${originalSubstitute}|${otherNumberStringInRange}}}`
 }
 

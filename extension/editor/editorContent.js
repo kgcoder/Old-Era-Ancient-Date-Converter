@@ -77,7 +77,10 @@ function setInitialHtml() {
 }
 
 function openAllWikipediaDropDowns(callback){
-    if(!currentLocation || !currentLocation.includes('en.wikipedia.org'))return
+    if(!currentLocation || !currentLocation.includes('en.wikipedia.org')){
+        callback()
+        return
+    }
 
     setTimeout(() => {
         const links = document.getElementsByClassName('mw-collapsible-text')
@@ -566,6 +569,7 @@ function createInstructions() {
     const pattern = new RegExp(`<selection class="(${allClassesString.replace('marker|', '')})" data-t="(.*?)".*?:(.*?);">(.*?)</selection>`, 'gm')  //(<span.*?>.*?</span>)?
 
 
+
     const { htmlWithIgParts: ignHtml } = htmlWithIgnoredParts(currentHTML)
 
 
@@ -578,12 +582,13 @@ function createInstructions() {
    // console.log('clean text',text)
 
     while ((result = pattern.exec(ignHtml))) {
-        console.log('result',result)
+        const method = result[1]
         const fromTemplate = result[2]
         const color = result[3]
+        
+      
 
-
-        console.log('color', color)
+      //  console.log('color', color)
         let type = 'normal'
         if (color === 'blue') type = 'bookTitle'
         if (color === 'violet') type = 'quote'
@@ -598,9 +603,9 @@ function createInstructions() {
         if (chunks.length === 2) {
             substitute = chunks[1]
         }
-        console.log('substitute', substitute)
+      //  console.log('substitute', substitute)
 
-        const obj = { index: result.index, length: result[0].length, method: result[1], text, type, substitute, fromTemplate }
+        const obj = { index: result.index, length: result[0].length, method, text, type, substitute, fromTemplate }
 
 
         occurrencesOfRawStrings.push(obj)
@@ -609,8 +614,8 @@ function createInstructions() {
 
     }
 
-    console.log('indexes of raw strings', occurrencesOfRawStrings)
-    console.log('local replacements',localReplacementsArray)
+    // console.log('all replacements', occurrencesOfRawStrings)
+    // console.log('local replacements',localReplacementsArray)
 
 
 
@@ -639,7 +644,7 @@ function createInstructions() {
     const fillerText = ignHtml.substr(lastIndex, ignHtml.length - lastIndex)
     cleanTexts.push({ text: fillerText, method: 'text' })
 
-    console.log('cleanTexts', cleanTexts)
+    //console.log('cleanTexts', cleanTexts)
 
     let cleanHTML = ''
     cleanTexts.forEach(obj => {
@@ -719,15 +724,68 @@ function createInstructions() {
             if (cleanTextObj.originalSubstitute) instruction['originalSubstitute'] = cleanTextObj.originalSubstitute
             if(cleanTextObj.fromTemplate)instruction['fromTemplate'] = true
 
+            console.log('instruction1',instruction)
             instructions.push(instruction)
 
 
         }
     })
 
-    console.log('instructions', JSON.stringify(instructions))
+    localReplacementsArray = []
 
-    return instructions
+    getLocalReplacements(cleanHTML, localReplacementsArray, currentPageData)
+    localReplacementsArray = localReplacementsArray.map(item => {
+        item.edit.targetIndex = item.index
+        if(['bc-y','bc-y-r1','bc-y-r2'].includes(item.edit.method))item.edit.method = 'year'
+        if(['bc-i','bc-i-r1','bc-i-r2'].includes(item.edit.method))item.edit.method = 'impreciseYear'
+        return item
+    })
+
+
+
+    localReplacementsArray = localReplacementsArray.sort((a, b) => a.edit.targetIndex - b.edit.targetIndex)
+
+    localReplacementsArray.forEach(localRep => {
+        if(localRep.edit.target == '540 BCE'){
+            console.log('weird local rep',localRep)
+        }
+    })
+
+    const replacementsFromInstructions = getReplacementsFromEdits(instructions,cleanHTML)
+
+    console.log('replacementsFromInstructions',replacementsFromInstructions)
+
+    const finalInstructions = []
+
+    replacementsFromInstructions.forEach((repFromInstr) => {
+        if(repFromInstr.edit.target == '540 BCE'){
+            console.log('weird repl',repFromInstr)
+        }
+        const localReplacementInTheSamePlace = localReplacementsArray.find(localRep => localRep.index == repFromInstr.index)
+        if(localReplacementInTheSamePlace && repFromInstr.replacement == localReplacementInTheSamePlace.replacement){
+            //no instruction is needed
+            console.log('same')
+            console.log('repFromInstr',repFromInstr)
+            console.log('localReplacementInTheSamePlace',localReplacementInTheSamePlace)
+        }else{
+
+          //  console.log('repFromInsts',repFromInstr.edit)
+
+
+            finalInstructions.push(repFromInstr.edit)
+        }
+    })
+    
+
+
+
+    console.log('local replacements',localReplacementsArray)
+
+    console.log('replacementsFromInstructions', replacementsFromInstructions)
+
+    console.log('final instructions',finalInstructions)
+
+    return finalInstructions
 
 
 }
@@ -811,26 +869,33 @@ function getRightSide(array, index) {
 function test() {
     console.log('test')
     instructions = createInstructions()
-    console.log('instructions',instructions)
+   // console.log('instructions',instructions)
 
     chrome.storage.local.set({ instructions }, function () {
         console.log('instructions saved')
     })
 
+    htmlBeforeTesting = currentHTML
+
+
     setBodyFromHTML(originalHTML)
 
-    const htmlWithMarkers = createHTMLWithMarkersForEditor(instructions)
 
-    console.log('htmlWithMarkers100',htmlWithMarkers)
-    const parser = new DOMParser();
-    const cleanHtml = removeAttributesFromTags(htmlWithMarkers)
-    const bodyDOM = parser.parseFromString(cleanHtml, "text/xml");
+    translateEverything(null,instructions)
 
-    textsArray = []
-    getTextsArray(bodyDOM.documentElement)
 
-    textNodesArray = []
-    getTextNodesArray(document.body)
+    // const htmlWithMarkers = createHTMLWithMarkersForEditor(instructions)
+
+    // console.log('htmlWithMarkers100',htmlWithMarkers)
+    // const parser = new DOMParser();
+    // const cleanHtml = removeAttributesFromTags(htmlWithMarkers)
+    // const bodyDOM = parser.parseFromString(cleanHtml, "text/xml");
+
+    // textsArray = []
+    // getTextsArray(bodyDOM.documentElement)
+
+    // textNodesArray = []
+    // getTextNodesArray(document.body)
 
     console.log('textsArray',textsArray)
     console.log('textNodesArray',textNodesArray)
@@ -851,8 +916,7 @@ function test() {
     // }
 
 
-    doReplacements2()
-    htmlBeforeTesting = currentHTML
+  //  doReplacements2()
     currentHTML = new XMLSerializer().serializeToString(document.body)
     currentHTML = removeProblematicPartsFromHtml(currentHTML)
     //currentHTML = currentHTML.replace(/mw-collapsed/g, 'mw-expanded')

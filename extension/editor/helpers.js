@@ -57,8 +57,22 @@ function getReplacementsFromEdits(edits, htmlWithIgParts){
 
         const length = target.length
 
+        if(target == '540 BCE'){
+            console.log('edit before',edit)
+            edit.method = 'year'
+        }
+
+        if(method == 'bc-y-r2')edit.method = 'year'
+
+
+        if(['bc-y-r1','bc-y-r2'].includes(method))edit["method"] = 'year'
+        if(['bc-i-r1','bc-i-r2'].includes(method))edit.method = 'impreciseYear'
+
+        if(target == '540 BCE'){
+            console.log('edit after',edit)
+        }
        
-      return { isBroken:false, edit, index, length, replacement: createMarkerForEditor(target, method, type, originalSubstitute, fromTemplate) }
+      return { isBroken:false, edit, index, length, replacement: createMarkerForEditor(target, edit.method, type, originalSubstitute, fromTemplate) }
 
 
     })
@@ -83,6 +97,8 @@ function findIndexOfSubstringOccurrence(parentString, substring, occurrenceNumbe
 }
 
 function createMarkerForEditor(text, method, type = 'normal', originalSubstitute = '',fromTemplate = '') {
+    if(['bc-y-r1','bc-y-r2'].includes(method))method = 'year'
+    if(['bc-i-r1','bc-i-r2'].includes(method))method = 'impreciseYear'
     return `{{${method}|${text}|${type}|${originalSubstitute}|${fromTemplate}}}`
 }
 
@@ -442,7 +458,7 @@ function splitSpan(markerStart, inner, markerEnd) {
         const result = inner.match(innerPattern)
         if (!result) return markerStart + inner + markerEnd
         const [m, leftText, spanStart, middleText, spanEnd, rightText] = result
-        console.log('result', result)
+     //   console.log('result', result)
 
         return markerStart + leftText + markerEnd +
             spanStart + markerStart + middleText + markerEnd + spanEnd +
