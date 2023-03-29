@@ -393,7 +393,7 @@ function startRequestForEditor(){
 }
 
 
-function translateEverything(r,instrucstions = []) {
+function translateEverything(r,finalInstructions = []) {
     findIfPageIsMillenniumOrCenturyCategory()
     findIfPageIsDecadeCategory()
     findIfPageIsAboutEarlyCenturyOrMillennium()
@@ -418,8 +418,8 @@ function translateEverything(r,instrucstions = []) {
  
 
 
-    if (isTranslated || instrucstions.length) {
-        const editsToUse = instrucstions.length ? instrucstions : editsArray
+    if (isTranslated || finalInstructions.length) {
+        const editsToUse = finalInstructions.length ? finalInstructions : editsArray
         const repsFromServer = getReplacementsFromServer(editsToUse, htmlWithIgParts)
         replacementsArray = resolveReplacements(replacementsArray, repsFromServer)
     }

@@ -19,6 +19,7 @@ let htmlBeforeTesting = ''
 
 
 let instructions = []
+let finalInstructions = []
 let texts = []
 let tags = []
 
@@ -30,25 +31,21 @@ const allClassesString = allClasses.join('|')
 
 
 function onEditorLoad() {
-//     if(!isEditingMode)return
+     if(!isEditingMode)return
      console.log('editing mode')
-//     //disableAllLinks()
      setInitialHtml()
      addToHistory(currentHTML)
      openAllWikipediaDropDowns(()=>{
 
  
-//    // getPageData()
 
     editsFromServer = editsArray
 
-    console.log('edits from server',editsFromServer)
 
     loadEdits(editsFromServer,true,false)
 
 
     if (document.addEventListener) {
-        console.log('addeventlistener')
         document.addEventListener('click', interceptClickEvent);
     }
 
@@ -61,12 +58,7 @@ function setInitialHtml() {
 
     let currentLocation = window.location.toString()
  
-    const inner = document.body.innerHTML
-    console.log('inner', inner)
-
     if (currentLocation.includes('localhost')) {
-        // const p = document.getElementsByClassName('p')
-        // console.log('PPP', p)
         originalHTML = document.body.innerHTML
     } else {
         originalHTML = new XMLSerializer().serializeToString(document.body)
@@ -401,7 +393,6 @@ function createHTMLWithMarkersForEditor(editsFromServer,shouldFixBrokenEdits = f
 
 
 function replaceCurlyBracesWithMarkup(html) {
-    console.log('replaceCurlyBracesWithMarkup html', html)
     const pattern = new RegExp('\\{\\{(.*?)\\|(.*?)\\|(.*?)\\|(.*?)\\|(.*?)\\}\\}', 'g')
     return html.replace(pattern, (match, method, target, type, originalSubstitute,fromTemplate) => {
         let color = 'red'
@@ -724,7 +715,6 @@ function createInstructions() {
             if (cleanTextObj.originalSubstitute) instruction['originalSubstitute'] = cleanTextObj.originalSubstitute
             if(cleanTextObj.fromTemplate)instruction['fromTemplate'] = true
 
-            console.log('instruction1',instruction)
             instructions.push(instruction)
 
 
@@ -745,46 +735,22 @@ function createInstructions() {
 
     localReplacementsArray = localReplacementsArray.sort((a, b) => a.edit.targetIndex - b.edit.targetIndex)
 
-    localReplacementsArray.forEach(localRep => {
-        if(localRep.edit.target == '540 BCE'){
-            console.log('weird local rep',localRep)
-        }
-    })
 
     const replacementsFromInstructions = getReplacementsFromEdits(instructions,cleanHTML)
 
-    console.log('replacementsFromInstructions',replacementsFromInstructions)
 
     const finalInstructions = []
 
     replacementsFromInstructions.forEach((repFromInstr) => {
-        if(repFromInstr.edit.target == '540 BCE'){
-            console.log('weird repl',repFromInstr)
-        }
+     
         const localReplacementInTheSamePlace = localReplacementsArray.find(localRep => localRep.index == repFromInstr.index)
         if(localReplacementInTheSamePlace && repFromInstr.replacement == localReplacementInTheSamePlace.replacement){
             //no instruction is needed
-            console.log('same')
-            console.log('repFromInstr',repFromInstr)
-            console.log('localReplacementInTheSamePlace',localReplacementInTheSamePlace)
         }else{
-
-          //  console.log('repFromInsts',repFromInstr.edit)
-
-
             finalInstructions.push(repFromInstr.edit)
         }
     })
     
-
-
-
-    console.log('local replacements',localReplacementsArray)
-
-    console.log('replacementsFromInstructions', replacementsFromInstructions)
-
-    console.log('final instructions',finalInstructions)
-
     return finalInstructions
 
 
@@ -808,9 +774,7 @@ function getOccurrences2(string, target) {
 
 function getNumberOfOccurrence(allMatches, neededIndex) {
     const index = allMatches.findIndex(item => item.index === neededIndex)
-    console.log('original index', index)
     if (index >= 0) return index + 1
-
     console.log('something wrong', allMatches, 'nIndex', neededIndex)
     return index
 }
@@ -868,12 +832,24 @@ function getRightSide(array, index) {
 
 function test() {
     console.log('test')
-    instructions = createInstructions()
-   // console.log('instructions',instructions)
+    finalInstructions = createInstructions()
+    //finalInstructions = instructions
 
-    chrome.storage.local.set({ instructions }, function () {
-        console.log('instructions saved')
+    console.log('finalInstructions before',JSON.stringify(finalInstructions))
+    finalInstructions = finalInstructions.map(edit => {
+        const newEdit = JSON.parse(JSON.stringify(edit))
+        if(edit.method == 'bc-y-r2')newEdit.method = 'year'
+        if(['bc-y','bc-y-r1','bc-y-r2'].includes(edit.method))edit.method = 'year'
+        if(['bc-i','bc-i-r1','bc-i-r2'].includes(edit.method))edit.method = 'impreciseYear'
+        return newEdit
     })
+
+
+    console.log('finalInstructions',JSON.stringify(finalInstructions))
+
+    // chrome.storage.local.set({ instructions }, function () {
+    //     console.log('instructions saved')
+    // })
 
     htmlBeforeTesting = currentHTML
 
@@ -881,47 +857,12 @@ function test() {
     setBodyFromHTML(originalHTML)
 
 
-    translateEverything(null,instructions)
+    translateEverything(null,JSON.parse(JSON.stringify(finalInstructions)))
 
 
-    // const htmlWithMarkers = createHTMLWithMarkersForEditor(instructions)
-
-    // console.log('htmlWithMarkers100',htmlWithMarkers)
-    // const parser = new DOMParser();
-    // const cleanHtml = removeAttributesFromTags(htmlWithMarkers)
-    // const bodyDOM = parser.parseFromString(cleanHtml, "text/xml");
-
-    // textsArray = []
-    // getTextsArray(bodyDOM.documentElement)
-
-    // textNodesArray = []
-    // getTextNodesArray(document.body)
-
-    console.log('textsArray',textsArray)
-    console.log('textNodesArray',textNodesArray)
-
-
-    // const textInFirstNode = textNodesArray[1].firstNode.data
-  
-    // if(textNodesArray.length < textsArray.length){
-  
-    //     const index = textsArray.findIndex(item => {
-    //         return textInFirstNode === item
-    //     })
-
-       
-    //     if(index > 0){
-    //         textsArray.splice(0, index);
-    //     }
-    // }
-
-
-  //  doReplacements2()
     currentHTML = new XMLSerializer().serializeToString(document.body)
     currentHTML = removeProblematicPartsFromHtml(currentHTML)
-    //currentHTML = currentHTML.replace(/mw-collapsed/g, 'mw-expanded')
     setBodyFromCurrentHTML()
-   // openAllWikipediaDropDowns()
    
 
 }
@@ -934,10 +875,44 @@ function backToEditing() {
 }
 
 
-function doReplacements2() {
-    for (let i = 0; i < textsArray.length; i++) {
-        const text = textsArray[i]
-        const node = textNodesArray[i]
-        replaceTextInNodeIfNeededForEditor(node, text)
+async function sendToServer() {
+    console.log('send to server')
+    // if(!isTestingMode){
+    //     alert('Editing mode')
+    //     return 
+    // }
+   
+    let currentLocation = window.location.toString()
+    currentLocation = currentLocation.split('?')[0].split('#')[0]
+    console.log('url', currentLocation)
+    console.log('edits', finalInstructions)
+
+
+    const data = {
+        url: currentLocation,
+        edits: finalInstructions
     }
+    const result = await fetch('http://localhost:3200/api/pages', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+
+    console.log('post result', result)
+
+    const json = await result.json()
+    pageId = json.id
+
+
+    if(pageId){
+        window.open(`http://localhost:3000/#/translatedPages/${pageId}/show`)
+    }
+
+    
+
 }
+
+
+

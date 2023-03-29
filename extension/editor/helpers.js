@@ -57,22 +57,8 @@ function getReplacementsFromEdits(edits, htmlWithIgParts){
 
         const length = target.length
 
-        if(target == '540 BCE'){
-            console.log('edit before',edit)
-            edit.method = 'year'
-        }
-
-        if(method == 'bc-y-r2')edit.method = 'year'
-
-
-        if(['bc-y-r1','bc-y-r2'].includes(method))edit["method"] = 'year'
-        if(['bc-i-r1','bc-i-r2'].includes(method))edit.method = 'impreciseYear'
-
-        if(target == '540 BCE'){
-            console.log('edit after',edit)
-        }
        
-      return { isBroken:false, edit, index, length, replacement: createMarkerForEditor(target, edit.method, type, originalSubstitute, fromTemplate) }
+      return { isBroken:false, edit, index, length, replacement: createMarkerForEditor(target, method, type, originalSubstitute, fromTemplate) }
 
 
     })
