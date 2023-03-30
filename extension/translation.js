@@ -330,8 +330,31 @@ function fixBrokenEdits(gaps,html){
                 ocNum = orderChunks[3]
             }
 
+            let ocNumToTry = ocNum
+            let index = undefined
+            while(true){
 
-            const index = findIndexOfSubstringOccurrence(line, brokenEdit.target, ocNum)
+                index = findIndexOfSubstringOccurrence(line, brokenEdit.target, ocNumToTry)
+                
+                if(index){
+                   const globalIndex = firstIndex + index
+                    if(isIndexInsideTag(globalIndex,html)){
+                        console.log('is inside tag')
+                        console.log(line.substr(0,100))
+                        const newStartOfLine = index + brokenEdit.target.length
+                        firstIndex = firstIndex + newStartOfLine
+                        line = line.substr(newStartOfLine, line.length - newStartOfLine)
+                        ocNumToTry = 1
+                        index = undefined
+                        continue
+
+                    } 
+                }
+
+                break
+
+            }
+
             if(index){
                 brokenEdit.targetIndex = firstIndex + index
                 const newStartOfLine = index + brokenEdit.target.length
@@ -339,9 +362,6 @@ function fixBrokenEdits(gaps,html){
                 line = line.substr(newStartOfLine, line.length - newStartOfLine)
                 fixedEdits.push(brokenEdit)
             }
-
-
-
 
         })
 

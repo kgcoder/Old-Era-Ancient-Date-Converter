@@ -8,6 +8,8 @@
 
 function getReplacementsFromEdits(edits, htmlWithIgParts){
     
+    if(!edits || !edits.length)return []
+
     const myNewReplacements = edits.map((edit) => {
 
     

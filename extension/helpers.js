@@ -123,6 +123,15 @@ function checkIfSecondYearIsShortened(year1, year2) {
 }
 
 
+function isIndexInsideTag(index,text){
+    while(index < text.length){
+        const character = text.slice(index,index + 1)
+        if(character === '>')return true
+        if(character === '<')return false
+        index++
+    }
+    return false
+}
 
 
 function getSample(lineNumber,columnNumber,html){

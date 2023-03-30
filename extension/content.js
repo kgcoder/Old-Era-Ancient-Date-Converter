@@ -388,7 +388,10 @@ function startRequestForEditor(){
  
      }).catch(error => {
          console.log(error)
-        // translateEverything(null)
+         editsArray = []
+         if(isEditingMode){
+            onEditorLoad()
+        }
      })
 }
 
