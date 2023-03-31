@@ -143,3 +143,44 @@ function getSample(lineNumber,columnNumber,html){
     console.log('broken string:',line.slice(columnNumber - 10,columnNumber + 20))
 
 }
+
+
+function chunksFromLine(line) {
+    const escapedLine = line.replace(/\\;/g, '!!!SEMICOLON!!!')
+    const chunks = escapedLine.split(';')
+    return chunks.map(chunk => chunk.replace(/!!!SEMICOLON!!!/g, ';'))
+}
+
+
+function lineFromChunks(chunks) {
+    const escapedChunks = chunks.map(chunk => addEscapesToSemicolons(chunk))
+    return escapedChunks.join(';')
+}
+
+function addEscapesToSemicolons(text) {
+    return text.replace(/;/g, '\\;')
+}
+
+
+function getEditFromLine(line){
+    const chunks = chunksFromLine(line)
+    if(chunks.length !== 6)return null
+    const string = chunks[0]
+    const target = chunks[1]
+    const method = chunks[2]
+    const type = chunks[3]
+    const order = chunks[4]
+    const fromTemplate = chunks[5] == "1"
+
+    //TODO:validate data
+
+
+    return {
+        string,
+        target,
+        method,
+        type,
+        order,
+        fromTemplate
+    }
+}

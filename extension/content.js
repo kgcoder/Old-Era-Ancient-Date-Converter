@@ -262,7 +262,9 @@ window.onload = () => {
     
         if (!isExtensionOff  && currentLocation) {
             if (!shouldNotUseServer && currentLocation.includes("en.wikipedia.org")) {
-                isEditingMode ? startRequestForEditor() : startRequest()
+                isEditingMode ? startRequestForEditor() :  startRequest()
+            }else if(!shouldNotUseServer && currentLocation.includes("britannica.com")){
+                isEditingMode ? startWebRequestForEditor() :  startWebRequest()
             } else {
                 if(isEditingMode){
                     editsArray = []
@@ -315,32 +317,31 @@ function getPageVersionFromHtml(html) {
     return result ? result[1] : ''
 }
 
-function startRequest() {
+async function startRequest() {
     if(!pageIsLoaded || requestHasStarted)return
     requestHasStarted = true
     const encodedUrl = encodeURIComponent(currentLocation)
   
+    try{
 
-    fetch(`${baseUrl}/api/pages/${encodedUrl}`).then(r => {
-       // console.log('response',r)
-        if(r.status !== 200)return {}
-        return r.json()
-    }).then(r => {
+        const r = await fetch(`${baseUrl}/api/pages/${encodedUrl}`)
+        const json = r.status !== 200 ? {} : await r.json()
 
-        editsArray = r.edits
-        pageHasIssues = r.hasIssues 
-        pageId = r.id
+        console.log('edits',json.edits)
+        editsArray = json.edits
+        pageHasIssues = json.hasIssues 
+        pageId = json.id
         
-        isTranslated = r.isTranslated
+        isTranslated = json.isTranslated
 
      
-        lastOkVersion = r.lastOkVersion
-        numberOfBCsHasChanged = r.numberOfBCsHasChanged || false
-        editsCount = r.editsCount || 0
-        properBCs = r.properBCs || 0
-        translatedForVersion = r.translatedForVersion
+        lastOkVersion = json.lastOkVersion
+        numberOfBCsHasChanged = json.numberOfBCsHasChanged || false
+        editsCount = json.editsCount || 0
+        properBCs = json.properBCs || 0
+        translatedForVersion = json.translatedForVersion
 
-        images = r.images
+        images = json.images
 
         try{
             if(!isEditingMode){
@@ -351,48 +352,148 @@ function startRequest() {
             console.log(e)
 
         }
-
-
-
-    }).catch(error => {
-        console.log(error)
+        
+    }catch(e){
+        console.log(e)
         translateEverything(null)
-    })
+    }
 
 }
 
-function startRequestForEditor(){
+
+async function startWebRequest() {
+    if(!pageIsLoaded || requestHasStarted)return
+    requestHasStarted = true
+
+    const uriComponent = currentLocation.replace('https://','').replace('http://','').replace('www.','')
+    
+    const url = `${webBaseUrl}/wiki/api.php?action=parse&origin=*&prop=wikitext&formatversion=2&format=json&page=Dates/${uriComponent}`
+    
+    console.log('url',url)
+  
+    try{
+
+        const r = await fetch(url)
+        const json = r.status !== 200 ? {} : await r.json()
+
+        console.log('json',json)
+
+        const wikitext = json.parse.wikitext
+        if (!wikitext) {
+            translateEverything(null)
+            return 
+        }
+
+        const lines = wikitext.split('\n')
+
+        editsArray = lines.map(line => getEditFromLine(line)).filter(obj => obj !== null)
+
+        console.log(editsArray)
+       
+  
+
+        try{
+            if(!isEditingMode){
+                translateEverything(null,editsArray)
+            }
+
+        }catch(e){
+            console.log(e)
+
+        }
+        
+    }catch(e){
+        console.log(e)
+        translateEverything(null)
+    }
+
+}
+
+
+
+async function startRequestForEditor(){
 
     if(!pageIsLoaded || requestHasStarted)return
     requestHasStarted = true
     const encodedUrl = encodeURIComponent(currentLocation)
 
-    fetch(`http://localhost:3200/api/modify/getPageForParser/${encodedUrl}`).then(r => {
-        // console.log('response',r)
-         if(r.status !== 200)return {}
-         return r.json()
-     }).then(r => {
- 
-        editsArray = r.edits
-         try{
-             if(isEditingMode){
-                 onEditorLoad()
-             }
- 
-         }catch(e){
-             console.log(e)
- 
-         }
- 
- 
- 
-     }).catch(error => {
-         console.log(error)
+    try{
+        const r = await fetch(`http://localhost:3200/api/modify/getPageForParser/${encodedUrl}`)
+        const json = r.status !== 200 ? {} : await r.json()
+
+        editsArray = json.edits
+        try{
+            if(isEditingMode){
+                onEditorLoad()
+            }
+
+        }catch(e){
+            console.log(e)
+
+        }
+    }catch(e){
+        console.log(e)
          editsArray = []
          if(isEditingMode){
             onEditorLoad()
         }
-     })
+    }
+
+ 
+}
+
+
+
+async function startWebRequestForEditor(){
+
+    if(!pageIsLoaded || requestHasStarted)return
+    requestHasStarted = true
+
+    const uriComponent = currentLocation.replace('https://','').replace('http://','').replace('www.','')
+    
+    const url = `${webBaseUrl}/wiki/api.php?action=parse&origin=*&prop=wikitext&formatversion=2&format=json&page=Dates/${uriComponent}`
+    
+    console.log('url',url)
+
+    try{
+        const r = await fetch(url)
+        const json = r.status !== 200 ? {} : await r.json()
+
+        console.log('json',json)
+
+        const wikitext = json.parse.wikitext
+        if (!wikitext) {
+            editsArray = []
+            if(isEditingMode){
+                onEditorLoad()
+            }
+            return
+        }
+
+        const lines = wikitext.split('\n')
+
+        editsArray = lines.map(line => getEditFromLine(line)).filter(obj => obj !== null)
+
+        console.log(editsArray)
+
+        try{
+            if(isEditingMode){
+                onEditorLoad()
+            }
+
+        }catch(e){
+            console.log(e)
+
+        }
+    }catch(e){
+        console.log(e)
+         editsArray = []
+         if(isEditingMode){
+            onEditorLoad()
+        }
+    }
+
+ 
 }
 
 

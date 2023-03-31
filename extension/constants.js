@@ -7,6 +7,7 @@
 
  const baseUrl = 'https://dates.oldera.org'
  const frontendBaseUrl = 'https://dates.oldera.org'
+ const webBaseUrl = 'https://timeline.oldera.org'
  
  //const baseUrl = 'http://localhost:3250'
  //const frontendBaseUrl = 'http://localhost:3000'

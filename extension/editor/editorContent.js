@@ -828,6 +828,15 @@ function getRightSide(array, index) {
     return result
 }
 
+function toggleTestingModeFromShortcut(){
+    if(!isEditingMode)return
+    isTestingMode = !isTestingMode
+    if(isTestingMode){
+        test()
+    }else{
+        backToEditing()
+    }
+}
 
 
 function test() {
@@ -845,7 +854,15 @@ function test() {
     })
 
 
+    const lines = finalInstructions.map(({string,target,method,type,order,fromTemplate}) => {
+        return `${string};${target};${method};${type ?? ""};${order ? order : ""};${fromTemplate ? "1" : ""}`
+    })
+
+    const finalText = lines.join('\n')
+
     console.log('finalInstructions',JSON.stringify(finalInstructions))
+
+    console.log('finalText',finalText)
 
     // chrome.storage.local.set({ instructions }, function () {
     //     console.log('instructions saved')
