@@ -138,7 +138,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
                 updateTranslation()
                 replaceImages(images)
                 chrome.runtime.sendMessage('pageMetadataIsReady') //message for the popup script  
-            } else if (currentLocation && !shouldNotUseServer && currentLocation.includes("en.wikipedia.org")) {
+            } else if (currentLocation && !shouldNotUseServer && isOnWikipedia) {
                 isEditingMode ? startRequestForEditor() : startRequest()
             }
             
@@ -261,7 +261,7 @@ window.onload = () => {
         }
     
         if (!isExtensionOff  && currentLocation) {
-            if (!shouldNotUseServer && currentLocation.includes("en.wikipedia.org")) {
+            if (!shouldNotUseServer && isOnWikipedia) {
                 isEditingMode ? startRequestForEditor() :  startRequest()
             }else if(!shouldNotUseServer && currentLocation.includes("britannica.com")){
                 isEditingMode ? startWebRequestForEditor() :  startWebRequest()
@@ -270,14 +270,15 @@ window.onload = () => {
                     editsArray = []
                     onEditorLoad()
                 }else{
-                    translateEverything(null)
+                    if(isOnWikipedia){
+                        translateEverything(null)
+                    }else{
+                        translateEverythingOnWeb(null)
+                    }
                 }
             }
         }
 
-        // if(isEditingMode){
-        //     onEditorLoad()
-        // }
       
     })
 
@@ -380,7 +381,7 @@ async function startWebRequest() {
 
         const wikitext = json.parse.wikitext
         if (!wikitext) {
-            translateEverything(null)
+            translateEverythingOnWeb(null)
             return 
         }
 
@@ -394,7 +395,7 @@ async function startWebRequest() {
 
         try{
             if(!isEditingMode){
-                translateEverything(null,editsArray)
+                translateEverythingOnWeb(null,editsArray)
             }
 
         }catch(e){
@@ -404,7 +405,7 @@ async function startWebRequest() {
         
     }catch(e){
         console.log(e)
-        translateEverything(null)
+        translateEverythingOnWeb(null)
     }
 
 }
@@ -524,7 +525,9 @@ function translateEverything(r,finalInstructions = []) {
 
     if (isTranslated || finalInstructions.length) {
         const editsToUse = finalInstructions.length ? finalInstructions : editsArray
+        console.log('editsToUse',editsToUse)
         const repsFromServer = getReplacementsFromServer(editsToUse, htmlWithIgParts)
+        console.log('repsFromServer',repsFromServer)
         replacementsArray = resolveReplacements(replacementsArray, repsFromServer)
     }
 
@@ -539,7 +542,127 @@ function translateEverything(r,finalInstructions = []) {
 
 
 
+
     if (htmlWithMarkers) {
+
+        console.log('htmlWithMarkers',htmlWithMarkers)
+
+        const parser = new DOMParser();
+        const originalBodyDOM = parser.parseFromString(html, "text/xml");
+        const cleanHtml = removeAttributesFromTags(htmlWithMarkers)
+        const bodyDOM = parser.parseFromString(cleanHtml, "text/xml");
+
+
+        textsArray = []
+        getTextsArray(bodyDOM.documentElement)
+
+   
+        textNodesArray = []
+        getTextNodesArray(document.body)
+
+  
+
+        const textInFirstNode = textNodesArray[1].firstNode.data
+  
+        if(textNodesArray.length < textsArray.length){
+      
+            const index = textsArray.findIndex(item => {
+                return textInFirstNode === item
+            })
+
+           
+            if(index > 0){
+                textsArray.splice(0, index);
+            }
+        }
+
+      
+
+        
+        doReplacements()
+        updateDates()
+
+    }
+
+    replaceImages(images)
+
+
+    if (r) {
+        prepareVersionInfo(r)    
+    }
+
+       
+
+
+    allWorkFinishedForPage = true
+
+    updateIcon()
+
+    updatePageTitle()
+
+    chrome.runtime.sendMessage('pageMetadataIsReady') //message for the popup script
+    
+
+}
+
+
+
+function translateEverythingOnWeb(r,finalInstructions = []) {
+  
+    
+    let html = new XMLSerializer().serializeToString(document.body)
+
+    let htmlWithMarkers
+
+    const { htmlWithIgParts, ignoredParts } = htmlWithIgnoredParts(html)
+
+
+    let replacementsArray = []
+    getLocalReplacements(htmlWithIgParts, replacementsArray, currentPageData)
+    replacementsArray = replacementsArray.sort((a, b) => a.index - b.index)
+ 
+
+
+    if (finalInstructions.length) {
+        const editsToUse = finalInstructions.length ? finalInstructions : editsArray
+        console.log('editsToUse',editsToUse)
+        const {result:text,insertions} = extractTextFromHtml(htmlWithIgParts)
+        let repsFromServer = getReplacementsFromServerForWeb(editsToUse, text)
+        console.log('repsFromServer',repsFromServer)
+
+        repsFromServer = repsFromServer.sort((a,b) => a.index - b.index)
+
+        console.log('repsFromServer2',repsFromServer)
+
+        const rawRepsInHtmlArray = []
+        moveReplacementsFromTextToHtml(text,htmlWithIgParts,JSON.parse(JSON.stringify(repsFromServer)), rawRepsInHtmlArray, insertions)
+
+
+        console.log('rawRepsInHtmlArray',rawRepsInHtmlArray)
+
+
+        const normalReplacementsInHtmlFromServer = mergeReplacements(rawRepsInHtmlArray)
+        replacementsArray = resolveReplacements(replacementsArray, normalReplacementsInHtmlFromServer)
+
+        console.log('replacementsArray',replacementsArray)
+
+    }
+
+    
+    replacementsArray = replacementsArray.filter(replacement => replacement.edit.method !== 'bc-ig')
+    replacementsArray = replacementsArray.sort((a, b) => a.index - b.index)
+
+    
+    editsArray = replacementsArray.map(item => item.edit)
+    
+    htmlWithMarkers = createHTMLWithMarkers(replacementsArray, htmlWithIgParts, ignoredParts)
+
+
+
+
+    if (htmlWithMarkers) {
+
+        console.log('htmlWithMarkers',htmlWithMarkers)
 
         const parser = new DOMParser();
         const originalBodyDOM = parser.parseFromString(html, "text/xml");

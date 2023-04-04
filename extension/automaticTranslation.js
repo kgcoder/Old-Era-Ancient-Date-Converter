@@ -69,8 +69,9 @@ function createAutomaticReplacements(html, replacementsArray, pageData) {
 
 
 
-    intermediaryReplacementsArray = intermediaryReplacementsArray.sort((a,b) => a.index - b.index)
+    intermediaryReplacementsArray = intermediaryReplacementsArray.sort((a,b) => a.index - b.index).map(item => ({index:item.index,edit:item}))
 
+    console.log('intermediaryReplacementsArray',intermediaryReplacementsArray)
 
     moveReplacementsFromTextToHtml(text,html,intermediaryReplacementsArray, rawReplacementsInHtmlArray, insertions)
 
@@ -183,9 +184,12 @@ function extractTextFromHtml(html){
 function moveReplacementsFromTextToHtml(text,html,replacementsInTextArray,finalReplacementsArray,insertions){
     if(!replacementsInTextArray.length)return
 
+    console.log('replacementsInTextArray',replacementsInTextArray)
+
     let indexOfReplacement = 0
     let indexInTextToLookFor = replacementsInTextArray[indexOfReplacement].index
 
+   
     let indexInText = 0
     let indexInHtml = 0
 
@@ -222,7 +226,7 @@ function moveReplacementsFromTextToHtml(text,html,replacementsInTextArray,finalR
 
             if(indexInText === indexInTextToLookFor){
                 const currentReplacementInText = replacementsInTextArray[indexOfReplacement]
-                const targetLength = currentReplacementInText.length
+                const targetLength = currentReplacementInText.edit.target.length
                 const targetInText = text.slice(indexInText,indexInText + targetLength)
                 const targetInHtml = html.slice(indexInHtml,indexInHtml + targetLength)
                 
@@ -241,7 +245,7 @@ function moveReplacementsFromTextToHtml(text,html,replacementsInTextArray,finalR
                 }
 
 
-                const {target,otherNumberStringInRange, index, method, length, originalSubstitute} = currentReplacementInText
+                const {target,otherNumberStringInRange, index, method, length, originalSubstitute} = currentReplacementInText.edit
 
                 addReplacement(finalReplacementsArray,method,target,otherNumberStringInRange,indexInHtml,true,'normal',originalSubstitute)
 
@@ -349,6 +353,7 @@ function addReplacement(replacementsArray, method,targetString, otherNumberStrin
         if (indexOfExistingReplacement !== -1) return
     }
 
+   
     const edit = {
         target: targetString,
         originalSubstitute,
@@ -358,7 +363,6 @@ function addReplacement(replacementsArray, method,targetString, otherNumberStrin
         
     }
 
-    
     const replacement = {
         isBroken: false,
         edit,

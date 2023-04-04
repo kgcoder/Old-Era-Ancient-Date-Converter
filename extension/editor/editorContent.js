@@ -36,18 +36,19 @@ function onEditorLoad() {
      setInitialHtml()
      addToHistory(currentHTML)
      openAllWikipediaDropDowns(()=>{
+        openAllBritannicaDropDowns(() => {
+            editsFromServer = editsArray
+        
+            loadEdits(editsFromServer,true,false)
+        
+            if (document.addEventListener) {
+                document.addEventListener('click', interceptClickEvent);
+            }
+
+        })
 
  
 
-    editsFromServer = editsArray
-
-
-    loadEdits(editsFromServer,true,false)
-
-
-    if (document.addEventListener) {
-        document.addEventListener('click', interceptClickEvent);
-    }
 
     })
  
@@ -69,7 +70,7 @@ function setInitialHtml() {
 }
 
 function openAllWikipediaDropDowns(callback){
-    if(!currentLocation || !currentLocation.includes('en.wikipedia.org')){
+    if(!currentLocation || !isOnWikipedia){
         callback()
         return
     }
@@ -88,6 +89,28 @@ function openAllWikipediaDropDowns(callback){
 
     },1000)
 
+}
+
+
+function openAllBritannicaDropDowns(callback){
+    if(!currentLocation || !currentLocation.includes('britannica.com')){
+        callback()
+        return
+    }
+
+    setTimeout(() => {
+        const links = document.getElementsByClassName('js-content link-blue')
+   
+        Array.prototype.forEach.call(links, link => {
+            if(link.innerHTML.toLowerCase().includes('show more')){
+                link.click()
+            }      
+        });
+
+
+        callback()
+
+    },1000)
 }
 
 
@@ -298,7 +321,15 @@ function createHTMLWithMarkersForEditor(editsFromServer,shouldFixBrokenEdits = f
 
     const { htmlWithIgParts, ignoredParts } = htmlWithIgnoredParts(html)
 
-    let replacements = getReplacementsFromEdits(editsFromServer,htmlWithIgParts)
+    let replacements = []
+    const {result:text,insertions} = extractTextFromHtml(htmlWithIgParts)
+    if(isOnWikipedia){
+        replacements = getReplacementsFromEdits(editsFromServer,htmlWithIgParts)
+    }else{
+        replacements = getReplacementsFromEdits(editsFromServer,text)
+        console.log('replacements',replacements)
+    }
+
    
     let currentGap = null
     let lastGoodEdit = null
@@ -329,9 +360,11 @@ function createHTMLWithMarkersForEditor(editsFromServer,shouldFixBrokenEdits = f
     pageHasIssues = filteredEdits.length !== replacements.length
     replacements = filteredEdits
 
+    console.log('filteredEdits',filteredEdits)
+
 
     if(shouldFixBrokenEdits){
-        const fixedEdits = fixBrokenEdits(gaps,htmlWithIgParts)
+        const fixedEdits = fixBrokenEdits(gaps,isOnWikipedia ? htmlWithIgParts : text)
         if(showOnlyFixed){
             replacements = fixedEdits
         }else{
@@ -339,6 +372,14 @@ function createHTMLWithMarkersForEditor(editsFromServer,shouldFixBrokenEdits = f
         }
     }
 
+    let finalReplacements = replacements
+    if(!isOnWikipedia){
+        finalReplacements = []
+        console.log('replacements before moving to html',replacements)
+        moveReplacementsFromTextToHtml(text,htmlWithIgParts,replacements, finalReplacements, insertions)
+    }
+
+    console.log('final replacements',finalReplacements)
 
 
     localReplacementsArray = []
@@ -354,13 +395,15 @@ function createHTMLWithMarkersForEditor(editsFromServer,shouldFixBrokenEdits = f
         return item
     })
 
+    console.log('local replacements',localReplacementsArray)
 
-    replacements = resolveReplacements(localReplacementsArray, replacements)
+    replacements = resolveReplacements(localReplacementsArray, finalReplacements)
 
-    replacements = replacements.sort((a, b) => a.edit.targetIndex - b.edit.targetIndex)
+    replacements = replacements.sort((a, b) => a.index - b.index)
 
 
   
+ 
 
 
 
@@ -564,13 +607,7 @@ function createInstructions() {
     const { htmlWithIgParts: ignHtml } = htmlWithIgnoredParts(currentHTML)
 
 
-    //const text = extractTextFromHtml(ignHtml)
-    
 
-
-   // console.log('ignHtml before creating instructions', ignHtml)
-
-   // console.log('clean text',text)
 
     while ((result = pattern.exec(ignHtml))) {
         const method = result[1]
@@ -643,7 +680,10 @@ function createInstructions() {
     })
 
 
-    const instructions = []
+    if(!isOnWikipedia){
+        const instructions = getFinalReplacementsForWeb(cleanHTML,cleanTexts.filter(obj => obj.method !== 'text'))
+        return instructions
+    }
 
     cleanTexts.forEach((cleanTextObj, index) => {
         if (cleanTextObj.method === 'text') {
@@ -721,6 +761,8 @@ function createInstructions() {
         }
     })
 
+    console.log('instructions',instructions)
+
     localReplacementsArray = []
 
     getLocalReplacements(cleanHTML, localReplacementsArray, currentPageData)
@@ -738,6 +780,7 @@ function createInstructions() {
 
     const replacementsFromInstructions = getReplacementsFromEdits(instructions,cleanHTML)
 
+    console.log('replacementsFromInstructions',replacementsFromInstructions)
 
     const finalInstructions = []
 
@@ -750,6 +793,8 @@ function createInstructions() {
             finalInstructions.push(repFromInstr.edit)
         }
     })
+
+
     
     return finalInstructions
 
@@ -842,7 +887,6 @@ function toggleTestingModeFromShortcut(){
 function test() {
     console.log('test')
     finalInstructions = createInstructions()
-    //finalInstructions = instructions
 
     console.log('finalInstructions before',JSON.stringify(finalInstructions))
     finalInstructions = finalInstructions.map(edit => {
@@ -854,15 +898,7 @@ function test() {
     })
 
 
-    const lines = finalInstructions.map(({string,target,method,type,order,fromTemplate}) => {
-        return `${string};${target};${method};${type ?? ""};${order ? order : ""};${fromTemplate ? "1" : ""}`
-    })
 
-    const finalText = lines.join('\n')
-
-    console.log('finalInstructions',JSON.stringify(finalInstructions))
-
-    console.log('finalText',finalText)
 
     // chrome.storage.local.set({ instructions }, function () {
     //     console.log('instructions saved')
@@ -874,7 +910,20 @@ function test() {
     setBodyFromHTML(originalHTML)
 
 
-    translateEverything(null,JSON.parse(JSON.stringify(finalInstructions)))
+    if(isOnWikipedia){
+        translateEverything(null,JSON.parse(JSON.stringify(finalInstructions)))
+    }else{
+        const lines = finalInstructions.map(({string,target,method,type,order,fromTemplate}) => {
+            return `${string};${target};${method};${type ?? ""};${order ? order : ""};${fromTemplate ? "1" : ""}`
+        })
+    
+        const finalText = lines.join('\n')
+    
+        console.log('finalInstructions',JSON.stringify(finalInstructions))
+    
+        console.log('finalText:\n',finalText)
+        translateEverythingOnWeb(null,JSON.parse(JSON.stringify(finalInstructions)))
+    }
 
 
     currentHTML = new XMLSerializer().serializeToString(document.body)
@@ -898,6 +947,11 @@ async function sendToServer() {
     //     alert('Editing mode')
     //     return 
     // }
+
+    if(!isOnWikipedia){
+        //TODO:show popup
+        return
+    }
    
     let currentLocation = window.location.toString()
     currentLocation = currentLocation.split('?')[0].split('#')[0]
@@ -933,3 +987,127 @@ async function sendToServer() {
 
 
 
+function getFinalReplacementsForWeb(cleanHTML,cleanTexts){
+ 
+
+
+    localReplacementsArray = []
+
+    getLocalReplacements(cleanHTML, localReplacementsArray, currentPageData)
+    localReplacementsArray = localReplacementsArray.map(item => {
+        item.edit.targetIndex = item.index
+        if(['bc-y','bc-y-r1','bc-y-r2'].includes(item.edit.method))item.edit.method = 'year'
+        if(['bc-i','bc-i-r1','bc-i-r2'].includes(item.edit.method))item.edit.method = 'impreciseYear'
+        return item
+    })
+
+
+
+    localReplacementsArray = localReplacementsArray.sort((a, b) => a.edit.targetIndex - b.edit.targetIndex)
+
+
+    console.log('cleanTexts',cleanTexts)
+    console.log('localReplacementsArray',localReplacementsArray)
+
+
+
+    //const replacementsFromInstructions = getReplacementsFromEdits(instructions,cleanHTML)
+
+
+
+
+    const filteredCleanTexts = []
+    cleanTexts.forEach((cleanText) => {
+     
+        const localReplacementInTheSamePlace = localReplacementsArray.find(localRep => localRep.index == cleanText.index)
+        if(localReplacementInTheSamePlace && 
+            cleanText.method == localReplacementInTheSamePlace.edit.method &&
+            cleanText.text == localReplacementInTheSamePlace.edit.target &&
+            cleanText.type == localReplacementInTheSamePlace.edit.type &&
+            cleanText.originalSubstitute == localReplacementInTheSamePlace.edit.originalSubstitute
+            ){
+            //no instruction is needed
+        }else{
+            filteredCleanTexts.push(cleanText)
+        }
+    })
+
+
+    console.log('filteredCleanTexts',filteredCleanTexts)
+
+    const {result:text,insertions} = extractTextFromHtml(cleanHTML)
+    console.log('text',text)
+    const replacementsInText = moveReplacementsHtmlToText(cleanHTML,text,insertions,filteredCleanTexts)
+
+    console.log('replacementsInText',replacementsInText)
+
+
+
+    const finalInstructions = []
+    replacementsInText.forEach((edit) => {
+     
+            const left = getLeftSideInText(text,edit)
+            const right = getRightSideInText(text,edit)
+
+
+            const targetIndex = edit.index
+            const bigStringIndex = targetIndex - left.length
+
+            const bigLine = left + edit.text + right
+
+            console.log('bigLine',bigLine)
+            const stringOccurrences = getOccurrences2(text, bigLine)
+
+            let numberOfOccurrence = 1
+
+            if (stringOccurrences.length !== 1) {
+                numberOfOccurrence = getNumberOfOccurrence(stringOccurrences, bigStringIndex)
+            }
+
+            if(!edit.text)return
+
+            const targetOccurrences = getOccurrences2(bigLine, edit.text)
+            let numberOfTargetOccurrence = 1
+            if (targetOccurrences.length !== 1) {
+                const relTargetIndex = left.length
+                numberOfTargetOccurrence = getNumberOfOccurrence(targetOccurrences, relTargetIndex)
+            }
+
+            const order = `${stringOccurrences.length}.${numberOfOccurrence}.${targetOccurrences.length}.${numberOfTargetOccurrence}`
+
+            const instruction = {
+                string: bigLine,
+                target: edit.text,
+                method: edit.method,
+            }
+            if (order !== '1.1.1.1') instruction['order'] = order
+            if (edit.type !== 'normal') instruction['type'] = edit.type
+            if (edit.originalSubstitute) instruction['originalSubstitute'] = edit.originalSubstitute
+          //  if(edit.fromTemplate)instruction['fromTemplate'] = true
+
+          finalInstructions.push(instruction)
+
+
+        
+    })
+
+    return finalInstructions
+
+}
+
+
+function getLeftSideInText(text,edit) {
+    if (edit.index <= 0) return ''
+    let startIndex = Math.max(edit.index - 15,0)
+    const leftPart = text.slice(startIndex,edit.index)
+    return leftPart
+
+}
+
+function getRightSideInText(text,edit) {
+    if (edit.index >= text.length - 1) return ''
+    let startIndex = edit.index + edit.text.length
+    let endIndex = Math.min(startIndex + 15,text.length - 1)
+    const rightPart = text.slice(startIndex,endIndex)
+    return rightPart
+}

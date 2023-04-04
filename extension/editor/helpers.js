@@ -8,6 +8,7 @@
 
 function getReplacementsFromEdits(edits, htmlWithIgParts){
     
+    console.log('text',htmlWithIgParts)
     if(!edits || !edits.length)return []
 
     const myNewReplacements = edits.map((edit) => {
@@ -256,15 +257,6 @@ function escapeText(text) {
 function setBodyFromCurrentHTML() {
     setBodyFromHTML(currentHTML)
     console.log('set from current')
-    // let currentLocation = window.location.toString()
-    // if (currentLocation.includes('localhost')) {
-    //     document.body.innerHTML = currentHTML
-    // } else {
-    //     const parser = new DOMParser();
-    //     const bodyDOM = parser.parseFromString(currentHTML, "text/xml");
-    //     document.body = bodyDOM.documentElement
-    // }
-
 }
 
 function setBodyFromHTML(html) {
@@ -464,6 +456,141 @@ function removeProblematicPartsFromHtml(html){
     return html
 }
 
+
+function moveReplacementsHtmlToText(html,text,insertions,replacementsInHtmlArray){
+
+    console.log('replacementsInHtmlArray',replacementsInHtmlArray)
+
+    // { text: targetText, 
+    //     method: obj.method, 
+    //     index: indexInOriginalText, 
+    //     type: obj.type, 
+    //     originalSubstitute: obj.substitute, 
+    //     fromTemplate:obj.fromTemplate 
+    // }
+
+    if(!replacementsInHtmlArray.length)return []
+
+    let nextInsertionIndexInArray = -1
+    let nextReplacementIndexInArray = 0
+
+    let nextInsertionIndexInText = -1
+    let nextReplacement = replacementsInHtmlArray[0]
+    let nextReplacementIndexInHtml = nextReplacement.index
+
+    if(insertions.length){
+        nextInsertionIndexInArray = 0
+        nextInsertionIndexInText = insertions[0]
+    }
+
+
+    
+
+    let indexInText = 0
+    let indexInHtml = 0
+
+    let isInsideTag = false
+
+    const result = []
+
+    while(indexInHtml < html.length){
+        const characterInHtml = html.slice(indexInHtml,indexInHtml + 1)
+
+        if(characterInHtml === '<'){
+            isInsideTag = true
+            indexInHtml++
+            continue
+        }
+        if(characterInHtml === '>'){
+            isInsideTag = false
+            indexInHtml++
+            continue
+        }
+
+        if(isInsideTag){
+            indexInHtml++
+            continue
+        }
+
+        const characterInText = text.slice(indexInText,indexInText + 1)
+
+        if(characterInText !== characterInHtml){
+            console.log('something is wrong',characterInHtml)
+            console.log('something is wrong',characterInText)
+        }
+
+
+        let justFoundReplacement = false
+        if(indexInHtml === nextReplacementIndexInHtml){
+            console.log('indexInHtml === nextReplacementIndexInHtml:',nextReplacement.text)
+
+            const targetLength = nextReplacement.text.length
+            const targetInText = text.slice(indexInText,indexInText + targetLength)
+            if(targetInText === nextReplacement.text){
+                console.log('found replacement:',targetInText)
+
+                result.push({
+                    text: nextReplacement.text, 
+                    method: nextReplacement.method, 
+                    index: indexInText, 
+                    type: nextReplacement.type, 
+                    originalSubstitute: nextReplacement.substitute, 
+                    fromTemplate:nextReplacement.fromTemplate 
+                })
+
+
+                justFoundReplacement = true
+                indexInHtml += targetLength
+                indexInText += targetLength
+
+                nextReplacementIndexInArray++
+
+                if(nextReplacementIndexInArray < replacementsInHtmlArray.length){
+                    nextReplacement = replacementsInHtmlArray[nextReplacementIndexInArray]
+                    nextReplacementIndexInHtml = nextReplacement.index
+                    
+                }else{
+                    return result
+                }
+
+
+
+
+
+
+            }else{
+                console.log("something doesn't work")
+            }
+        }
+        
+
+        if(!justFoundReplacement){
+            indexInText++
+            indexInHtml++
+        }
+
+
+        if(indexInText === nextInsertionIndexInText){
+            indexInText++
+            nextInsertionIndexInArray++
+            if(nextInsertionIndexInArray < insertions.length){
+                nextInsertionIndexInText = insertions[nextInsertionIndexInArray]
+            }else{
+                nextInsertionIndexInArray = -1
+                nextInsertionIndexInText = -1
+            }
+
+
+        }
+
+        
+    }
+
+
+    return result
+
+
+}
 
 
 

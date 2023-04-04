@@ -6,6 +6,7 @@
  */
 
 let currentLocation = window.location.toString()
+let isOnWikipedia = false
 
 const mainBaseURL = 'https://en.wikipedia.org/wiki/'
 const additionalBaseURL = 'https://en.wikipedia.org/w/index.php?'
@@ -20,6 +21,9 @@ function prepareLocation() {
     .replace('http://www.','')
     .replace('http://','')
     domain = domain.split('/')[0]
+
+
+    isOnWikipedia = currentLocation.includes('en.wikipedia.org')
 
 
     if (currentLocation.includes(mainBaseURL)) {
