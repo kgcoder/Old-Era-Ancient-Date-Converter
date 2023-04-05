@@ -20,6 +20,7 @@ function selectNumbers(digits) {
         'metres',
         'meters',
         'ft',
+        'feet',
         'pounds',
         'kilometers',
         'kilometres',
@@ -89,9 +90,9 @@ function selectNumbersWithBCs() {
 function findRoundYears() {
     if(shouldReturnBecauseOfTestingMode())return
     console.log('find round years')
-    const pattern = new RegExp('<selection class="year" data-t="(.*?)" style="background-color:green;">(\\b\\d+0\\b.*?)</selection>', 'g')
+    const pattern = new RegExp('<selection class="bc-y" data-t="(.*?)" style="background-color:green;">(\\b\\d+0\\b.*?)</selection>', 'g')
     currentHTML = currentHTML.replace(pattern, (match, fromTemplate, inner) => {
-        return `<selection class="impreciseYear" data-t="${fromTemplate}" style="background-color:pink;">${inner}</selection>`
+        return `<selection class="bc-i" data-t="${fromTemplate}" style="background-color:pink;">${inner}</selection>`
     })
     setBodyFromCurrentHTML()
     addToHistory(currentHTML)
@@ -215,9 +216,9 @@ function clearSelection() {
     html = removeProblematicPartsFromHtml(html)
     const chunks = html.split('__selection__')
     if (selectionMode === 'markerMode') {
-        const pattern = new RegExp('<selection class="impreciseYear" data-t="(.*?)".*?>(.*?)</selection>', 'g')
+        const pattern = new RegExp('<selection class="bc-i" data-t="(.*?)".*?>(.*?)</selection>', 'g')
         currentHTML = chunks[0] + chunks[1].replace(/<selection class="marker".*?>(.*?)<\/selection>/gm, '$1')
-            .replace(pattern, '<selection class="year" data-t="$1" style="background-color:green;">$2</selection>') + chunks[2]
+            .replace(pattern, '<selection class="bc-y" data-t="$1" style="background-color:green;">$2</selection>') + chunks[2]
 
     } else if (selectionMode === 'bookTitleMode') {
         const pattern = new RegExp(`<selection class="(${allClassesString})" data-t="(.*?)".*?>(.*?)</selection>`, 'g')
@@ -263,8 +264,8 @@ function roundYearsInRange(){
     html = removeProblematicPartsFromHtml(html)
     const chunks = html.split('__selection__')
     if (selectionMode === 'markerMode') {
-        const pattern = new RegExp('<selection class="year" data-t="(.*?)".*?>(.*?)</selection>', 'g')
-        currentHTML = chunks[0] + chunks[1].replace(pattern, '<selection class="impreciseYear" data-t="$1" style="background-color:pink;">$2</selection>') + chunks[2]
+        const pattern = new RegExp('<selection class="bc-y" data-t="(.*?)".*?>(.*?)</selection>', 'g')
+        currentHTML = chunks[0] + chunks[1].replace(pattern, '<selection class="bc-i" data-t="$1" style="background-color:pink;">$2</selection>') + chunks[2]
     }
 
     setBodyFromCurrentHTML()

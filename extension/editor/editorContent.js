@@ -390,8 +390,8 @@ function createHTMLWithMarkersForEditor(editsFromServer,shouldFixBrokenEdits = f
     getLocalReplacements(htmlWithIgParts, localReplacementsArray, currentPageData)
     localReplacementsArray = localReplacementsArray.map(item => {
         item.edit.targetIndex = item.index
-        if(['bc-y','bc-y-r1','bc-y-r2'].includes(item.edit.method))item.edit.method = 'year'
-        if(['bc-i','bc-i-r1','bc-i-r2'].includes(item.edit.method))item.edit.method = 'impreciseYear'
+        if(['bc-y-r1','bc-y-r2'].includes(item.edit.method))item.edit.method = 'bc-y'
+        if(['bc-i-r1','bc-i-r2'].includes(item.edit.method))item.edit.method = 'bc-i'
         return item
     })
 
@@ -443,7 +443,6 @@ function replaceCurlyBracesWithMarkup(html) {
             target = target + '_substitute_' + originalSubstitute
         }
         switch (method) {
-            case 'year':
             case 'bc-y':
             case 'bc-y-r1':
             case 'bc-y-r2':
@@ -453,41 +452,38 @@ function replaceCurlyBracesWithMarkup(html) {
                 color = 'rosyBrown'
                 break
             case 'bc-y1':
-            case 'oneDigitYear':
                 color = 'gainsboro'
                 break
             case 'bc-y2':
-            case 'twoDigitYear':
                 color = 'dimgray'
                 break
             case 'bc-i':
             case 'bc-i-r1':
             case 'bc-i-r2':
-            case 'impreciseYear':
                 color = 'pink'
                 break
-            case 'decade':
+            case 'bc-d':
                 color = 'olive'
                 break
-            case 'century':
+            case 'bc-c':
                 color = 'orange'
                 break
-            case '00s':
+            case 'bc-00s':
                 color = 'coral'
                 break
-            case 'millennium':
+            case 'bc-m':
                 color = 'darkcyan'
                 break
-            case '000s':
+            case 'bc-000s':
                 color = 'blueViolet'
                 break
-            case 'remove':
+            case 'bc-r':
                 color = 'brown'
                 break
-            case 'OE':
+            case 'bc-tn':
                 color = 'aqua'
                 break
-            case 'ofOE':
+            case 'bc-ot':
                 color = 'lime'
                 break
             case 'bc-ig':
@@ -540,14 +536,14 @@ function addListenersToSelections() {
             } else if (e.altKey) {
                 let newClassName = ''
                 let color = ''
-                if (sel.className === 'year') {
-                    newClassName = 'oneDigitYear'
+                if (sel.className === 'bc-y') {
+                    newClassName = 'bc-y1'
                     color = 'gainsboro'
-                } else if (sel.className === 'oneDigitYear') {
-                    newClassName = 'twoDigitYear'
+                } else if (sel.className === 'bc-y1') {
+                    newClassName = 'bc-y2'
                     color = 'dimgray'
-                } else if (sel.className === 'twoDigitYear') {
-                    newClassName = 'year'
+                } else if (sel.className === 'bc-y2') {
+                    newClassName = 'bc-y'
                     color = 'green'
                 } else {
                     return
@@ -561,9 +557,9 @@ function addListenersToSelections() {
                     return
                 }
                 console.log('className',sel.className)
-                if (!['year','impreciseYear'].includes(sel.className)) return
-                const newClassName = ['year',].includes(sel.className) ? 'impreciseYear' : 'year'
-                const color = newClassName === 'year' ? 'green' : 'pink'
+                if (!['bc-y','bc-i'].includes(sel.className)) return
+                const newClassName = ['bc-y',].includes(sel.className) ? 'bc-i' : 'bc-y'
+                const color = newClassName === 'bc-y' ? 'green' : 'pink'
                 sel.outerHTML = `<selection class="${newClassName}" data-t="${sel.outerHTML.includes('data-t="true"') ? 'true' : '' }" style="background-color:${color};">` + sel.innerHTML + '</selection>'
             }
 
@@ -750,8 +746,8 @@ function createInstructions() {
     getLocalReplacements(cleanHTML, localReplacementsArray, currentPageData)
     localReplacementsArray = localReplacementsArray.map(item => {
         item.edit.targetIndex = item.index
-        if(['bc-y','bc-y-r1','bc-y-r2'].includes(item.edit.method))item.edit.method = 'year'
-        if(['bc-i','bc-i-r1','bc-i-r2'].includes(item.edit.method))item.edit.method = 'impreciseYear'
+        if(['bc-y','bc-y-r1','bc-y-r2'].includes(item.edit.method))item.edit.method = 'bc-y'
+        if(['bc-i','bc-i-r1','bc-i-r2'].includes(item.edit.method))item.edit.method = 'bc-i'
         return item
     })
 
@@ -873,9 +869,9 @@ function test() {
     console.log('finalInstructions before',JSON.stringify(finalInstructions))
     finalInstructions = finalInstructions.map(edit => {
         const newEdit = JSON.parse(JSON.stringify(edit))
-        if(edit.method == 'bc-y-r2')newEdit.method = 'year'
-        if(['bc-y','bc-y-r1','bc-y-r2'].includes(edit.method))edit.method = 'year'
-        if(['bc-i','bc-i-r1','bc-i-r2'].includes(edit.method))edit.method = 'impreciseYear'
+        if(edit.method == 'bc-y-r2')newEdit.method = 'bc-y'
+        if(['bc-y','bc-y-r1','bc-y-r2'].includes(edit.method))edit.method = 'bc-y'
+        if(['bc-i','bc-i-r1','bc-i-r2'].includes(edit.method))edit.method = 'bc-i'
         return newEdit
     })
 
@@ -940,10 +936,12 @@ async function sendToServer() {
     console.log('url', currentLocation)
     console.log('edits', finalInstructions)
 
+    const editsWithLongMethodNames = finalInstructions.map(edit =>( {...edit,method:shortToLongMethodConversions[edit.method]}))
+
 
     const data = {
         url: currentLocation,
-        edits: finalInstructions
+        edits: editsWithLongMethodNames
     }
     const result = await fetch('http://localhost:3200/api/pages', {
         method: 'POST',
@@ -978,8 +976,8 @@ function getFinalReplacementsForWeb(cleanHTML,cleanTexts){
     getLocalReplacements(cleanHTML, localReplacementsArray, currentPageData)
     localReplacementsArray = localReplacementsArray.map(item => {
         item.edit.targetIndex = item.index
-        if(['bc-y','bc-y-r1','bc-y-r2'].includes(item.edit.method))item.edit.method = 'year'
-        if(['bc-i','bc-i-r1','bc-i-r2'].includes(item.edit.method))item.edit.method = 'impreciseYear'
+        if(['bc-y','bc-y-r1','bc-y-r2'].includes(item.edit.method))item.edit.method = 'bc-y'
+        if(['bc-i','bc-i-r1','bc-i-r2'].includes(item.edit.method))item.edit.method = 'bc-i'
         return item
     })
 

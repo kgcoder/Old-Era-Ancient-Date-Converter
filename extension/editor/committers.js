@@ -7,7 +7,7 @@
 
 
 function commitYears() {
-    replaceMarkers('year', 'green')
+    replaceMarkers('bc-y', 'green')
 }
 
 function commitADYears() {
@@ -17,37 +17,37 @@ function commitADYears() {
 
 function commitDecades() {
 
-    replaceMarkers('decade', 'olive')
+    replaceMarkers('bc-d', 'olive')
 }
 
 
 function commitCenturies() {
-    replaceMarkers('century', 'orange')
+    replaceMarkers('bc-c', 'orange')
 }
 
 function commit00s() {
-    replaceMarkers('00s', 'coral')
+    replaceMarkers('bc-00s', 'coral')
 }
 
 function commitMillennia() {
-    replaceMarkers('millennium', 'darkcyan')
+    replaceMarkers('bc-m', 'darkcyan')
 }
 
 function commit000s() {
-    replaceMarkers('000s', 'blueViolet')
+    replaceMarkers('bc-000s', 'blueViolet')
 }
 
 function commitRemovals() {
-    replaceMarkers('remove', 'brown')
+    replaceMarkers('bc-r', 'brown')
 }
 
 
 function commitOE() {
-    replaceMarkers('OE', 'aqua')
+    replaceMarkers('bc-tn', 'aqua')
 }
 
 function commitOfOE() {
-    replaceMarkers('ofOE', 'lime')
+    replaceMarkers('bc-ot', 'lime')
 }
 
 function commitIgnoredPart() {

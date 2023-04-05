@@ -7,7 +7,7 @@
 const spacePattern = ' |\\s|\\&nbsp;|\\&#160;|\\&#8201;'
 const completeSpacePatternInHtml = `(<span[^>]*?>)(${spacePattern})(</span>)|${spacePattern}`
 const bcPatternInHtml = `(${completeSpacePatternInHtml}|-)((b\\.(${completeSpacePatternInHtml})?c\\.?|bc)e?|(<small>)(bce?)</small>)`
-const methods = Object.keys(methodConversions).join('|')
+const methods = Object.keys(shortToLongMethodConversions).join('|')
 
 const nakedYearPatternInHtml = '\\b([1-9][0-9]{0,2},[0-9]{3}|[0-9]{1,4}|10000|10,000)(?!\\])\\b'
 

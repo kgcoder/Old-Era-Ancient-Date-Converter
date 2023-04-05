@@ -143,24 +143,24 @@ const seasons = [
  
 
 
-const methodConversions = {
-    'bc-y': 'year',
-    'bc-y1': 'oneDigitYear',
-    'bc-y2': 'twoDigitYear',
-    'bc-i': 'impreciseYear',
-    'bc-i2': 'bc-i2',//twoDigitImpreciseYear //1070/60 BC
-    'bc-d': 'decade',
-    'bc-sd': 'bc-sd',//'shortDecade',
-    'bc-dp': 'bc-dp',//decades (plural)
-    'bc-00s': '00s',
-    'bc-000s': '000s',
-    'bc-c': 'century',
-    'bc-m': 'millennium',
-    'bc-r': 'remove',
-    'bc-ig': 'bc-ig',//ignore
-    'bc-tn': 'OE', // Old Era  timelineName
-    'bc-ot': 'ofOE', //of the Old Era ofTimeline
-    'bc-at': 'abbreviatedTimeline', //OE
+const shortToLongMethodConversions = {
+    "bc-y": "year",
+    "bc-y1": "oneDigitYear",
+    "bc-y2": "twoDigitYear",
+    "bc-i": "impreciseYear",
+    "bc-i2": "bc-i2",//twoDigitImpreciseYear //1070/60 BC
+    "bc-d": "decade",
+    "bc-sd": "bc-sd",//"shortDecade",
+    "bc-dp": "bc-dp",//decades (plural)
+    "bc-00s": "00s",
+    "bc-000s": "000s",
+    "bc-c": "century",
+    "bc-m": "millennium",
+    "bc-r": "remove",
+    "bc-ig": "bc-ig",//ignore
+    "bc-tn": "OE", // Old Era  timelineName
+    "bc-ot": "ofOE", //of the Old Era ofTimeline
+    "bc-at": "abbreviatedTimeline", //OE
 
     //the following classes should not be used in markup
     'bc-y-r1':'bc-y-r1',//first year in range
@@ -170,23 +170,52 @@ const methodConversions = {
 
 }
 
+
+const longToShortMethodConversions = {
+    "year" : "bc-y",
+    "oneDigitYear" : "bc-y1",
+    "twoDigitYear" : "bc-y2",
+    "impreciseYear" : "bc-i",
+    "bc-i2": "bc-i2",//twoDigitImpreciseYear //1070/60 BC
+    "decade" : "bc-d",
+    "bc-sd": "bc-sd",//"shortDecade",
+    "bc-dp": "bc-dp",//decades (plural)
+    "00s" : "bc-00s",
+    "000s" : "bc-000s",
+    "century" : "bc-c",
+    "millennium" : "bc-m",
+    "remove" : "bc-r",
+    "bc-ig": "bc-ig",//ignore
+    "OE" : "bc-tn", // Old Era  timelineName
+    "ofOE" : "bc-ot", //of the Old Era ofTimeline
+    "abbreviatedTimeline" : "bc-at", //OE
+
+    //the following classes should not be used in markup
+    'bc-y-r1':'bc-y-r1',//first year in range
+    'bc-y-r2':'bc-y-r2',//second year in range
+    'bc-i-r1':'bc-i-r1',//first year in range
+    'bc-i-r2':'bc-i-r2',//second year in range
+
+}
+
+
 //for editor
 const allClasses = [
     'marker',
-    'year',
+    'bc-y',
     'ad-y',
-    'oneDigitYear',
-    'twoDigitYear',
-    'impreciseYear',
-    'remove',
-    'decade',
-    'century',
-    '00s',
-    'millennium',
-    '000s',
-    'remove',
-    'OE',
-    'ofOE',
+    'bc-y1',
+    'bc-y2',
+    'bc-i',
+    'bc-r',
+    'bc-d',
+    'bc-c',
+    'bc-00s',
+    'bc-m',
+    'bc-000s',
+    'bc-tn',
+    'bc-ot',
+    'bc-at',
     'bc-ig',
     'bc-y-r1',
     'bc-y-r2',

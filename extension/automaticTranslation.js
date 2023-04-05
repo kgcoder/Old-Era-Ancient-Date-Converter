@@ -281,7 +281,7 @@ function mergeReplacements(rawReplacements){
     for(let i = 0; i < rawReplacements.length;i++){
         const replacement = rawReplacements[i]
       
-        if(currentGroup.length === 0 || (replacement.index === lastIndex && replacement.edit.method === 'remove') ){
+        if(currentGroup.length === 0 || (replacement.index === lastIndex && replacement.edit.method === 'bc-r') ){
             currentGroup.push(replacement)
         }else{
             groupsArray.push(currentGroup)

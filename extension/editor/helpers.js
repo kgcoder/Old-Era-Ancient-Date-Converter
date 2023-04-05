@@ -86,8 +86,8 @@ function findIndexOfSubstringOccurrence(parentString, substring, occurrenceNumbe
 }
 
 function createMarkerForEditor(text, method, type = 'normal', originalSubstitute = '',fromTemplate = '') {
-    if(['bc-y-r1','bc-y-r2'].includes(method))method = 'year'
-    if(['bc-i-r1','bc-i-r2'].includes(method))method = 'impreciseYear'
+    if(['bc-y-r1','bc-y-r2'].includes(method))method = 'bc-y'
+    if(['bc-i-r1','bc-i-r2'].includes(method))method = 'bc-i'
     return `{{${method}|${text}|${type}|${originalSubstitute}|${fromTemplate}}}`
 }
 
@@ -140,9 +140,9 @@ function getReplacementNodeForEditor(text, method, originalSubstitute,fromTempla
     const type = 'normal'
     switch (method) {
 
-        case 'remove':
+        case 'bc-r':
             return null
-        case 'year': {
+        case 'bc-y': {
             const year = originalNumber
             if (isNaN(year)) return null
             const translatedYear = `${10001 - year}`
@@ -157,23 +157,23 @@ function getReplacementNodeForEditor(text, method, originalSubstitute,fromTempla
 
             return textWithComment(text, `${year}`, translatedYear, type)
         }
-        case 'impreciseYear': {
+        case 'bc-i': {
             const year = originalNumber
             if (isNaN(year)) return null
             const translatedYear = `${10000 - year}`
             return textWithComment(text, `${year} BCE`, translatedYear, type)
         }
-        case 'oneDigitYear': {
+        case 'bc-y1': {
             const year = originalNumber
             const translatedYear = `${(10001 - year) % 10}`
             return textWithComment(text, `${year} BCE`, translatedYear, type)
         }
-        case 'twoDigitYear': {
+        case 'bc-y2': {
             const year = originalNumber
             const translatedYear = `${(10001 - year) % 100}`
             return textWithComment(text, `${year} BCE`, `${translatedYear < 10 ? '0' : ''}${translatedYear}`, type)
         }
-        case 'decade': {
+        case 'bc-d': {
             const decade = originalNumber
             if (isNaN(decade)) return document.createTextNode('')
             const baseYear = 9990 - decade
@@ -185,7 +185,7 @@ function getReplacementNodeForEditor(text, method, originalSubstitute,fromTempla
             return textWithComment(text, `${decade}s BCE`, translated, type)
 
         }
-        case 'century': {
+        case 'bc-c': {
             let century = originalNumber
             if (isNaN(century)) {
                 century = numbersFromWords[text.toLowerCase()]
@@ -195,7 +195,7 @@ function getReplacementNodeForEditor(text, method, originalSubstitute,fromTempla
             return textWithComment(text, `${text} century BCE`, translatedCenturyWithEnding, type)
         }
 
-        case '00s': {
+        case 'bc-00s': {
             const x00s = originalNumber
             if (isNaN(x00s)) return emptySpan()
             const translated = `${9900 - x00s}s`
@@ -203,7 +203,7 @@ function getReplacementNodeForEditor(text, method, originalSubstitute,fromTempla
         }
 
 
-        case 'millennium': {
+        case 'bc-m': {
             let millennium = originalNumber
             if (isNaN(millennium)) {
                 millennium = numbersFromWords[text.toLowerCase()]
@@ -213,18 +213,18 @@ function getReplacementNodeForEditor(text, method, originalSubstitute,fromTempla
             return textWithComment(text, `${text} millennium BCE`, translatedMillenniumWithEnding, type)
         }
 
-        case '000s': {
+        case 'bc-000s': {
             const x000s = originalNumber
             if (isNaN(x000s)) return emptySpan()
             const translated = `${9000 - x000s}s`
             return textWithComment(text, `${parseInt(text, 10)}s BCE`, translated, type)
         }
 
-        case 'OE': {
+        case 'bc-tn': {
             return textWithComment(text, text, 'Old Era', type)
         }
 
-        case 'ofOE': {
+        case 'bc-ot': {
             return textWithComment(text, text, 'of the Old Era', type)
         }
 

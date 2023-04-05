@@ -186,10 +186,10 @@ function createCenturiesAndMillenniaReplacementsFromMarkup(html, replacementsArr
         const smallBC = result[25] || ''
 
 
-        if (method === 'bc-m' && (centMill === 'millennium' || centMill === 'millennia')) {
-            method = 'millennium'
+        if (method === 'bc-m' && (centMill === "millennium" || centMill === "millennia")) {
+            method = 'bc-m'
         } else if (method === 'bc-c') {
-            method = 'century'
+            //do nothing
         } else {
             return
         }
@@ -202,20 +202,20 @@ function createCenturiesAndMillenniaReplacementsFromMarkup(html, replacementsArr
 
         if(smallTag){
             let index = result.index + stringTillBC.length
-            addReplacement(replacementsArray, 'remove', spaceBeforeSmallTag,'', index, false, type)
+            addReplacement(replacementsArray, 'bc-r', spaceBeforeSmallTag,'', index, false, type)
             
             index += spaceBeforeSmallTag.length + smallTag.length
-            addReplacement(replacementsArray, 'remove', smallBC,'',index, false, type)
+            addReplacement(replacementsArray, 'bc-r', smallBC,'',index, false, type)
 
         }else if (bcSpanOpening.length) {
             let index = result.index + stringTillBC.length + bcSpanOpening.length
-            addReplacement(replacementsArray, 'remove', space,'', index, false, type)
+            addReplacement(replacementsArray, 'bc-r', space,'', index, false, type)
             
             index = result.index + stringTillBC.length + totalBCSpan.length
-            addReplacement(replacementsArray, 'remove', nakedBC,'', index , false, type)
+            addReplacement(replacementsArray, 'bc-r', nakedBC,'', index , false, type)
         } else {
             const index = result.index + stringTillBC.length
-            addReplacement(replacementsArray, 'remove', bc,'', index , false, type)
+            addReplacement(replacementsArray, 'bc-r', bc,'', index , false, type)
         }
     }
 }
@@ -240,9 +240,9 @@ function createYearReplacementsWithInnerSpansFromMarkup(html, replacementsArray)
         if(target.includes('class="bc-'))continue
 
         
-        method = methodConversions[method]
+        method = shortToLongMethodConversions[method]
 
-        if (['year', 'impreciseYear'].includes(method)) {
+        if (['bc-y', 'bc-i'].includes(method)) {
             const year = numberFromString(target)
             if (year === 0 || year > firstYearOfOldEra) {
                 method = 'bc-ig'
@@ -255,7 +255,7 @@ function createYearReplacementsWithInnerSpansFromMarkup(html, replacementsArray)
         let index = result.index + spanOpening.length
         addReplacement(replacementsArray, method, target,'', index, true, type, substitute)
 
-        let removingMethod = method === 'bc-ig' ? 'bc-ig' : 'remove'
+        let removingMethod = method === 'bc-ig' ? 'bc-ig' : 'bc-r'
 
         index += target.length + bcSpanOpening.length
         addReplacement(replacementsArray, removingMethod, space,'', index, true, type, substitute)
@@ -280,12 +280,12 @@ function createReplacementsFromMarkup(html, replacementsArray) {
 
         const index = result.index + spanOpening.length
 
-        method = methodConversions[method]
+        method = shortToLongMethodConversions[method]
 
 
         type = convertTypeFromMakup(type)
 
-        if (['year', 'impreciseYear'].includes(method)) {
+        if (['bc-y', 'bc-i'].includes(method)) {
             const year = numberFromString(target)
             if (year === 0 || year > firstYearOfOldEra) {
                 method = 'bc-ig'
@@ -324,7 +324,7 @@ function processOneHeadline(headline, html, replacementsArray){
         const originalSubstitute = result[6] || ''
         const target = result[7] || ''
         type = convertTypeFromMakup(type)
-        method = methodConversions[method]
+        method = shortToLongMethodConversions[method]
         resultsArray.push({method,type,target, originalSubstitute})
     }
 

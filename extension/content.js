@@ -329,7 +329,7 @@ async function startRequest() {
         const json = r.status !== 200 ? {} : await r.json()
 
         console.log('edits',json.edits)
-        editsArray = json.edits
+        editsArray = json.edits.map(edit =>( {...edit,method:longToShortMethodConversions[edit.method]}))
         pageHasIssues = json.hasIssues 
         pageId = json.id
         
@@ -387,7 +387,7 @@ async function startWebRequest() {
 
         const lines = wikitext.split('\n')
 
-        editsArray = lines.map(line => getEditFromLine(line)).filter(obj => obj !== null)
+        editsArray = lines.map(line => getEditFromLine(line)).filter(obj => obj !== null).map(edit =>( {...edit,method:longToShortMethodConversions[edit.method]}))
 
         console.log(editsArray)
        
@@ -422,7 +422,7 @@ async function startRequestForEditor(){
         const r = await fetch(`http://localhost:3200/api/modify/getPageForParser/${encodedUrl}`)
         const json = r.status !== 200 ? {} : await r.json()
 
-        editsArray = json.edits
+        editsArray = json.edits.map(edit =>( {...edit,method:longToShortMethodConversions[edit.method]}))
         try{
             if(isEditingMode){
                 onEditorLoad()
@@ -473,7 +473,7 @@ async function startWebRequestForEditor(){
 
         const lines = wikitext.split('\n')
 
-        editsArray = lines.map(line => getEditFromLine(line)).filter(obj => obj !== null)
+        editsArray = lines.map(line => getEditFromLine(line)).filter(obj => obj !== null).map(edit =>( {...edit,method:longToShortMethodConversions[edit.method]}))
 
         console.log(editsArray)
 
@@ -736,14 +736,14 @@ function resolveReplacements(replacementsArray, repsFromServer) {
                 const serverMethod = repFromServer.edit.method
 
                 
-                const isServerMethodAYearMethod = serverMethod === 'year' || serverMethod === 'impreciseYear'
+                const isServerMethodAYearMethod = serverMethod === 'bc-y' || serverMethod === 'bc-i'
                 if(isServerMethodAYearMethod){
                     const localMethod = sameLocalRep.edit.method
                     let properMethod = serverMethod
                     if(!isEditingMode && localMethod === 'bc-y-r1' || localMethod === 'bc-y-r2' || localMethod === 'bc-i-r1' || localMethod === 'bc-i-r2'){
                         properMethod = localMethod
                     }
-                    if(!isEditingMode && serverMethod === 'impreciseYear' ){
+                    if(!isEditingMode && serverMethod === 'bc-i' ){
                         if(localMethod === 'bc-y-r1')properMethod = 'bc-i-r1'
                         if(localMethod === 'bc-y-r2')properMethod = 'bc-i-r2'
                     }
@@ -800,8 +800,8 @@ function findIfPageIsMillenniumOrCenturyCategory(){
     const reg = new RegExp(`^Category:${nakedCenturyPattern}(-|${spacePattern})(millennium|century)( BCE?)?.*?$`)
     const matches = title.match(reg)
     if(matches){
-        isPageCenturyCategory = matches[5] === 'century'
-        isPageMillenniumCategory = matches[5] === 'millennium'
+        isPageCenturyCategory = matches[5] === "century"
+        isPageMillenniumCategory = matches[5] === "millennium"
     }
 }
 
@@ -826,8 +826,8 @@ function findIfPageIsAboutEarlyCenturyOrMillennium(){
     if(matches){
         const word = matches[4]
 
-        const millennium = word === 'millennium' ? parseInt(matches[2],10) : 1
-        const century = word === 'century' ? parseInt(matches[2],10) : 1
+        const millennium = word === "millennium" ? parseInt(matches[2],10) : 1
+        const century = word === "century" ? parseInt(matches[2],10) : 1
 
 
         currentPageData.isPageAboutEarlyCenturyOrMillennium = millennium >= 3 || century >= 30
@@ -1062,7 +1062,7 @@ function getReplacementStrings(text, originalSubstitute,otherNumberStringInRange
         
     switch (method) {
    
-        case 'year': {
+        case 'bc-y': {
             return getYearReplacementString(text,originalNumber)
         }
         case 'bc-y-r1': {
@@ -1076,7 +1076,7 @@ function getReplacementStrings(text, originalSubstitute,otherNumberStringInRange
         // }
 
 
-        case 'impreciseYear': {
+        case 'bc-i': {
             return getYearReplacementString(text, originalNumber,true)
         }
         case 'bc-i-r1': {
@@ -1086,19 +1086,14 @@ function getReplacementStrings(text, originalSubstitute,otherNumberStringInRange
             return getSecondYearInRangeReplacementString(originalText,originalNumber,otherNumberStringInRange,true)
         }
 
-
-
-        //case 'impreciseYearShort': {
-        //     return getImpreciseYearReplacementString(originalNumber,'any',true)
-        // }
-        case 'oneDigitYear': {
+        case 'bc-y1': {
             const year = originalNumber
             if (isNaN(year)) return null
             const translatedYear = translateYearPrecisely(year)
             const translatedYearString = `${translatedYear % 10}`
             return [translatedYearString, `${year} BC`,`${translatedYear}`]
         }
-        case 'twoDigitYear': {
+        case 'bc-y2': {
             const year = originalNumber
             if (isNaN(year)) return null
             const translatedYear = translateYearPrecisely(year)
@@ -1113,7 +1108,7 @@ function getReplacementStrings(text, originalSubstitute,otherNumberStringInRange
             const translatedYearString = `${translatedYear % 100}`
             return [`${translatedYear % 100 < 10 ? '0' : ''}${translatedYearString}`, `${year} BC`, `${translatedYear}`]
         }
-        case 'decade':
+        case 'bc-d':
         case 'bc-dp':
         case 'bc-sd': {
             const decadeWord = method === 'bc-sd' ? '' : method === 'bc-dp' ? ' decades' :' decade'
@@ -1138,7 +1133,7 @@ function getReplacementStrings(text, originalSubstitute,otherNumberStringInRange
             return [translated, `${numberFromString(text, 10)}s BC`, translated]
         }
 
-        case 'century': {
+        case 'bc-c': {
             let century = originalNumber
             if (isNaN(century)) {
                 century = numbersFromWords[text.toLowerCase()]
@@ -1162,7 +1157,7 @@ function getReplacementStrings(text, originalSubstitute,otherNumberStringInRange
             return [translatedCenturyString, `${originalCenturyWithEnding} century BC`, `${translatedCenturyString} century`]
         }
 
-        case '00s': {
+        case 'bc-00s': {
             const x00s = originalNumber
             if (isNaN(x00s)) return null
 
@@ -1183,7 +1178,7 @@ function getReplacementStrings(text, originalSubstitute,otherNumberStringInRange
             return [translated00sString, `${numberFromString(text, 10)}s BC`, translated00sString]
         }
 
-        case 'millennium': {
+        case 'bc-m': {
             let millennium = originalNumber
             if (isNaN(millennium)) {
                 millennium = numbersFromWords[text.toLowerCase()]
@@ -1209,7 +1204,7 @@ function getReplacementStrings(text, originalSubstitute,otherNumberStringInRange
 
 
 
-        case '000s': {
+        case 'bc-000s': {
             const x000s = originalNumber
             if (isNaN(x000s)) return null
 
@@ -1230,19 +1225,19 @@ function getReplacementStrings(text, originalSubstitute,otherNumberStringInRange
             return [translated000sString, `${numberFromString(text)}s BC`, translated000sString]
         }
 
-        case 'remove': {
+        case 'bc-r': {
             return ["", "", ""]
         }
 
-        case 'OE': {
+        case 'bc-tn': {
             return [timelineName, "", ""]
         }
 
-        case 'ofOE': {
+        case 'bc-ot': {
             return [ofTimeline, "", ""]
         }
             
-        case 'abbreviatedTimeline': {
+        case 'bc-at': {
             return [abbreviatedTimelineName, "", ""]
         }
         
@@ -1263,25 +1258,7 @@ function translateYearImprecisely(year){
     return translatedYear
 }
 
-function getYearString(translatedYear, label, shortened = false){
-    label = resolveLabel(label, translatedYear)
 
-    if(shouldUseDotNotation){
-        let yearWithinCentury = translatedYear % 100
-        let century = Math.floor(translatedYear / 100)
-        if(yearWithinCentury === 0){
-            yearWithinCentury = 100
-        }else{
-            century += 1
-        }
-
-        return `${shortened ? '' : century + '^'}${yearWithinCentury}${label}`
-
-    }
-    return `${translatedYear}${label}`
-
-    
-}
 
 function getFirstYearInRangeReplacementString(originalText,year,otherNumberStringInRange = "",isImprecise = false){
     if (isNaN(year)) return null
@@ -1338,26 +1315,6 @@ function getYearReplacementString(originalText, year, isImprecise = false, short
 }
 
 
-function getImpreciseYearReplacementString(year,label, shortened = false,otherNumberStringInRange = ""){
-    if (isNaN(year)) return null
-    let translatedYear = `${firstYearOfOldEra + (shouldTranslateYearsPrecisely ? 1 : 0) - year}`
-    if(translatedYear == 0)translatedYear = 1
-    const translatedYearString = getYearString(translatedYear,label, shortened)
-
- 
-    return [translatedYearString, `${year} BC`, translatedYearString]
-}
-
-function resolveLabel(label, translatedYear){
-    if(label === 'any'){
-        return translatedYear <= lastTranslatedYearWithLabel ? `\u00A0${abbreviatedTimelineName}` : ''
-    }else if(label === 'OE'){
-        return `\u00A0${abbreviatedTimelineName}`
-    }else if(label === '-'){
-        return ''
-    }
-    return ''
-}
 
 function createMarker(text, method, type = 'normal', originalSubstitute = '',otherNumberStringInRange = '') { 
     return `{{${method}|${text}|${type}|${originalSubstitute}|${otherNumberStringInRange}}}`
@@ -1374,8 +1331,3 @@ function numberSuffix(number) {
     if (lastDigit === 3) return 'rd'
     return 'th'
 }
-
-// function escapeText(text) {
-//     return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
-// }

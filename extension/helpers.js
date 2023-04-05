@@ -34,8 +34,8 @@ function numberFromString(string) {
 
 function methodForYear(year, pageData) {
     if(year > firstYearOfOldEra) return 'bc-ig'
-    if (!pageData.isPageAboutEarlyCenturyOrMillennium && year >= 3000 && year % 10 === 0) return'impreciseYear'
-    return 'year'
+    if (!pageData.isPageAboutEarlyCenturyOrMillennium && year >= 3000 && year % 10 === 0) return'bc-i'
+    return 'bc-y'
 }
 
 function getPageDataForSummary(html){
@@ -50,8 +50,8 @@ function getPageDataForSummary(html){
 
     const word = result[3]
 
-    const millennium = word === 'millennium' ? number : 1
-    const century = word === 'century' ? number : 1
+    const millennium = word === "millennium" ? number : 1
+    const century = word === "century" ? number : 1
 
     const pageData = {isPageAboutEarlyCenturyOrMillennium:millennium >=3 || century >= 30 }
     return pageData
