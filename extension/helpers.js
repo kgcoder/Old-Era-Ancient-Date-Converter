@@ -184,3 +184,77 @@ function getEditFromLine(line){
         fromTemplate
     }
 }
+
+
+function convertMethodNameLongToShort(edit){
+    const newName = longToShortMethodConversions[edit.method]
+    if(newName){
+        return {...edit,method:newName}
+    }
+    return edit
+}
+
+function clearCache(){
+    console.log('clear cache')
+
+    chrome.storage.local.remove(["WebsitesSupportedByBackend"],function(){
+        let error = chrome.runtime.lastError;
+           if (error) {
+               console.error(error);
+           }
+    })
+}
+
+
+async function prepareListOfWebsitesSupportedByBackend(){
+      // saveTimestampedDataString('test','value')
+
+   let websitesSupportedByBackendString = await getDataStringFromStorage('WebsitesSupportedByBackend')
+   console.log('got result from loval storage:',websitesSupportedByBackendString)
+   if(!websitesSupportedByBackendString){
+        try{
+            websitesSupportedByBackendString = await requestListOfWebsites()
+            console.log('got websites from server:\n',websitesSupportedByBackendString)
+            saveTimestampedDataString('WebsitesSupportedByBackend',websitesSupportedByBackendString)
+        }catch(e){
+            console.log('error while fetching list of websites',e)
+        }
+   }
+
+   if(websitesSupportedByBackendString){
+        const websites = websitesSupportedByBackendString.split('\n').filter(line => !line.includes('<')).map(line => line.trim())
+        console.log('websites',websites)
+        sitesSupportedByBackend = websites
+   }
+
+}
+
+
+function saveTimestampedDataString(key, value) {
+    const object = { value: value, timestamp: new Date().getTime() }
+    chrome.storage.local.set({ [key]: JSON.stringify(object) }).then(() => {
+         console.log("Value is set:",value);
+     });
+}
+
+
+function getDataStringFromStorage(key) {
+    return new Promise((resolve,reject) => {
+        chrome.storage.local.get([key], function (result) {
+            const dataObjectString = result[key]
+            if (!dataObjectString) return resolve(null)
+            const obj = JSON.parse(dataObjectString)
+            if (!obj) return resolve(null)
+    
+            const timestamp = obj.timestamp
+            if(!timestamp) return resolve(null)
+            const now = new Date().getTime()
+            const diff = now - timestamp
+    
+            if (diff > kCacheTTL) return resolve(null)
+    
+            resolve(obj.value)
+        })
+
+    })
+}

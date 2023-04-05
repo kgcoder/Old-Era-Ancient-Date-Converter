@@ -143,6 +143,9 @@
         },
         "sendToServer":{
             "description":"send to server"
+        },
+        "clearCache":{
+            "description":"clear cache"
         }
     }
 }

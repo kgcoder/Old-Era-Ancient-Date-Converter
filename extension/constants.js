@@ -12,6 +12,7 @@
  //const baseUrl = 'http://localhost:3250'
  //const frontendBaseUrl = 'http://localhost:3000'
  
+ const kCacheTTL = 86400000 //cache ttl in milliseconds
  const numbersFromWords = {
      'first': 1,
      'second': 2,

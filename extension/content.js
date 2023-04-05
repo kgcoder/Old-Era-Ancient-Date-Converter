@@ -48,6 +48,7 @@ let pageNotAnalysedYet = false
 let pageId = ''
 let requestHasStarted = false
 let pageIsLoaded = false
+let sitesSupportedByBackend = []
 let allowedSites = []
 
 let isThisSiteAllowed = false
@@ -214,7 +215,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 })
 
 
-
+prepareListOfWebsitesSupportedByBackend()
 
 
 
@@ -240,7 +241,11 @@ function sendPageMetadata(sendResponse) {
 
 
 
-window.onload = () => {
+window.onload = async () => {
+
+
+ 
+
 
     pageIsLoaded = true
 
@@ -256,14 +261,16 @@ window.onload = () => {
     
     
         if(!isThisSiteAllowed){
+            console.log('site not allowed')
             chrome.runtime.sendMessage('pageMetadataIsReady') //message for the popup script
             return
         }
     
+        console.log('just before request',sitesSupportedByBackend)
         if (!isExtensionOff  && currentLocation) {
             if (!shouldNotUseServer && isOnWikipedia) {
                 isEditingMode ? startRequestForEditor() :  startRequest()
-            }else if(!shouldNotUseServer && currentLocation.includes("britannica.com")){
+            }else if(!shouldNotUseServer && sitesSupportedByBackend.includes(domain)){
                 isEditingMode ? startWebRequestForEditor() :  startWebRequest()
             } else {
                 if(isEditingMode){
@@ -329,7 +336,7 @@ async function startRequest() {
         const json = r.status !== 200 ? {} : await r.json()
 
         console.log('edits',json.edits)
-        editsArray = json.edits.map(edit =>( {...edit,method:longToShortMethodConversions[edit.method]}))
+        editsArray = json.edits.map(edit => convertMethodNameLongToShort(edit))
         pageHasIssues = json.hasIssues 
         pageId = json.id
         
@@ -362,6 +369,37 @@ async function startRequest() {
 }
 
 
+async function requestListOfWebsites() {
+
+    const url = `${webBaseUrl}/wiki/api.php?action=parse&origin=*&prop=wikitext&formatversion=2&format=json&page=Dates/SupportedWebsites`
+    
+    console.log('url',url)
+
+    return new Promise(async (resolve,reject) => {
+        try{
+    
+            const r = await fetch(url)
+            const json = r.status !== 200 ? {} : await r.json()
+    
+            console.log('json',json)
+    
+            const wikitext = json.parse.wikitext
+            if (!wikitext) {
+                return reject()
+            }
+    
+            resolve(wikitext)
+           
+        }catch(e){
+            console.log(e)
+        }
+
+    })
+  
+
+}
+
+
 async function startWebRequest() {
     if(!pageIsLoaded || requestHasStarted)return
     requestHasStarted = true
@@ -379,6 +417,11 @@ async function startWebRequest() {
 
         console.log('json',json)
 
+        if(json.error){
+            translateEverythingOnWeb(null)
+            return 
+        }
+
         const wikitext = json.parse.wikitext
         if (!wikitext) {
             translateEverythingOnWeb(null)
@@ -387,7 +430,7 @@ async function startWebRequest() {
 
         const lines = wikitext.split('\n')
 
-        editsArray = lines.map(line => getEditFromLine(line)).filter(obj => obj !== null).map(edit =>( {...edit,method:longToShortMethodConversions[edit.method]}))
+        editsArray = lines.map(line => getEditFromLine(line)).filter(obj => obj !== null).map(edit => convertMethodNameLongToShort(edit))
 
         console.log(editsArray)
        
@@ -422,7 +465,7 @@ async function startRequestForEditor(){
         const r = await fetch(`http://localhost:3200/api/modify/getPageForParser/${encodedUrl}`)
         const json = r.status !== 200 ? {} : await r.json()
 
-        editsArray = json.edits.map(edit =>( {...edit,method:longToShortMethodConversions[edit.method]}))
+        editsArray = json.edits.map(edit => convertMethodNameLongToShort(edit))
         try{
             if(isEditingMode){
                 onEditorLoad()
@@ -462,6 +505,14 @@ async function startWebRequestForEditor(){
 
         console.log('json',json)
 
+        if(json.error){
+            editsArray = []
+            if(isEditingMode){
+                onEditorLoad()
+            }
+            return
+        }
+
         const wikitext = json.parse.wikitext
         if (!wikitext) {
             editsArray = []
@@ -473,9 +524,9 @@ async function startWebRequestForEditor(){
 
         const lines = wikitext.split('\n')
 
-        editsArray = lines.map(line => getEditFromLine(line)).filter(obj => obj !== null).map(edit =>( {...edit,method:longToShortMethodConversions[edit.method]}))
+        editsArray = lines.map(line => getEditFromLine(line)).filter(obj => obj !== null).map(edit => convertMethodNameLongToShort(edit))
 
-        console.log(editsArray)
+        console.log({editsArray})
 
         try{
             if(isEditingMode){
