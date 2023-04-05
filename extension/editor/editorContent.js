@@ -651,7 +651,7 @@ function createInstructions() {
 
 
 
-    const cleanTexts = []
+    let cleanTexts = []
     let lastIndex = 0
 
     let indexInOriginalText = 0
@@ -672,7 +672,7 @@ function createInstructions() {
     const fillerText = ignHtml.substr(lastIndex, ignHtml.length - lastIndex)
     cleanTexts.push({ text: fillerText, method: 'text' })
 
-    //console.log('cleanTexts', cleanTexts)
+    console.log('cleanTexts', cleanTexts)
 
     let cleanHTML = ''
     cleanTexts.forEach(obj => {
@@ -680,40 +680,39 @@ function createInstructions() {
     })
 
 
+    
+    
     if(!isOnWikipedia){
-        const instructions = getFinalReplacementsForWeb(cleanHTML,cleanTexts.filter(obj => obj.method !== 'text'))
+        const filteredCleanTexts = cleanTexts.filter(cleanTextObj => cleanTextObj.method !== 'text')
+        console.log('filtered cleanTexts', filteredCleanTexts)
+        const instructions = getFinalReplacementsForWeb(cleanHTML,filteredCleanTexts)
         return instructions
     }
 
+
+
+    const instructions = []
+
+
     cleanTexts.forEach((cleanTextObj, index) => {
+    
         if (cleanTextObj.method === 'text') {
-            // currentIndex += cleanTextObj.text.length
+            // skip
         } else {
-            // console.log('currentIndex', currentIndex)
 
             const left = getLeftSide(cleanTexts, index)
             const right = getRightSide(cleanTexts, index)
 
 
             const targetIndex = cleanTextObj.index
-            //console.log('target index', targetIndex)
             const bigStringIndex = targetIndex - left.length
-
-            //console.log('string index', bigStringIndex)
-
-
-
-
-
-            // console.log('left', left)
-            // console.log('right', right)
             const bigLine = left + cleanTextObj.text + right
+
             const stringOccurrences = getOccurrences2(cleanHTML, bigLine)
 
             let numberOfOccurrence = 1
 
             if (stringOccurrences.length !== 1) {
-                //console.log('line to find:', bigLine)
                 numberOfOccurrence = getNumberOfOccurrence(stringOccurrences, bigStringIndex)
             }
 
@@ -725,23 +724,6 @@ function createInstructions() {
                 const relTargetIndex = left.length
                 numberOfTargetOccurrence = getNumberOfOccurrence(targetOccurrences, relTargetIndex)
             }
-
-
-            //console.log('cleanTextObj', cleanTextObj)
-
-           
-            // console.log('bigLine: ', bigLine)
-            // console.log('target', cleanTextObj.text)
-            // console.log('calculated target index', cleanTextObj.index)
-
-            // console.log('string occurrences', stringOccurrences.length)
-            // console.log('needed index', bigStringIndex)
-            // console.log('numberOfOccurrence', numberOfOccurrence)
-
-            // console.log('number of target occurrences', targetOccurrences.length)
-            // console.log('numberOfTargetOccurrence', numberOfTargetOccurrence)
-
-
 
             const order = `${stringOccurrences.length}.${numberOfOccurrence}.${targetOccurrences.length}.${numberOfTargetOccurrence}`
 
@@ -757,8 +739,8 @@ function createInstructions() {
 
             instructions.push(instruction)
 
-
         }
+        
     })
 
     console.log('instructions',instructions)
@@ -840,7 +822,7 @@ function getLeftSide(array, index) {
         }
         result = text + result
         if (result.length > 15) {
-            return result.substr(result.length - 15, 15)
+            return result.slice(result.length - 15, result.length)
         }
         if (shouldReturn) {
             return result
@@ -864,7 +846,7 @@ function getRightSide(array, index) {
         }
         result = result + text
         if (result.length > 15) {
-            return result.substr(0, 15)
+            return result.slice(0, 15)
         }
         if (shouldReturn) {
             return result
