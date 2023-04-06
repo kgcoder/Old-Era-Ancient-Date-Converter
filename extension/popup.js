@@ -514,8 +514,11 @@ function toggleWebsiteUsage() {
 
     updateUIInAccordanceWithMode()
 
-    chrome.storage.local.set({ sitesData:JSON.stringify({allowedSites}) })
-    sendMessageToPage('toggleSiteUsage')
+    
+    chrome.storage.local.set({ ['sitesData']:JSON.stringify({allowedSites}) }).then(() => {
+        sendMessageToPage('toggleSiteUsage')
+    })
+ 
 
 }
 

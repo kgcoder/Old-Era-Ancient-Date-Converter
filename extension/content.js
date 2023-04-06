@@ -109,11 +109,12 @@ function getConfigFromLocalStorage(callback){
         }
 
         if(result.sitesData){
+            console.log('result.sitesData',result.sitesData)
             const sitesData = JSON.parse(result.sitesData)
             allowedSites = sitesData.allowedSites
         }else{
             allowedSites = ['en.wikipedia.org']
-            chrome.storage.local.set({ sitesData: JSON.stringify({allowedSites}) }).then(() => {
+            chrome.storage.local.set({ ['sitesData']: JSON.stringify({allowedSites}) }).then(() => {
                // console.log("Value is set");
             });
         }
@@ -127,6 +128,7 @@ function getConfigFromLocalStorage(callback){
 
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
    
+    console.log('message',message)
     if (message === 'turnOff') {
       
         updateTranslation()
@@ -253,7 +255,9 @@ window.onload = async () => {
         updateIcon()
         console.log('currentLocation',currentLocation)
         if(currentLocation){
-            const index = allowedSites.findIndex(site => currentLocation.includes(site))
+            console.log('allowed sites test',JSON.stringify(allowedSites))
+            const index = allowedSites.findIndex(site => domain === site)
+            console.log('index',index)
             isThisSiteAllowed = index !== -1
         }else{
             isThisSiteAllowed = false
@@ -270,7 +274,7 @@ window.onload = async () => {
         if (!isExtensionOff  && currentLocation) {
             if (!shouldNotUseServer && isOnWikipedia) {
                 isEditingMode ? startRequestForEditor() :  startRequest()
-            }else if(!shouldNotUseServer && sitesSupportedByBackend.includes(domain)){
+            }else if(!shouldNotUseServer && sitesSupportedByBackend.includes(domain) ){
                 isEditingMode ? startWebRequestForEditor() :  startWebRequest()
             } else {
                 if(isEditingMode){
@@ -401,6 +405,7 @@ async function requestListOfWebsites() {
 
 
 async function startWebRequest() {
+    console.log('starting web request')
     if(!pageIsLoaded || requestHasStarted)return
     requestHasStarted = true
 
@@ -559,7 +564,6 @@ function translateEverything(r,finalInstructions = []) {
     
     
     let html = new XMLSerializer().serializeToString(document.body)
-
 
     currentVersion = getPageVersionFromHtml(html)
 

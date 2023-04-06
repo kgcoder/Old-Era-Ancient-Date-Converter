@@ -93,7 +93,7 @@ function openAllWikipediaDropDowns(callback){
 
 
 function openAllBritannicaDropDowns(callback){
-    if(!currentLocation || !currentLocation.includes('britannica.com')){
+    if(!currentLocation || domain !== 'britannica.com'){
         callback()
         return
     }

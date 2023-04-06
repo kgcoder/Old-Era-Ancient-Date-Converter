@@ -23,7 +23,7 @@ function prepareLocation() {
     domain = domain.split('/')[0]
 
 
-    isOnWikipedia = currentLocation.includes('en.wikipedia.org')
+    isOnWikipedia = domain === 'en.wikipedia.org'
 
 
     if (currentLocation.includes(mainBaseURL)) {
