@@ -76,6 +76,9 @@ let ofTimeline = ofTimeline_default
 let abbreviatedTimelineName = abbreviatedTimelineName_default
 
 
+
+
+
 function getConfigFromLocalStorage(callback){
         chrome.storage.local.get(['isExtensionOff', 'isEditingMode', 'shouldNotUseServer', 
         'shouldTranslateYearsPrecisely', 'shouldTranslateDatesInBookTitles', 
@@ -269,6 +272,14 @@ window.onload = async () => {
             chrome.runtime.sendMessage('pageMetadataIsReady') //message for the popup script
             return
         }
+
+
+        navigator.permissions.query({ name: "clipboard-write" }).then((result) => {
+            if (result.state == "granted" || result.state == "prompt") {
+              console.log("Write access granted!");
+            }
+        });
+
     
         console.log('just before request',sitesSupportedByBackend)
         if (!isExtensionOff  && currentLocation) {
@@ -375,9 +386,7 @@ async function startRequest() {
 
 async function requestListOfWebsites() {
 
-    const url = `${webBaseUrl}/wiki/api.php?action=parse&origin=*&prop=wikitext&formatversion=2&format=json&page=Dates/SupportedWebsites`
-    
-    console.log('url',url)
+    const url = getWikitextUrlOnMyServer('SupportedWebsites')
 
     return new Promise(async (resolve,reject) => {
         try{
@@ -409,12 +418,8 @@ async function startWebRequest() {
     if(!pageIsLoaded || requestHasStarted)return
     requestHasStarted = true
 
-    const uriComponent = currentLocation.replace('https://','').replace('http://','').replace('www.','')
-    
-    const url = `${webBaseUrl}/wiki/api.php?action=parse&origin=*&prop=wikitext&formatversion=2&format=json&page=Dates/${uriComponent}`
-    
-    console.log('url',url)
-  
+    const url = getWikitextUrlOnMyServer()
+      
     try{
 
         const r = await fetch(url)
@@ -498,9 +503,7 @@ async function startWebRequestForEditor(){
     if(!pageIsLoaded || requestHasStarted)return
     requestHasStarted = true
 
-    const uriComponent = currentLocation.replace('https://','').replace('http://','').replace('www.','')
-    
-    const url = `${webBaseUrl}/wiki/api.php?action=parse&origin=*&prop=wikitext&formatversion=2&format=json&page=Dates/${uriComponent}`
+    const url = getWikitextUrlOnMyServer()
     
     console.log('url',url)
 

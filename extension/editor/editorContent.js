@@ -776,10 +776,12 @@ function createInstructions() {
     })
 
 
-    const reg = new RegExp('\n','g')
-    finalInstructions.forEach(edit => {
-        edit.string = edit.string.replace(reg,'\\n')
-    })
+    // if(!isOnWikipedia){
+    //     const reg = new RegExp('\n','g')
+    //     finalInstructions.forEach(edit => {
+    //         edit.string = edit.string.replace(reg,'\\n')
+    //     })
+    // }
 
 
     
@@ -900,30 +902,11 @@ function test() {
     if(isOnWikipedia){
         translateEverything(null,JSON.parse(JSON.stringify(finalInstructions)))
     }else{
-        const nReg = new RegExp('\n','g')
-        const tReg = new RegExp('\t','g')
-        let lines = finalInstructions.map(({string,target,method,type,order,fromTemplate}) => {
-
-            console.log('string before:',string)
-            string = string.replace(nReg,'\\n').replace(tReg,'\\t')
-
-            console.log('string after:',string)
-            return `${string};${target};${method};${type ?? ""};${order ? order : ""};${fromTemplate ? "1" : ""}`
-        })
-    
-
-        lines = ['<poem><nowiki>'].concat(lines).concat([
-            '</nowiki></poem>',
-            '[[Category:Pages with dates]]',
-            `[[Category:${domain}]]`
-        ])
-
-        const finalText = lines.join('\n')
+        
     
         console.log('finalInstructions',JSON.stringify(finalInstructions))
     
-        console.log('finalText:')
-        console.log(finalText)
+       
         translateEverythingOnWeb(null,JSON.parse(JSON.stringify(finalInstructions)))
     }
 
@@ -950,8 +933,9 @@ async function sendToServer() {
     //     return 
     // }
 
+
     if(!isOnWikipedia){
-        //TODO:show popup
+        showPopupWithInstructions()
         return
     }
    
@@ -987,6 +971,59 @@ async function sendToServer() {
 
     
 
+}
+
+
+function showPopupWithInstructions(){
+    const nReg = new RegExp('\n','g')
+        const tReg = new RegExp('\t','g')
+        let lines = finalInstructions.map(({string,target,method,type,order,fromTemplate}) => {
+
+            console.log('string before:',string)
+            string = string.replace(nReg,'\\n').replace(tReg,'\\t')
+
+            console.log('string after:',string)
+            return `${string};${target};${method};${type ?? ""};${order ? order : ""};${fromTemplate ? "1" : ""}`
+        })
+    
+
+        lines = ['<poem><nowiki>'].concat(lines).concat([
+            '</nowiki></poem>',
+            '[[Category:Pages with dates]]',
+            `[[Category:${domain}]]`
+        ])
+
+        const finalText = lines.join('\n')
+
+
+        const url = getPageUrlOnMyServerForEditing()
+
+
+    console.log('showing popup',url)
+    const popup = document.createElement('div')
+    popup.className = 'popup'
+    popup.innerHTML = `
+        <a href="#" class="popup-close">&times;</a>
+		<textarea class="popup-input">${finalText}</textarea>
+		<a href="#" class="popup-link">Open data page on the server</a>
+    `
+    document.body.appendChild(popup)
+
+    const closeButton = popup.getElementsByClassName('popup-close')[0]
+    closeButton.addEventListener('click', () => {
+        popup.parentElement.removeChild(popup)
+    })
+
+    const linkButton = popup.getElementsByClassName('popup-link')[0]
+    linkButton.addEventListener('click', async() => {
+        try {
+            await navigator.clipboard.writeText(finalText);
+            console.log('Content copied to clipboard');
+        } catch (err) {
+            console.error('Failed to copy to clipboard: ', err);
+        }
+        window.open(url)
+    })
 }
 
 
