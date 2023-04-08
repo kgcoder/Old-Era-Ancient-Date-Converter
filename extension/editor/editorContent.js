@@ -37,7 +37,15 @@ function onEditorLoad() {
      addToHistory(currentHTML)
      openAllWikipediaDropDowns(()=>{
         openAllBritannicaDropDowns(() => {
-            editsFromServer = editsArray
+
+            const regN = new RegExp('\\\\n','g')
+            const regT = new RegExp('\\\\t','g')
+
+            editsFromServer = editsArray.map(edit => {
+                return {...edit, string:edit.string.replace(regN,'\n').replace(regT,'\t')} 
+            })
+    
+            console.log('editsFromServer',JSON.stringify(editsFromServer))
         
             loadEdits(editsFromServer,true,false)
         
@@ -135,7 +143,7 @@ function interceptClickEvent(e) {
 
 
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
-    console.log('message',message)
+    console.log('message1',message)
     if(!isEditingMode)return
     switch (message) {
 
@@ -240,9 +248,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         case 'sendToServer':
             sendToServer()
             break
-        case 'clearCache':
-            clearCache()
-            break
+        
         case 'toggleTestingModeFromShortcut':
             toggleTestingModeFromShortcut()
             break

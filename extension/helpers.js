@@ -195,14 +195,20 @@ function convertMethodNameLongToShort(edit){
 }
 
 function clearCache(){
-    console.log('clear cache')
+    console.log('1clear cache')
 
-    chrome.storage.local.remove(["WebsitesSupportedByBackend"],function(){
-        let error = chrome.runtime.lastError;
-           if (error) {
-               console.error(error);
-           }
-    })
+    try{
+        chrome.storage.local.remove(["WebsitesSupportedByBackend"],function(){
+            console.log('success')
+            let error = chrome.runtime.lastError;
+               if (error) {
+                   console.error(error);
+               }
+        })
+
+    }catch(e){
+        console.log('e',e)
+    }
 }
 
 

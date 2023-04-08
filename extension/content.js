@@ -182,6 +182,10 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         updateTranslation()
     }
 
+    if(message === 'clearCache') {
+        clearCache()
+    }
+            
     if (message === 'toggleServer') {
         window.location.reload()
     }
@@ -427,22 +431,32 @@ async function startWebRequest() {
 
         console.log('json',json)
 
+        
         if(json.error){
             translateEverythingOnWeb(null)
             return 
         }
-
+        
         const wikitext = json.parse.wikitext
         if (!wikitext) {
             translateEverythingOnWeb(null)
             return 
         }
-
+        
         const lines = wikitext.split('\n')
+        const regN = new RegExp('\\\\n','g')
+        const regT = new RegExp('\\\\t','g')
 
-        editsArray = lines.map(line => getEditFromLine(line)).filter(obj => obj !== null).map(edit => convertMethodNameLongToShort(edit))
+        console.log('editsArray before',JSON.stringify(lines))
+        
+        editsArray = lines.map(line => getEditFromLine(line))
+        .filter(obj => obj !== null)
+        .map(edit => convertMethodNameLongToShort(edit))
+        .map(edit => {
+            return {...edit, string:edit.string.replace(regN,'\n').replace(regT,'\t')} 
+        })
 
-        console.log(editsArray)
+        console.log('editsArray after',JSON.stringify(editsArray))
        
   
 
@@ -475,7 +489,10 @@ async function startRequestForEditor(){
         const r = await fetch(`http://localhost:3200/api/modify/getPageForParser/${encodedUrl}`)
         const json = r.status !== 200 ? {} : await r.json()
 
+        
+
         editsArray = json.edits.map(edit => convertMethodNameLongToShort(edit))
+      
         try{
             if(isEditingMode){
                 onEditorLoad()
