@@ -281,7 +281,7 @@ window.onload = async () => {
         }
 
         if(isEditingMode){
-            alert('In editing mode all links are disabled to prevent you from losing your progress by acidentally clicking one of them. To enable links click "Stop editing" in the OE extension pupup.')
+            alert('In editing mode all links are disabled to prevent you from losing your progress by accidentally clicking one of them. To enable links click "Stop editing" in the OE extension pupup.')
         }
 
 
