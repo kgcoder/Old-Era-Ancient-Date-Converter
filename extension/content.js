@@ -124,8 +124,6 @@ function getConfigFromLocalStorage(callback){
             });
         }
 
-
-
         callback()
     })
 }
@@ -160,7 +158,8 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     }
 
     if (message === 'openEdits') {
-        const link = `${frontendBaseUrl}/#/translatedPages/${pageId}/show`
+        const link = isOnWikipedia ? `${frontendBaseUrl}/#/translatedPages/${pageId}/show` :
+        getPageUrlOnMyServer()
         window.open(link)
     }
 
@@ -251,7 +250,8 @@ function sendPageMetadata(sendResponse) {
         pageHasNoBCDates, pageIsNotTranslatedYet,
         pageNotAnalysedYet,
         isThisSiteAllowed,
-        domain
+        domain,
+        isOnWikipedia
     })
 }
 
@@ -278,6 +278,10 @@ window.onload = async () => {
         if(!isThisSiteAllowed){
             chrome.runtime.sendMessage('pageMetadataIsReady') //message for the popup script
             return
+        }
+
+        if(isEditingMode){
+            alert('In editing mode all links are disabled to prevent you from losing your progress by acidentally clicking one of them. To enable links click "Stop editing" in the OE extension pupup.')
         }
 
 
@@ -693,6 +697,8 @@ function translateEverythingOnWeb(r,finalInstructions = []) {
 
         repsFromServer = repsFromServer.sort((a,b) => a.index - b.index)
 
+        pageIsNotTranslatedYet = repsFromServer.length == 0
+
         const rawRepsInHtmlArray = []
         moveReplacementsFromTextToHtml(text,htmlWithIgParts,JSON.parse(JSON.stringify(repsFromServer)), rawRepsInHtmlArray, insertions)
 
@@ -755,9 +761,8 @@ function translateEverythingOnWeb(r,finalInstructions = []) {
     replaceImages(images)
 
 
-    if (r) {
-        prepareVersionInfo(r)    
-    }
+
+
 
        
 

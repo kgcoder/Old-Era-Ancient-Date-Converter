@@ -171,6 +171,16 @@ document.addEventListener('DOMContentLoaded', function () {
         })
     })
 
+    const nonwikiEditsLink = document.getElementById("seeNonWikiEdits")
+
+    nonwikiEditsLink.addEventListener('click', function () {
+        chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
+            chrome.tabs.sendMessage(tabs[0].id, 'openEdits')
+            window.close();
+
+        })
+    })
+
     //input listeners=========
 
     startingYearInput.addEventListener('input', function () {
@@ -305,7 +315,8 @@ document.addEventListener('DOMContentLoaded', function () {
             abbreviatedTimelineName = result.abbreviatedTimelineName
         }
      
-        updatePageInfoVisibility(!isExtensionOff)
+        updatePageInfoVisibility(false)
+        updateNonWikiPageInfoVisibility(false)
 
         if(result.sitesData){
             const sitesData = JSON.parse(result.sitesData)
@@ -411,7 +422,7 @@ function updatePageMetadata(response){
 
     const { lastOkVersion, translatedForVersion,
         currentVersionSeemsOK, isCurrentVersionVerified,
-        pageHasNoBCDates, pageIsNotTranslatedYet, pageNotAnalysedYet, isThisSiteAllowed, domain } = response
+        pageHasNoBCDates, pageIsNotTranslatedYet, pageNotAnalysedYet, isThisSiteAllowed, domain, isOnWikipedia } = response
 
     
     isCurrentSiteAllowed = isThisSiteAllowed
@@ -442,7 +453,8 @@ function updatePageMetadata(response){
     const pageInfo = document.getElementById("pageInfo")
     pageInfo.style.display = pageIsNotTranslatedYet ? 'none' : 'flex'
 
-    updatePageInfoVisibility(!isExtensionOff)
+    updatePageInfoVisibility(!isExtensionOff && isOnWikipedia)
+    updateNonWikiPageInfoVisibility(!isExtensionOff && !isOnWikipedia && isThisSiteAllowed && !pageIsNotTranslatedYet)
     updateUIInAccordanceWithMode()
 }
 
@@ -461,7 +473,10 @@ function toggleExtension() {
     updateUIInAccordanceWithMode()
     chrome.storage.local.set({ isExtensionOff }, function () {
      
-        if(isExtensionOff)updatePageInfoVisibility(false)
+        if(isExtensionOff){
+            updatePageInfoVisibility(false)
+            updateNonWikiPageInfoVisibility(false)
+        }
         chrome.runtime.sendMessage({ message: 'updateIcon' });
         sendMessageToPage(isExtensionOff ? 'turnOff' : 'turnOn')
 
@@ -473,8 +488,6 @@ function toggleExtension() {
 function toggleEditingMode() {
     isEditingMode = !isEditingMode
     chrome.storage.local.set({ isEditingMode }, function () {
-       // updatePageInfoVisibility(!isEditingMode)
-       // updateLinksSectionVisibility(!isEditingMode)
 
         updateUIInAccordanceWithMode()
 
@@ -566,6 +579,12 @@ function sendMessageToPage(message) {
 function updatePageInfoVisibility(visible){
     const currentPageInfoDiv = document.getElementById("currentPageInfo")
     currentPageInfoDiv.style.display = visible ? 'flex' : 'none'
+}
+
+function updateNonWikiPageInfoVisibility(visible){
+    const a = document.getElementById("seeNonWikiEdits")
+    const span = a.parentElement
+    span.style.display = visible ? 'flex' : 'none'
 }
 
 function updateLinksSectionVisibility(visible){
