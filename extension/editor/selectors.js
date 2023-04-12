@@ -76,16 +76,16 @@ function selectNumbers(digits) {
 }
 
 
-function selectNumbersWithBCs() {
-    if(shouldReturnBecauseOfTestingMode())return
-    splitUpTagsAndTexts()
+// function selectNumbersWithBCs() {
+//     if(shouldReturnBecauseOfTestingMode())return
+//     splitUpTagsAndTexts()
 
-    const pattern = `(?<!<[^>]*?)(\\b([0-9]{1,4}(?!\\])\\b)(((<span.*?>)( |\\s|\\&nbsp;|\\&#160;)(</span>)| |\\s|\\&nbsp;|\\&#160;)(b\\.( |\\s|\\&nbsp;|\\&#160;)?c\\.|bc)(e)?))`;
-    const reg = new RegExp(pattern, "gi");
+//     const pattern = `(?<!<[^>]*?)(\\b([0-9]{1,4}(?!\\])\\b)(((<span.*?>)( |\\s|\\&nbsp;|\\&#160;)(</span>)| |\\s|\\&nbsp;|\\&#160;)(b\\.( |\\s|\\&nbsp;|\\&#160;)?c\\.|bc)(e)?))`;
+//     const reg = new RegExp(pattern, "gi");
 
-    markTextsMatchingRegExp(reg, '$1')
+//     markTextsMatchingRegExp(reg, '$1')
 
-}
+// }
 
 function findRoundYears() {
     if(shouldReturnBecauseOfTestingMode())return

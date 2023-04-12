@@ -71,7 +71,6 @@ function createAutomaticReplacements(html, replacementsArray, pageData) {
 
     intermediaryReplacementsArray = intermediaryReplacementsArray.sort((a,b) => a.index - b.index).map(item => ({index:item.index,edit:item}))
 
-    console.log('intermediaryReplacementsArray',intermediaryReplacementsArray)
 
     moveReplacementsFromTextToHtml(text,html,intermediaryReplacementsArray, rawReplacementsInHtmlArray, insertions)
 
@@ -183,8 +182,6 @@ function extractTextFromHtml(html){
 
 function moveReplacementsFromTextToHtml(text,html,replacementsInTextArray,finalReplacementsArray,insertions){
     if(!replacementsInTextArray.length)return
-
-    console.log('replacementsInTextArray',replacementsInTextArray)
 
     let indexOfReplacement = 0
     let indexInTextToLookFor = replacementsInTextArray[indexOfReplacement].index

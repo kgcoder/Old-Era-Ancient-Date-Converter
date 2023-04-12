@@ -152,10 +152,10 @@ function chunksFromLine(line) {
 }
 
 
-function lineFromChunks(chunks) {
-    const escapedChunks = chunks.map(chunk => addEscapesToSemicolons(chunk))
-    return escapedChunks.join(';')
-}
+// function lineFromChunks(chunks) {
+//     const escapedChunks = chunks.map(chunk => addEscapesToSemicolons(chunk))
+//     return escapedChunks.join(';')
+// }
 
 function addEscapesToSemicolons(text) {
     return text.replace(/;/g, '\\;')
@@ -187,6 +187,15 @@ function getEditFromLine(line){
 
 
 function convertMethodNameLongToShort(edit){
+    const newName = longToShortMethodConversions[edit.method]
+    if(newName){
+        return {...edit,method:newName}
+    }
+    return edit
+}
+
+
+function fixNsAndTsInEditString(edit){
     const newName = longToShortMethodConversions[edit.method]
     if(newName){
         return {...edit,method:newName}

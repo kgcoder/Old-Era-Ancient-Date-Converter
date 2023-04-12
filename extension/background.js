@@ -29,7 +29,6 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
         })
     } else if (message === 'toggleTestingMode') {
         sendMsg('toggleTestingMode',({isTestingMode}) => {
-            console.log('testing mode',isTestingMode)
             sendResponse({isTestingMode})
         })
     } else if (message === 'markerMode' || message === 'bookTitleMode' || message === 'quoteMode') {
@@ -100,10 +99,7 @@ function updateIcon(tabId){
 
 
 chrome.commands.onCommand.addListener(function (command) {
-    console.log('Command:', command);
     sendMsg(command)
-
-
 });
 
 

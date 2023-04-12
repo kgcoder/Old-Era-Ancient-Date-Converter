@@ -16,9 +16,9 @@ const buttonIDs = [
     'markWordCentury',
     'markWordMillennium',
     'findBCs',
-    'findBCsWithoutSpaces',
+    // 'findBCsWithoutSpaces',
     'commitYears',
-    'commitADYears',
+    // 'commitADYears',
     'commitDecades',
     'commitCenturies',
     'commit00s',
@@ -38,10 +38,14 @@ const buttonIDs = [
 
 function addListenersToEditorButtons(){
     buttonIDs.forEach(id => {
-
+        if(id === "sendToServer"){
+            const button = document.getElementById(id)
+            button.disabled = true
+        }
         document.getElementById(id).addEventListener('click', () => sendMsg(id), false)
     })
 }
+
 
 
 

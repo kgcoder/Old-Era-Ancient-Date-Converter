@@ -59,7 +59,10 @@ let images = []
 let editsArray = []
 let domain = ''
 
+
 let isEditingMode = false
+
+
 
 const firstYearOfOldEra_default = 10000
 const lastTranslatedYearWithLabel_default = 6000
@@ -132,24 +135,31 @@ function getConfigFromLocalStorage(callback){
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
    
     console.log('message',message)
+
+    if(message === 'toggleOnOff'){
+        isExtensionOff = !isExtensionOff
+        chrome.storage.local.set({ isExtensionOff }, function () {
+            if(isExtensionOff){
+                turnOff()
+            }else{
+                turnOn()
+            }
+        })
+    }
+    if(message === "toggleEditingMode"){
+        isEditingMode = !isEditingMode
+        chrome.storage.local.set({ isEditingMode }, function () {
+            window.location.reload()
+         })
+    }
     if (message === 'turnOff') {
+
+        turnOff()
       
-        updateTranslation()
-        replaceImages(images, true)
+        
     }
     if (message === 'turnOn') {
-        
-        getConfigFromLocalStorage(function() {
-            if (allWorkFinishedForPage) {
-                updateTranslation()
-                replaceImages(images)
-                chrome.runtime.sendMessage('pageMetadataIsReady') //message for the popup script  
-            } else if (currentLocation && !shouldNotUseServer && isOnWikipedia) {
-                isEditingMode ? startRequestForEditor() : startRequest()
-            }
-            
-        })
-
+        turnOn()
     }
 
     if (message === 'openEdits') {
@@ -372,7 +382,8 @@ async function startRequest() {
 
         try{
             if(!isEditingMode){
-                translateEverything(r)
+                console.log('r',json)
+                translateEverything(json)
             }
 
         }catch(e){
@@ -486,7 +497,13 @@ async function startRequestForEditor(){
     const encodedUrl = encodeURIComponent(currentLocation)
 
     try{
-        const r = await fetch(`http://localhost:3200/api/modify/getPageForParser/${encodedUrl}`)
+
+
+        const url = kIsDevEnv ? 
+        `http://localhost:3200/api/modify/getPageForParser/${encodedUrl}` :
+        `${baseUrl}/api/pages/${encodedUrl}`
+
+        const r = await fetch(url)
         const json = r.status !== 200 ? {} : await r.json()
 
         
@@ -1012,7 +1029,23 @@ function updateDataInSpan(span){
     }
 }
 
+function turnOff(){
+    updateTranslation()
+    replaceImages(images, true)
+}
 
+function turnOn(){
+    getConfigFromLocalStorage(function() {
+        if (allWorkFinishedForPage) {
+            updateTranslation()
+            replaceImages(images)
+            chrome.runtime.sendMessage('pageMetadataIsReady') //message for the popup script  
+        } else if (currentLocation && !shouldNotUseServer && isOnWikipedia) {
+            isEditingMode ? startRequestForEditor() : startRequest()
+        }
+        
+    })
+}
 
 function replaceImages(images, reverse = false) {
 

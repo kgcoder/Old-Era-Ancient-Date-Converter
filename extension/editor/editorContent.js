@@ -6,6 +6,8 @@
  */
 
 
+
+
 let currentHTML = ''
 let editsFromServer = []
 
@@ -183,9 +185,9 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         case 'find4DigitNumbers':
             selectNumbers(4)
             break
-        case 'findNumbersWithBCs':
-            selectNumbersWithBCs()
-            break
+        // case 'findNumbersWithBCs':
+        //     selectNumbersWithBCs()
+        //     break
         case 'findRoundYears':
             findRoundYears()
             break
@@ -944,6 +946,11 @@ async function sendToServer() {
         showPopupWithInstructions()
         return
     }
+
+    if(!kIsDevEnv){
+        alert("You can't save data related to Wikipedia at this moment.")
+        return
+    }
    
     let currentLocation = window.location.toString()
     currentLocation = currentLocation.split('?')[0].split('#')[0]
@@ -971,7 +978,7 @@ async function sendToServer() {
     pageId = json.id
 
 
-    if(pageId){
+    if(pageId && kIsDevEnv){
         window.open(`http://localhost:3000/#/translatedPages/${pageId}/show`)
     }
 
@@ -1011,7 +1018,7 @@ function showPopupWithInstructions(){
     popup.innerHTML = `
         <a href="#" class="popup-close">&times;</a>
 		<textarea class="popup-input">${finalText}</textarea>
-		<a href="#" class="popup-link">Open data page on the server</a>
+		<a href="#" class="popup-link">Copy to clipboard and open data page on the server</a>
     `
     document.body.appendChild(popup)
 
@@ -1123,7 +1130,7 @@ function getFinalReplacementsForWeb(cleanHTML,cleanTexts){
             const order = `${stringOccurrences.length}.${numberOfOccurrence}.${targetOccurrences.length}.${numberOfTargetOccurrence}`
 
             const instruction = {
-                string: bigLine,
+                string: addEscapesToSemicolons(bigLine),
                 target: edit.text,
                 method: edit.method,
             }

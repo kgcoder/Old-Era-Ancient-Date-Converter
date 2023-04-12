@@ -81,6 +81,12 @@
             },
             "description": "round years in range"
         },
+        "toggleOnOff": {
+            "description": "turn on/off"
+        },
+        "toggleEditingMode": {
+            "description": "toggle editing mode"
+        },
         "findRoundYears": {
             "description": "find round years"
         },
@@ -134,9 +140,6 @@
         },
         "find4DigitNumbers":{
             "description": "find 4 digit numbers"
-        },
-        "findNumbersWithBCs":{
-            "description": "find numbers with BCs"
         },
         "toggleTestingModeFromShortcut":{
             "description": "toggle test mode"
