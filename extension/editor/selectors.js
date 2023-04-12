@@ -89,7 +89,6 @@ function selectNumbers(digits) {
 
 function findRoundYears() {
     if(shouldReturnBecauseOfTestingMode())return
-    console.log('find round years')
     const pattern = new RegExp('<selection class="bc-y" data-t="(.*?)" style="background-color:green;">(\\b\\d+0\\b.*?)</selection>', 'g')
     currentHTML = currentHTML.replace(pattern, (match, fromTemplate, inner) => {
         return `<selection class="bc-i" data-t="${fromTemplate}" style="background-color:pink;">${inner}</selection>`
@@ -177,7 +176,6 @@ function selectRange() {
     let element = document.createElement("selection")
     element.style.backgroundColor = 'red'
     element.className = 'marker'
-    console.log('selection', window.getSelection())
     window.getSelection().getRangeAt(0).surroundContents(element)
     currentHTML = new XMLSerializer().serializeToString(document.body)
     currentHTML = removeProblematicPartsFromHtml(currentHTML)
@@ -191,7 +189,6 @@ function selectRange() {
 
 function clearSelection() {
     if(shouldReturnBecauseOfTestingMode())return
-    console.log('clear selection')
     const range = window.getSelection().getRangeAt(0);
 
     let { startContainer, endContainer, startOffset, endOffset } = range
@@ -239,7 +236,6 @@ function clearSelection() {
 
 function roundYearsInRange(){
     if(shouldReturnBecauseOfTestingMode())return
-    console.log('roundYearsInRange')
     const range = window.getSelection().getRangeAt(0);
 
     let { startContainer, endContainer, startOffset, endOffset } = range
@@ -275,7 +271,6 @@ function roundYearsInRange(){
 
 function deleteInRange() {
     if(shouldReturnBecauseOfTestingMode())return
-    console.log('delete in range')
     const range = window.getSelection().getRangeAt(0);
 
     let { startContainer, endContainer, startOffset, endOffset } = range

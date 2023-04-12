@@ -34,7 +34,6 @@ const allClassesString = allClasses.join('|')
 
 function onEditorLoad() {
      if(!isEditingMode)return
-     console.log('editing mode')
      setInitialHtml()
      addToHistory(currentHTML)
      openAllWikipediaDropDowns(()=>{
@@ -47,7 +46,6 @@ function onEditorLoad() {
                 return {...edit, string:edit.string.replace(regN,'\n').replace(regT,'\t')} 
             })
     
-            console.log('editsFromServer',JSON.stringify(editsFromServer))
         
             loadEdits(editsFromServer,true,false)
         
@@ -133,19 +131,16 @@ function interceptClickEvent(e) {
         
 
         if(isEditingMode){
-            //tell the browser not to respond to the link click
             e.preventDefault();
         }
 
     }else{
-        console.log('target.tagName',target.tagName)
-      //  e.preventDefault();
+      //  console.log('target.tagName',target.tagName)
     }
 }
 
 
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
-    console.log('message1',message)
     if(!isEditingMode)return
     switch (message) {
 
@@ -276,7 +271,6 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
             sendResponse({isTestingMode,selectionMode})
             break
         case 'toggleTestingMode':{
-            console.log('toggleTestingMode')
             isTestingMode = !isTestingMode
             sendResponse({isTestingMode})
         }
@@ -338,7 +332,6 @@ function createHTMLWithMarkersForEditor(editsFromServer,shouldFixBrokenEdits = f
         replacements = getReplacementsFromEdits(editsFromServer,htmlWithIgParts)
     }else{
         replacements = getReplacementsFromEdits(editsFromServer,text)
-        console.log('replacements',replacements)
     }
 
    
@@ -359,7 +352,6 @@ function createHTMLWithMarkersForEditor(editsFromServer,shouldFixBrokenEdits = f
         }else if(currentGap && rep.isBroken === false){
             lastGoodEdit = rep.edit
             currentGap.lastGoodEdit = rep.edit
-            console.log('currentGap',currentGap)
             currentGap = null
         }
 
@@ -370,8 +362,6 @@ function createHTMLWithMarkersForEditor(editsFromServer,shouldFixBrokenEdits = f
 
     pageHasIssues = filteredEdits.length !== replacements.length
     replacements = filteredEdits
-
-    console.log('filteredEdits',filteredEdits)
 
 
     if(shouldFixBrokenEdits){
@@ -386,11 +376,8 @@ function createHTMLWithMarkersForEditor(editsFromServer,shouldFixBrokenEdits = f
     let finalReplacements = replacements
     if(!isOnWikipedia){
         finalReplacements = []
-        console.log('replacements before moving to html',replacements)
         moveReplacementsFromTextToHtml(text,htmlWithIgParts,replacements, finalReplacements, insertions)
     }
-
-    console.log('final replacements',finalReplacements)
 
 
     localReplacementsArray = []
@@ -405,8 +392,6 @@ function createHTMLWithMarkersForEditor(editsFromServer,shouldFixBrokenEdits = f
         if(['bc-i-r1','bc-i-r2'].includes(item.edit.method))item.edit.method = 'bc-i'
         return item
     })
-
-    console.log('local replacements',localReplacementsArray)
 
     replacements = resolveReplacements(localReplacementsArray, finalReplacements)
 
@@ -525,10 +510,8 @@ function addListenersToSelections() {
         let sel = selections[i]
         sel = removeListeners(sel)
         sel.addEventListener('click', (e) => {
-            console.log('selection', sel)
             //  e.preventDefault()
             document.getSelection().removeAllRanges();
-            console.log('clicked', e)
             const text = sel.innerHTML
             const chunks = text.split('_substitute_')
             const target = chunks[0]
@@ -539,7 +522,6 @@ function addListenersToSelections() {
                 }
                 const newSubstitute = prompt("Substitute", substitute);
                 if (newSubstitute == null) {
-                    console.log('cancel')
                     return
                 }
                 sel.innerHTML = newSubstitute ? target + '_substitute_' + newSubstitute : target
@@ -562,12 +544,9 @@ function addListenersToSelections() {
                 sel.outerHTML = `<selection class="${newClassName}" data-t="${sel.outerHTML.includes('data-t="true"') ? 'true' : ''}" style="background-color:${color};">` + sel.innerHTML + '</selection>'
 
             } else {
-                console.log('style', sel.style)
                 if (sel.style.backgroundColor === 'blue' || sel.style.backgroundColor === 'violet') {
-                    console.log('yes')
                     return
                 }
-                console.log('className',sel.className)
                 if (!['bc-y','bc-i'].includes(sel.className)) return
                 const newClassName = ['bc-y',].includes(sel.className) ? 'bc-i' : 'bc-y'
                 const color = newClassName === 'bc-y' ? 'green' : 'pink'
@@ -576,7 +555,6 @@ function addListenersToSelections() {
 
             const currentLocation = window.location.toString()
             if (currentLocation.includes('localhost')) {
-                // const p = document.getElementsByClassName('p')[0]
                 currentHTML = document.body.innerHTML
             } else {
                 currentHTML = new XMLSerializer().serializeToString(document.body)
@@ -596,13 +574,9 @@ function removeListeners(node) {
     return new_element
 }
 
-function yearNumberClicked() {
-    console.log('year number clicked')
-}
 
 
 function createInstructions() {
-    console.log('createInstructions')
 
     const occurrencesOfRawStrings = []
 
@@ -620,25 +594,19 @@ function createInstructions() {
         const method = result[1]
         const fromTemplate = result[2]
         const color = result[3]
-        
-      
 
-      //  console.log('color', color)
         let type = 'normal'
         if (color === 'blue') type = 'bookTitle'
         if (color === 'violet') type = 'quote'
 
         const target = result[4]
         const chunks = target.split('_substitute_')
-       // console.log('result[0]', result[0])
-      //  console.log('target', target)
-      //  console.log('chunks', chunks)
+  
         const text = chunks[0]
         let substitute = ''
         if (chunks.length === 2) {
             substitute = chunks[1]
         }
-      //  console.log('substitute', substitute)
 
         const obj = { index: result.index, length: result[0].length, method, text, type, substitute, fromTemplate }
 
@@ -649,8 +617,6 @@ function createInstructions() {
 
     }
 
-    // console.log('all replacements', occurrencesOfRawStrings)
-    // console.log('local replacements',localReplacementsArray)
 
 
 
@@ -679,7 +645,6 @@ function createInstructions() {
     const fillerText = ignHtml.substr(lastIndex, ignHtml.length - lastIndex)
     cleanTexts.push({ text: fillerText, method: 'text' })
 
-    console.log('cleanTexts', cleanTexts)
 
     let cleanHTML = ''
     cleanTexts.forEach(obj => {
@@ -691,7 +656,6 @@ function createInstructions() {
     
     if(!isOnWikipedia){
         const filteredCleanTexts = cleanTexts.filter(cleanTextObj => cleanTextObj.method !== 'text')
-        console.log('filtered cleanTexts', filteredCleanTexts)
         const instructions = getFinalReplacementsForWeb(cleanHTML,filteredCleanTexts)
         return instructions
     }
@@ -750,7 +714,6 @@ function createInstructions() {
         
     })
 
-    console.log('instructions',instructions)
 
     localReplacementsArray = []
 
@@ -769,7 +732,6 @@ function createInstructions() {
 
     const replacementsFromInstructions = getReplacementsFromEdits(instructions,cleanHTML)
 
-    console.log('replacementsFromInstructions',replacementsFromInstructions)
 
     const finalInstructions = []
 
@@ -782,20 +744,8 @@ function createInstructions() {
             finalInstructions.push(repFromInstr.edit)
         }
     })
-
-
-    // if(!isOnWikipedia){
-    //     const reg = new RegExp('\n','g')
-    //     finalInstructions.forEach(edit => {
-    //         edit.string = edit.string.replace(reg,'\\n')
-    //     })
-    // }
-
-
     
     return finalInstructions
-
-
 }
 
 
@@ -817,7 +767,7 @@ function getOccurrences2(string, target) {
 function getNumberOfOccurrence(allMatches, neededIndex) {
     const index = allMatches.findIndex(item => item.index === neededIndex)
     if (index >= 0) return index + 1
-    console.log('something wrong', allMatches, 'nIndex', neededIndex)
+    //console.log('something wrong', allMatches, 'nIndex', neededIndex)
     return index
 }
 
@@ -882,10 +832,8 @@ function toggleTestingModeFromShortcut(){
 
 
 function test() {
-    console.log('test')
     finalInstructions = createInstructions()
 
-    console.log('finalInstructions before',JSON.stringify(finalInstructions))
     finalInstructions = finalInstructions.map(edit => {
         const newEdit = JSON.parse(JSON.stringify(edit))
         if(edit.method == 'bc-y-r2')newEdit.method = 'bc-y'
@@ -893,13 +841,6 @@ function test() {
         if(['bc-i','bc-i-r1','bc-i-r2'].includes(edit.method))edit.method = 'bc-i'
         return newEdit
     })
-
-
-
-
-    // chrome.storage.local.set({ instructions }, function () {
-    //     console.log('instructions saved')
-    // })
 
     htmlBeforeTesting = currentHTML
 
@@ -909,12 +850,7 @@ function test() {
 
     if(isOnWikipedia){
         translateEverything(null,JSON.parse(JSON.stringify(finalInstructions)))
-    }else{
-        
-    
-        console.log('finalInstructions',JSON.stringify(finalInstructions))
-    
-       
+    }else{    
         translateEverythingOnWeb(null,JSON.parse(JSON.stringify(finalInstructions)))
     }
 
@@ -935,11 +871,6 @@ function backToEditing() {
 
 
 async function sendToServer() {
-    console.log('send to server')
-    // if(!isTestingMode){
-    //     alert('Editing mode')
-    //     return 
-    // }
 
 
     if(!isOnWikipedia){
@@ -954,8 +885,6 @@ async function sendToServer() {
    
     let currentLocation = window.location.toString()
     currentLocation = currentLocation.split('?')[0].split('#')[0]
-    console.log('url', currentLocation)
-    console.log('edits', finalInstructions)
 
     const editsWithLongMethodNames = finalInstructions.map(edit =>( {...edit,method:shortToLongMethodConversions[edit.method]}))
 
@@ -972,7 +901,6 @@ async function sendToServer() {
         body: JSON.stringify(data),
     })
 
-    console.log('post result', result)
 
     const json = await result.json()
     pageId = json.id
@@ -989,30 +917,27 @@ async function sendToServer() {
 
 function showPopupWithInstructions(){
     const nReg = new RegExp('\n','g')
-        const tReg = new RegExp('\t','g')
-        let lines = finalInstructions.map(({string,target,method,type,order,fromTemplate}) => {
+    const tReg = new RegExp('\t','g')
+    let lines = finalInstructions.map(({string,target,method,type,order,fromTemplate}) => {
 
-            console.log('string before:',string)
-            string = string.replace(nReg,'\\n').replace(tReg,'\\t')
+        string = string.replace(nReg,'\\n').replace(tReg,'\\t')
 
-            console.log('string after:',string)
-            return `${string};${target};${method};${type ?? ""};${order ? order : ""};${fromTemplate ? "1" : ""}`
-        })
-    
-
-        lines = ['<poem><nowiki>'].concat(lines).concat([
-            '</nowiki></poem>',
-            '[[Category:Pages with dates]]',
-            `[[Category:${domain}]]`
-        ])
-
-        const finalText = lines.join('\n')
+        return `${string};${target};${method};${type ?? ""};${order ? order : ""};${fromTemplate ? "1" : ""}`
+    })
 
 
-        const url = getPageUrlOnMyServerForEditing()
+    lines = ['<poem><nowiki>'].concat(lines).concat([
+        '</nowiki></poem>',
+        '[[Category:Pages with dates]]',
+        `[[Category:${domain}]]`
+    ])
+
+    const finalText = lines.join('\n')
 
 
-    console.log('showing popup',url)
+    const url = getPageUrlOnMyServerForEditing()
+
+
     const popup = document.createElement('div')
     popup.className = 'popup'
     popup.innerHTML = `
@@ -1031,7 +956,6 @@ function showPopupWithInstructions(){
     linkButton.addEventListener('click', async() => {
         try {
             await navigator.clipboard.writeText(finalText);
-            console.log('Content copied to clipboard');
         } catch (err) {
             console.error('Failed to copy to clipboard: ', err);
         }
@@ -1060,15 +984,6 @@ function getFinalReplacementsForWeb(cleanHTML,cleanTexts){
     localReplacementsArray = localReplacementsArray.sort((a, b) => a.edit.targetIndex - b.edit.targetIndex)
 
 
-    console.log('cleanTexts',cleanTexts)
-    console.log('localReplacementsArray',localReplacementsArray)
-
-
-
-    //const replacementsFromInstructions = getReplacementsFromEdits(instructions,cleanHTML)
-
-
-
 
     const filteredCleanTexts = []
     cleanTexts.forEach((cleanText) => {
@@ -1087,14 +1002,9 @@ function getFinalReplacementsForWeb(cleanHTML,cleanTexts){
     })
 
 
-    console.log('filteredCleanTexts',filteredCleanTexts)
 
     const {result:text,insertions} = extractTextFromHtml(cleanHTML)
-    console.log('text',text)
     const replacementsInText = moveReplacementsHtmlToText(cleanHTML,text,insertions,filteredCleanTexts)
-
-    console.log('replacementsInText',replacementsInText)
-
 
 
     const finalInstructions = []
@@ -1109,7 +1019,6 @@ function getFinalReplacementsForWeb(cleanHTML,cleanTexts){
 
             const bigLine = left + edit.text + right
 
-            console.log('bigLine',bigLine)
             const stringOccurrences = getOccurrences2(text, bigLine)
 
             let numberOfOccurrence = 1

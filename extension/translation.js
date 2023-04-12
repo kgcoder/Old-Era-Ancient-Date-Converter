@@ -453,8 +453,6 @@ function fixBrokenEdits(gaps,html){
                 if(index){
                    const globalIndex = firstIndex + index
                     if(isIndexInsideTag(globalIndex,html)){
-                        console.log('is inside tag')
-                        console.log(html.substr(globalIndex - 20,40))
                         const newStartOfLine = index + brokenEdit.target.length
                         firstIndex = firstIndex + newStartOfLine
                         line = line.substr(newStartOfLine, line.length - newStartOfLine)

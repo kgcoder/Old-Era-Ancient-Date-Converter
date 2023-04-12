@@ -40,7 +40,9 @@ const observer = new MutationObserver(function(mutations) {
 
                         if(isEditingMode){
                             setTimeout(()=> {
-                                node.parentElement.removeChild(node)
+                                if(node.parentElement){
+                                    node.parentElement.removeChild(node)
+                                }
                             },5000)
 
                         }

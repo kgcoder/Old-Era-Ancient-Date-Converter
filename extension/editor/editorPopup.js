@@ -51,7 +51,6 @@ function addListenersToEditorButtons(){
 
 async function sendMsg(message) {
     if (message === 'test') {
-        console.log('test clicked')
        // await chrome.runtime.sendMessage('toggleTestingMode',(response) => {
        //     console.log('resonse',response)
        //     console.log('error',chrome.runtime.lastError)
@@ -73,7 +72,6 @@ async function sendMsg(message) {
             updateButtons()
         })
     }
-    console.log('message before sending', message)
      chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
         chrome.tabs.sendMessage(tabs[0].id, message)
     })

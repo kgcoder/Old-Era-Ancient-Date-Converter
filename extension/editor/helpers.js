@@ -8,7 +8,6 @@
 
 function getReplacementsFromEdits(edits, htmlWithIgParts){
     
-    console.log('text',htmlWithIgParts)
     if(!edits || !edits.length)return []
 
     const myNewReplacements = edits.map((edit) => {
@@ -20,7 +19,7 @@ function getReplacementsFromEdits(edits, htmlWithIgParts){
 
         const orderChunks = order.split('.').map(chunk => parseInt(chunk, 10))
         if (orderChunks.length !== 4) {
-            console.log('not 4', edit)
+           // console.log('not 4', edit)
             return {edit,isBroken:true}//"no good"
         }
 
@@ -133,10 +132,8 @@ function replaceTextInNodeIfNeededForEditor(node, sourceText) {
 
 
 function getReplacementNodeForEditor(text, method, originalSubstitute,fromTemplate) {
-    console.log(`text: ${text}, method: ${method}, originalSubstitute: ${originalSubstitute}`)
     text = text.replace(',','')
     const originalNumber = originalSubstitute ? parseInt(originalSubstitute, 10) : parseInt(text, 10)
-    console.log('originalNumber', originalNumber)
     const type = 'normal'
     switch (method) {
 
@@ -153,7 +150,7 @@ function getReplacementNodeForEditor(text, method, originalSubstitute,fromTempla
         case 'ad-y': {
             const year = originalNumber
             if (isNaN(year)) return null
-            const translatedYear = (5214 + year)//.toLocaleString()
+            const translatedYear = (10000 + year).toLocaleString()
 
             return textWithComment(text, `${year}`, translatedYear, type)
         }
@@ -256,7 +253,6 @@ function escapeText(text) {
 
 function setBodyFromCurrentHTML() {
     setBodyFromHTML(currentHTML)
-    console.log('set from current')
 }
 
 function setBodyFromHTML(html) {
@@ -278,7 +274,6 @@ function splitUpTagsAndTexts() {
 
     const commentReg = new RegExp('<!--[\\s\\S]*?-->', 'gm')
     const html = currentHTML.replace(commentReg, (match) => {
-        console.log('comment', match)
         return ''
     })
     const regex1 = new RegExp('<(?!(/)?span)[^>]*?>', 'gm');
@@ -306,20 +301,6 @@ function splitUpTagsAndTexts() {
 
     putStylesAndScriptsInTags()
 
-
-
-    // console.log('all texts', texts)
-    // console.log('all tags', tags)
-    // const index = tags.findIndex(tag => {
-    //     const result = tag.match(/<.*?<.*?>/)
-
-    //     //) console.log(result)
-    //     return result
-    // })
-    // console.log('index', index)
-    // if (index >= 0) {
-    //     console.log(tags[index])
-    // }
 }
 
 
@@ -405,14 +386,8 @@ function markTextsMatchingRegExp(reg, matchNumber) {
 
 
 
-
-
-
-
     fixInnerSpans()
 
-
-    console.log('currentHTML', currentHTML)
     setBodyFromCurrentHTML()
     addToHistory(currentHTML)
 
@@ -434,11 +409,9 @@ function fixInnerSpans() {
 function splitSpan(markerStart, inner, markerEnd) {
     const innerPattern = new RegExp('^(.*?)(<span.*?>)(.*?)(</span>)(.*?)$')
     if (inner.includes('<span')) {
-        //   console.log('match', match)
         const result = inner.match(innerPattern)
         if (!result) return markerStart + inner + markerEnd
         const [m, leftText, spanStart, middleText, spanEnd, rightText] = result
-     //   console.log('result', result)
 
         return markerStart + leftText + markerEnd +
             spanStart + markerStart + middleText + markerEnd + spanEnd +
@@ -515,19 +488,17 @@ function moveReplacementsHtmlToText(html,text,insertions,replacementsInHtmlArray
         const characterInText = text.slice(indexInText,indexInText + 1)
 
         if(characterInText !== characterInHtml){
-            console.log('something is wrong',characterInHtml)
-            console.log('something is wrong',characterInText)
+           // console.log('something is wrong',characterInHtml)
+           // console.log('something is wrong',characterInText)
         }
 
 
         let justFoundReplacement = false
         if(indexInHtml === nextReplacementIndexInHtml){
-            console.log('indexInHtml === nextReplacementIndexInHtml:',nextReplacement.text)
 
             const targetLength = nextReplacement.text.length
             const targetInText = text.slice(indexInText,indexInText + targetLength)
             if(targetInText === nextReplacement.text){
-                console.log('found replacement:',targetInText)
 
                 result.push({
                     text: nextReplacement.text, 
@@ -559,7 +530,7 @@ function moveReplacementsHtmlToText(html,text,insertions,replacementsInHtmlArray
 
 
             }else{
-                console.log("something doesn't work")
+                //console.log("something doesn't work")
             }
         }
         

@@ -134,15 +134,6 @@ function isIndexInsideTag(index,text){
 }
 
 
-function getSample(lineNumber,columnNumber,html){
-    const lines = html.split('\n')
-    const line = lines[lineNumber - 1]
-    console.log('line',line)
-    console.log('number of lines',lines.length)
-
-    console.log('broken string:',line.slice(columnNumber - 10,columnNumber + 20))
-
-}
 
 
 function chunksFromLine(line) {
@@ -152,10 +143,6 @@ function chunksFromLine(line) {
 }
 
 
-// function lineFromChunks(chunks) {
-//     const escapedChunks = chunks.map(chunk => addEscapesToSemicolons(chunk))
-//     return escapedChunks.join(';')
-// }
 
 function addEscapesToSemicolons(text) {
     return text.replace(/;/g, '\\;')
@@ -204,11 +191,9 @@ function fixNsAndTsInEditString(edit){
 }
 
 function clearCache(){
-    console.log('1clear cache')
 
     try{
         chrome.storage.local.remove(["WebsitesSupportedByBackend"],function(){
-            console.log('success')
             let error = chrome.runtime.lastError;
                if (error) {
                    console.error(error);
@@ -222,14 +207,11 @@ function clearCache(){
 
 
 async function prepareListOfWebsitesSupportedByBackend(){
-      // saveTimestampedDataString('test','value')
 
    let websitesSupportedByBackendString = await getDataStringFromStorage('WebsitesSupportedByBackend')
-   console.log('got result from loval storage:',websitesSupportedByBackendString)
    if(!websitesSupportedByBackendString){
         try{
             websitesSupportedByBackendString = await requestListOfWebsites()
-            console.log('got websites from server:\n',websitesSupportedByBackendString)
             saveTimestampedDataString('WebsitesSupportedByBackend',websitesSupportedByBackendString)
         }catch(e){
             console.log('error while fetching list of websites',e)
@@ -238,7 +220,6 @@ async function prepareListOfWebsitesSupportedByBackend(){
 
    if(websitesSupportedByBackendString){
         const websites = websitesSupportedByBackendString.split('\n').filter(line => !line.includes('<')).map(line => line.trim())
-        console.log('websites',websites)
         sitesSupportedByBackend = websites
    }
 
@@ -248,7 +229,7 @@ async function prepareListOfWebsitesSupportedByBackend(){
 function saveTimestampedDataString(key, value) {
     const object = { value: value, timestamp: new Date().getTime() }
     chrome.storage.local.set({ [key]: JSON.stringify(object) }).then(() => {
-         console.log("Value is set:",value);
+         //console.log("Value is set:",value);
      });
 }
 

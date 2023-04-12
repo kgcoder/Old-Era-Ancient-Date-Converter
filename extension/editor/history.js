@@ -24,16 +24,11 @@ function goBackInHistory() {
         currentHTML = browserHistory[currentIndexInHistory]
         setBodyFromCurrentHTML()
     }
-    console.log('go back', currentIndexInHistory)
     addListenersToSelections()
 }
 
 function goForwardInHistory() {
-    console.log('forward')
-    console.log('history.length', browserHistory.length)
-    console.log('index', currentIndexInHistory)
     if (currentIndexInHistory < browserHistory.length - 1) {
-        console.log('forward for sure')
         currentIndexInHistory += 1
         currentHTML = browserHistory[currentIndexInHistory]
         setBodyFromCurrentHTML()

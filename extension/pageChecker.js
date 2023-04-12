@@ -27,8 +27,6 @@ function getOccurrences(string, pattern, index) {
 
 function prepareVersionInfo(serverResponse) {
 
-    console.log('serverResponse',serverResponse)
-
     numberOfBCsHasChangedInCurrentPage = serverResponse.numberOfBCsHasChanged || false
    
     currentVersionSeemsOK = !issuesInCurrentPageExist

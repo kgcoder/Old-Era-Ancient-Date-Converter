@@ -115,7 +115,6 @@ function getConfigFromLocalStorage(callback){
         }
 
         if(result.sitesData){
-            console.log('result.sitesData',result.sitesData)
             const sitesData = JSON.parse(result.sitesData)
             allowedSites = sitesData.allowedSites
         }else{
@@ -134,8 +133,6 @@ function getConfigFromLocalStorage(callback){
 
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
    
-    console.log('message',message)
-
     if(message === 'toggleOnOff'){
         isExtensionOff = !isExtensionOff
         chrome.storage.local.set({ isExtensionOff }, function () {
@@ -270,11 +267,8 @@ window.onload = async () => {
 
     getConfigFromLocalStorage(function(){
         updateIcon()
-        console.log('currentLocation',currentLocation)
         if(currentLocation){
-            console.log('allowed sites test',JSON.stringify(allowedSites))
             const index = allowedSites.findIndex(site => domain === site)
-            console.log('index',index)
             isThisSiteAllowed = index !== -1
         }else{
             isThisSiteAllowed = false
@@ -282,7 +276,6 @@ window.onload = async () => {
     
     
         if(!isThisSiteAllowed){
-            console.log('site not allowed')
             chrome.runtime.sendMessage('pageMetadataIsReady') //message for the popup script
             return
         }
@@ -290,12 +283,11 @@ window.onload = async () => {
 
         navigator.permissions.query({ name: "clipboard-write" }).then((result) => {
             if (result.state == "granted" || result.state == "prompt") {
-              console.log("Write access granted!");
+              //console.log("Write access granted!");
             }
         });
 
     
-        console.log('just before request',sitesSupportedByBackend)
         if (!isExtensionOff  && currentLocation) {
             if (!shouldNotUseServer && isOnWikipedia) {
                 isEditingMode ? startRequestForEditor() :  startRequest()
@@ -364,7 +356,6 @@ async function startRequest() {
         const r = await fetch(`${baseUrl}/api/pages/${encodedUrl}`)
         const json = r.status !== 200 ? {} : await r.json()
 
-        console.log('edits',json.edits)
         editsArray = json.edits.map(edit => convertMethodNameLongToShort(edit))
         pageHasIssues = json.hasIssues 
         pageId = json.id
@@ -382,7 +373,6 @@ async function startRequest() {
 
         try{
             if(!isEditingMode){
-                console.log('r',json)
                 translateEverything(json)
             }
 
@@ -408,9 +398,7 @@ async function requestListOfWebsites() {
     
             const r = await fetch(url)
             const json = r.status !== 200 ? {} : await r.json()
-    
-            console.log('json',json)
-    
+        
             const wikitext = json.parse.wikitext
             if (!wikitext) {
                 return reject()
@@ -429,7 +417,6 @@ async function requestListOfWebsites() {
 
 
 async function startWebRequest() {
-    console.log('starting web request')
     if(!pageIsLoaded || requestHasStarted)return
     requestHasStarted = true
 
@@ -439,9 +426,6 @@ async function startWebRequest() {
 
         const r = await fetch(url)
         const json = r.status !== 200 ? {} : await r.json()
-
-        console.log('json',json)
-
         
         if(json.error){
             translateEverythingOnWeb(null)
@@ -458,7 +442,6 @@ async function startWebRequest() {
         const regN = new RegExp('\\\\n','g')
         const regT = new RegExp('\\\\t','g')
 
-        console.log('editsArray before',JSON.stringify(lines))
         
         editsArray = lines.map(line => getEditFromLine(line))
         .filter(obj => obj !== null)
@@ -466,8 +449,6 @@ async function startWebRequest() {
         .map(edit => {
             return {...edit, string:edit.string.replace(regN,'\n').replace(regT,'\t')} 
         })
-
-        console.log('editsArray after',JSON.stringify(editsArray))
        
   
 
@@ -539,13 +520,9 @@ async function startWebRequestForEditor(){
 
     const url = getWikitextUrlOnMyServer()
     
-    console.log('url',url)
-
     try{
         const r = await fetch(url)
         const json = r.status !== 200 ? {} : await r.json()
-
-        console.log('json',json)
 
         if(json.error){
             editsArray = []
@@ -567,8 +544,6 @@ async function startWebRequestForEditor(){
         const lines = wikitext.split('\n')
 
         editsArray = lines.map(line => getEditFromLine(line)).filter(obj => obj !== null).map(edit => convertMethodNameLongToShort(edit))
-
-        console.log({editsArray})
 
         try{
             if(isEditingMode){
@@ -617,9 +592,7 @@ function translateEverything(r,finalInstructions = []) {
 
     if (isTranslated || finalInstructions.length) {
         const editsToUse = finalInstructions.length ? finalInstructions : editsArray
-        console.log('editsToUse',editsToUse)
         const repsFromServer = getReplacementsFromServer(editsToUse, htmlWithIgParts)
-        console.log('repsFromServer',repsFromServer)
         replacementsArray = resolveReplacements(replacementsArray, repsFromServer)
     }
 
@@ -637,10 +610,8 @@ function translateEverything(r,finalInstructions = []) {
 
     if (htmlWithMarkers) {
 
-        console.log('htmlWithMarkers',htmlWithMarkers)
 
         const parser = new DOMParser();
-        const originalBodyDOM = parser.parseFromString(html, "text/xml");
         const cleanHtml = removeAttributesFromTags(htmlWithMarkers)
         const bodyDOM = parser.parseFromString(cleanHtml, "text/xml");
 
@@ -717,26 +688,16 @@ function translateEverythingOnWeb(r,finalInstructions = []) {
 
     if (finalInstructions.length) {
         const editsToUse = finalInstructions.length ? finalInstructions : editsArray
-        console.log('editsToUse',editsToUse)
         const {result:text,insertions} = extractTextFromHtml(htmlWithIgParts)
         let repsFromServer = getReplacementsFromServerForWeb(editsToUse, text)
-        console.log('repsFromServer',repsFromServer)
 
         repsFromServer = repsFromServer.sort((a,b) => a.index - b.index)
-
-        console.log('repsFromServer2',repsFromServer)
 
         const rawRepsInHtmlArray = []
         moveReplacementsFromTextToHtml(text,htmlWithIgParts,JSON.parse(JSON.stringify(repsFromServer)), rawRepsInHtmlArray, insertions)
 
-
-        console.log('rawRepsInHtmlArray',rawRepsInHtmlArray)
-
-
         const normalReplacementsInHtmlFromServer = mergeReplacements(rawRepsInHtmlArray)
         replacementsArray = resolveReplacements(replacementsArray, normalReplacementsInHtmlFromServer)
-
-        console.log('replacementsArray',replacementsArray)
 
     }
 
@@ -753,8 +714,6 @@ function translateEverythingOnWeb(r,finalInstructions = []) {
 
 
     if (htmlWithMarkers) {
-
-        console.log('htmlWithMarkers',htmlWithMarkers)
 
         const parser = new DOMParser();
         const originalBodyDOM = parser.parseFromString(html, "text/xml");
@@ -909,7 +868,6 @@ function findIfPageIsDecadeCategory(){
 
 
 function findIfPageIsAboutEarlyCenturyOrMillennium(){
-    console.log('inside findIfPageIsAboutEarlyCenturyOrMillennium')
     const title = getPageTitle()
 
 
@@ -1118,7 +1076,6 @@ function replaceTextInNodeIfNeeded(oldNodes, sourceText) {
 
         const replacementNode = getDateCaseNode(obj.originalText, obj.originalSubstitute,obj.otherNumberStringInRange, obj.method, obj.type)
 
-      //  console.log('replacementNode',replacementNode)
         if (replacementNode) {
             firstOldNode.parentNode.insertBefore(replacementNode, firstOldNode)
 
