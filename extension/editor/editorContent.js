@@ -617,13 +617,6 @@ function createInstructions() {
 
     }
 
-
-
-
-
-
-
-
     let cleanTexts = []
     let lastIndex = 0
 
@@ -918,11 +911,11 @@ async function sendToServer() {
 function showPopupWithInstructions(){
     const nReg = new RegExp('\n','g')
     const tReg = new RegExp('\t','g')
-    let lines = finalInstructions.map(({string,target,method,type,order,fromTemplate}) => {
+    let lines = finalInstructions.map(({string,target,method,type,originalSubstitute,order,fromTemplate}) => {
 
         string = string.replace(nReg,'\\n').replace(tReg,'\\t')
 
-        return `${string};${target};${method};${type ?? ""};${order ? order : ""};${fromTemplate ? "1" : ""}`
+        return `${string};${target};${method};${type ?? ""};${order ? order : ""};${originalSubstitute ? originalSubstitute : ""};${fromTemplate ? "1" : ""}`
     })
 
 

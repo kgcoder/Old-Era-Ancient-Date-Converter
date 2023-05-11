@@ -432,8 +432,6 @@ function removeProblematicPartsFromHtml(html){
 
 function moveReplacementsHtmlToText(html,text,insertions,replacementsInHtmlArray){
 
-    console.log('replacementsInHtmlArray',replacementsInHtmlArray)
-
     // { text: targetText, 
     //     method: obj.method, 
     //     index: indexInOriginalText, 
@@ -505,7 +503,7 @@ function moveReplacementsHtmlToText(html,text,insertions,replacementsInHtmlArray
                     method: nextReplacement.method, 
                     index: indexInText, 
                     type: nextReplacement.type, 
-                    originalSubstitute: nextReplacement.substitute, 
+                    originalSubstitute: nextReplacement.originalSubstitute, 
                     fromTemplate:nextReplacement.fromTemplate 
                 })
 

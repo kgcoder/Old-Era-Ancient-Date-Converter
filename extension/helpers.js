@@ -151,13 +151,14 @@ function addEscapesToSemicolons(text) {
 
 function getEditFromLine(line){
     const chunks = chunksFromLine(line)
-    if(chunks.length !== 6)return null
+    if(chunks.length !== 7)return null
     const string = chunks[0]
     const target = chunks[1]
     const method = chunks[2]
     const type = chunks[3]
     const order = chunks[4]
-    const fromTemplate = chunks[5] == "1"
+    const originalSubstitute = chunks[5]
+    const fromTemplate = chunks[6] == "1"
 
     //TODO:validate data
 
@@ -168,6 +169,7 @@ function getEditFromLine(line){
         method,
         type,
         order,
+        originalSubstitute,
         fromTemplate
     }
 }
