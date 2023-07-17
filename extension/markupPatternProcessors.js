@@ -240,7 +240,6 @@ function createYearReplacementsWithInnerSpansFromMarkup(html, replacementsArray)
         if(target.includes('class="bc-'))continue
 
         
-        method = shortToLongMethodConversions[method]
 
         if (['bc-y', 'bc-i'].includes(method)) {
             const year = numberFromString(target)
@@ -280,7 +279,6 @@ function createReplacementsFromMarkup(html, replacementsArray) {
 
         const index = result.index + spanOpening.length
 
-        method = shortToLongMethodConversions[method]
 
 
         type = convertTypeFromMakup(type)
@@ -324,7 +322,6 @@ function processOneHeadline(headline, html, replacementsArray){
         const originalSubstitute = result[6] || ''
         const target = result[7] || ''
         type = convertTypeFromMakup(type)
-        method = shortToLongMethodConversions[method]
         resultsArray.push({method,type,target, originalSubstitute})
     }
 
