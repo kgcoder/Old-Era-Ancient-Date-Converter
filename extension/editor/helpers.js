@@ -572,7 +572,6 @@ function getThreeChunksFromHtml(){
 
     const newText1 = text1.slice(0, startOffset) + '__selection__' + text1.slice(startOffset, text1.length)
 
-
     const text2 = endContainer.data
     if (!text2) return null
     if (startContainer === endContainer) {
