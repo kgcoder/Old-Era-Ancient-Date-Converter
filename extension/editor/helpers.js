@@ -561,5 +561,40 @@ function moveReplacementsHtmlToText(html,text,insertions,replacementsInHtmlArray
 
 }
 
+//if user selected range of text this method should return an array of 3 strings (part of text before selection, selection itself, and the part of text after selection)
+function getThreeChunksFromHtml(){
+    const selection = window.getSelection()
+    if(!selection.rangeCount)return null
+    console.log('selection',selection)
+    const range = window.getSelection().getRangeAt(0);
+    console.log('range',JSON.stringify(range))
+    let { startContainer, endContainer, startOffset, endOffset } = range
+    const text1 = startContainer.data
+    console.log('startContainer',JSON.stringify(startContainer))
+    if (!text1) return null
+
+    const newText1 = text1.slice(0, startOffset) + '__selection__' + text1.slice(startOffset, text1.length)
 
 
+    const text2 = endContainer.data
+    if (!text2) return null
+    if (startContainer === endContainer) {
+        console.log('startContainer === endContainer')
+        endOffset += 13
+    }
+    startContainer.data = newText1
+    const newText2 = text2.slice(0, endOffset) + '__selection__' + text2.slice(endOffset, text2.length)
+
+    endContainer.data = newText2
+
+
+    let html = new XMLSerializer().serializeToString(document.body)
+    html = removeProblematicPartsFromHtml(html)
+    const chunks = html.split('__selection__')
+    if(chunks.length != 3){
+        currentHTML = chunks.join("")
+        setBodyFromCurrentHTML()
+        return null
+    }
+    return chunks
+}

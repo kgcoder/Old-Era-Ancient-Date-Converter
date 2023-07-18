@@ -12,7 +12,7 @@ function selectNumbers(digits) {
     splitUpTagsAndTexts()
 
     const prohibitedWordsAfter = [
-        'AD',
+        ' AD',
         'CE',
         'kg',
         'km',
@@ -189,29 +189,19 @@ function selectRange() {
 
 function clearSelection() {
     if(shouldReturnBecauseOfTestingMode())return
-    const range = window.getSelection().getRangeAt(0);
 
-    let { startContainer, endContainer, startOffset, endOffset } = range
-    const text1 = startContainer.data
-    if (!text1) return
-
-    const newText1 = text1.slice(0, startOffset) + '__selection__' + text1.slice(startOffset, text1.length)
-
-
-    const text2 = endContainer.data
-    if (!text2) return
-    if (startContainer === endContainer) {
-        endOffset += 13
+    const chunks = getThreeChunksFromHtml()
+    console.log('chunks',chunks)
+    if(!chunks) {
+        if (selectionMode === 'markerMode') {
+            currentHTML = currentHTML.replace(/<selection class="marker".*?>(.*?)<\/selection>/gm, '$1')
+            setBodyFromCurrentHTML()
+            addToHistory(currentHTML)
+        }
+        return
     }
-    startContainer.data = newText1
-    const newText2 = text2.slice(0, endOffset) + '__selection__' + text2.slice(endOffset, text2.length)
-
-    endContainer.data = newText2
 
 
-    let html = new XMLSerializer().serializeToString(document.body)
-    html = removeProblematicPartsFromHtml(html)
-    const chunks = html.split('__selection__')
     if (selectionMode === 'markerMode') {
         const pattern = new RegExp('<selection class="bc-i" data-t="(.*?)".*?>(.*?)</selection>', 'g')
         currentHTML = chunks[0] + chunks[1].replace(/<selection class="marker".*?>(.*?)<\/selection>/gm, '$1')
@@ -236,29 +226,8 @@ function clearSelection() {
 
 function roundYearsInRange(){
     if(shouldReturnBecauseOfTestingMode())return
-    const range = window.getSelection().getRangeAt(0);
-
-    let { startContainer, endContainer, startOffset, endOffset } = range
-    const text1 = startContainer.data
-    if (!text1) return
-
-    const newText1 = text1.slice(0, startOffset) + '__selection__' + text1.slice(startOffset, text1.length)
-
-
-    const text2 = endContainer.data
-    if (!text2) return
-    if (startContainer === endContainer) {
-        endOffset += 13
-    }
-    startContainer.data = newText1
-    const newText2 = text2.slice(0, endOffset) + '__selection__' + text2.slice(endOffset, text2.length)
-
-    endContainer.data = newText2
-
-
-    let html = new XMLSerializer().serializeToString(document.body)
-    html = removeProblematicPartsFromHtml(html)
-    const chunks = html.split('__selection__')
+    const chunks = getThreeChunksFromHtml()
+    if(!chunks) return
     if (selectionMode === 'markerMode') {
         const pattern = new RegExp('<selection class="bc-y" data-t="(.*?)".*?>(.*?)</selection>', 'g')
         currentHTML = chunks[0] + chunks[1].replace(pattern, '<selection class="bc-i" data-t="$1" style="background-color:pink;">$2</selection>') + chunks[2]
@@ -271,30 +240,8 @@ function roundYearsInRange(){
 
 function deleteInRange() {
     if(shouldReturnBecauseOfTestingMode())return
-    const range = window.getSelection().getRangeAt(0);
-
-    let { startContainer, endContainer, startOffset, endOffset } = range
-    const text1 = startContainer.data
-    if (!text1) return
-
-    const newText1 = text1.slice(0, startOffset) + '__selection__' + text1.slice(startOffset, text1.length)
-
-
-    const text2 = endContainer.data
-    if (!text2) return
-    if (startContainer === endContainer) {
-        endOffset += 13
-    }
-    startContainer.data = newText1
-    const newText2 = text2.slice(0, endOffset) + '__selection__' + text2.slice(endOffset, text2.length)
-
-    endContainer.data = newText2
-
-
-    let html = new XMLSerializer().serializeToString(document.body)
-    html = removeProblematicPartsFromHtml(html)
-    const chunks = html.split('__selection__')
-
+    const chunks = getThreeChunksFromHtml()
+    if(!chunks) return
     const pattern = new RegExp('<selection class=".*?".*?>(.*?)(_substitute_.*?)?</selection>', 'g')
     currentHTML = chunks[0] + chunks[1].replace(pattern, '$1') + chunks[2]
 

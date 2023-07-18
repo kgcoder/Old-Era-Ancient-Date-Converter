@@ -57,13 +57,28 @@ function commitIgnoredPart() {
 
 function replaceMarkers(className, color) {
     if(shouldReturnBecauseOfTestingMode())return
-    currentHTML = currentHTML.replace(/<selection class="marker".*?>(.*?)<\/selection>/gm, (match, inner) => {
-        return `<selection class="${className}" data-t="" style="background-color:${color};">${inner}</selection>`
-    })
+    
+    const chunks = getThreeChunksFromHtml()
+    if(!chunks) {
+        currentHTML = replaceMarkersInString(currentHTML,className, color)
+
+    }else{
+        currentHTML = chunks[0] + replaceMarkersInString(chunks[1],className, color) + chunks[2]
+    }
+
+
+
     setBodyFromCurrentHTML()
     addToHistory(currentHTML)
 
     addListenersToSelections()
 
 
+}
+
+
+function replaceMarkersInString(string, className, color){
+    return string.replace(/<selection class="marker".*?>(.*?)<\/selection>/gm, (match, inner) => {
+        return `<selection class="${className}" data-t="" style="background-color:${color};">${inner}</selection>`
+    })
 }
