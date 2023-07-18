@@ -565,12 +565,9 @@ function moveReplacementsHtmlToText(html,text,insertions,replacementsInHtmlArray
 function getThreeChunksFromHtml(){
     const selection = window.getSelection()
     if(!selection.rangeCount)return null
-    console.log('selection',selection)
     const range = window.getSelection().getRangeAt(0);
-    console.log('range',JSON.stringify(range))
     let { startContainer, endContainer, startOffset, endOffset } = range
     const text1 = startContainer.data
-    console.log('startContainer',JSON.stringify(startContainer))
     if (!text1) return null
 
     const newText1 = text1.slice(0, startOffset) + '__selection__' + text1.slice(startOffset, text1.length)
@@ -579,7 +576,6 @@ function getThreeChunksFromHtml(){
     const text2 = endContainer.data
     if (!text2) return null
     if (startContainer === endContainer) {
-        console.log('startContainer === endContainer')
         endOffset += 13
     }
     startContainer.data = newText1
