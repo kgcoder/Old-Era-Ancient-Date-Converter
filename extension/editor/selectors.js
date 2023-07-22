@@ -12,10 +12,13 @@ function selectNumbers(digits) {
     splitUpTagsAndTexts()
 
     const prohibitedWordsAfter = [
-        ' AD',
+        'AD',
+        'A\\.D\\.',
         'CE',
+        'C\\.E\\.',
         'kg',
         'km',
+        'mi',
         'miles',
         'metres',
         'meters',
@@ -66,9 +69,9 @@ function selectNumbers(digits) {
         'november',
         'december',
         
-    ].join('| ')
+    ].join('|')
 
-    const pattern = `(?<!(Fig.|AD|A\\.D\\.|aged|page|p\\.|p\\..?\\d{1,4}–|<[^>]*?|\\d{2,3},|\\d{2,3}\\.)(| |\\s|\\&nbsp;|\\&#160;))(\\b([0-9]{${digits}}(?!\\])\\b)(?!(${prohibitedWordsAfter}|,\\d{3}))(((<span.*?>)( |\\s|\\&nbsp;|\\&#160;)(</span>)| |\\s|\\&nbsp;|\\&#160;)(b\\.( |\\s|\\&nbsp;|\\&#160;)?c\\.|bc)(e)?)?)`;
+    const pattern = `(?<!(Fig.|AD|A\\.D\\.|age|aged|page|p\\.|p\\..?\\d{1,4}–|<[^>]*?)(| |\\s|\\&nbsp;|\\&#160;))(\\b([0-9]{${digits}}(?!\\])\\b)(?!((${spacePattern})(${prohibitedWordsAfter})|,\\d{3}))(((<span.*?>)( |\\s|\\&nbsp;|\\&#160;)(</span>)| |\\s|\\&nbsp;|\\&#160;)(b\\.( |\\s|\\&nbsp;|\\&#160;)?c\\.|bc)(e)?)?)`;
     const reg = new RegExp(pattern, "gi");
 
     markTextsMatchingRegExp(reg, '$3')
