@@ -191,7 +191,6 @@ function clearSelection() {
     if(shouldReturnBecauseOfTestingMode())return
 
     const chunks = getThreeChunksFromHtml()
-    console.log('chunks',chunks)
     if(!chunks) {
         if (selectionMode === 'markerMode') {
             currentHTML = currentHTML.replace(/<selection class="marker".*?>(.*?)<\/selection>/gm, '$1')

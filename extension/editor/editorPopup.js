@@ -28,9 +28,9 @@ const buttonIDs = [
     'commitOE',
     'commitOfOE',
     'commitIgnoredPart',
-    'markerMode',
-    'bookTitleMode',
-    'quoteMode',
+    // 'markerMode',
+    // 'bookTitleMode',
+    // 'quoteMode',
     'test',
     'sendToServer'
 ]

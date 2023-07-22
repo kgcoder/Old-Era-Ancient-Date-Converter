@@ -979,8 +979,9 @@ function updateDataInSpan(span){
     const [translated, originalForToast, translatedForToast] = translations
 
     if(isExtensionOff 
-    || (type === 'bookTitle' && !shouldTranslateDatesInBookTitles)
-    || (type === 'quote' && !shouldTranslateDatesInQuotes)){
+    // || (type === 'bookTitle' && !shouldTranslateDatesInBookTitles)
+    // || (type === 'quote' && !shouldTranslateDatesInQuotes)
+    ){
 
         span.innerHTML = originalText
         span.title = translatedForToast ?? undefined

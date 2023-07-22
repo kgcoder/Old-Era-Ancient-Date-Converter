@@ -489,11 +489,11 @@ function replaceCurlyBracesWithMarkup(html) {
                 color = 'red'
         }
 
-        if (type === 'quote') {
-            color = 'violet'
-        } else if (type === 'bookTitle') {
-            color = 'blue'
-        }
+        // if (type === 'quote') {
+        //     color = 'violet'
+        // } else if (type === 'bookTitle') {
+        //     color = 'blue'
+        // }
      
 
         return `<selection class="${method}" data-t="${fromTemplate}" style="background-color:${color};">${target}</selection>`

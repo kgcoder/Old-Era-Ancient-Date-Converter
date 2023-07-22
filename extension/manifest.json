@@ -114,15 +114,6 @@
         "commitRemovals": {
             "description": "commit removals"
         },
-        "markerMode": {
-            "description": "marker mode"
-        },
-        "bookTitleMode": {
-            "description": "book title mode"
-        },
-        "quoteMode": {
-            "description": "quote mode"
-        },
         "loadFromTemplates":{
             "description": "load edits from templates"
         },

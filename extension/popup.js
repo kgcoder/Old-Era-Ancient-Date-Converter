@@ -332,10 +332,10 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('TranslateYearsPreciselyCheckbox').checked = shouldTranslateYearsPrecisely
         
         shouldTranslateDatesInBookTitles = !!result.shouldTranslateDatesInBookTitles
-        document.getElementById('TranslateInBookTitlesCheckbox').checked = shouldTranslateDatesInBookTitles
+        //document.getElementById('TranslateInBookTitlesCheckbox').checked = shouldTranslateDatesInBookTitles
         
         shouldTranslateDatesInQuotes = !!result.shouldTranslateDatesInQuotes
-        document.getElementById('TranslateInQuotesCheckbox').checked = shouldTranslateDatesInQuotes
+        //document.getElementById('TranslateInQuotesCheckbox').checked = shouldTranslateDatesInQuotes
 
         document.getElementById('startingYearInput').value = `${firstYearOfOldEra}`
         document.getElementById('lastTranslatedYearWithLabelInput').value = `${lastTranslatedYearWithLabel}`
@@ -371,13 +371,13 @@ document.addEventListener('DOMContentLoaded', function () {
         togglePreciseTranslationOfYears()
     }, false)
 
-    document.getElementById('TranslateInBookTitlesCheckbox').addEventListener('click', () => {
-        toggleTranslationsInBookTitles()
-    }, false)
+    // document.getElementById('TranslateInBookTitlesCheckbox').addEventListener('click', () => {
+    //     toggleTranslationsInBookTitles()
+    // }, false)
 
-    document.getElementById('TranslateInQuotesCheckbox').addEventListener('click', () => {
-        toggleTranslationsInQuotes()
-    }, false)
+    // document.getElementById('TranslateInQuotesCheckbox').addEventListener('click', () => {
+    //     toggleTranslationsInQuotes()
+    // }, false)
 
 
     const advancedSettingsButton = document.getElementById('ShowHideAdvancedSettingsButton')
