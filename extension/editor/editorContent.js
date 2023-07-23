@@ -434,7 +434,7 @@ function createHTMLWithMarkersForEditor(editsFromServer,shouldFixBrokenEdits = f
 function replaceCurlyBracesWithMarkup(html) {
     const pattern = new RegExp('\\{\\{(.*?)\\|(.*?)\\|(.*?)\\|(.*?)\\|(.*?)\\}\\}', 'g')
     return html.replace(pattern, (match, method, target, type, originalSubstitute,fromTemplate) => {
-        let color = 'red'
+        let color = 'red;color:white'
         if (originalSubstitute) {
             target = target + '_substitute_' + originalSubstitute
         }
@@ -459,7 +459,7 @@ function replaceCurlyBracesWithMarkup(html) {
                 color = 'pink'
                 break
             case 'bc-d':
-                color = 'olive'
+                color = 'olive;color:white'
                 break
             case 'bc-c':
                 color = 'orange'
@@ -486,7 +486,7 @@ function replaceCurlyBracesWithMarkup(html) {
                 color = 'dimgray'
                 break
             default:
-                color = 'red'
+                color = 'red;color:white'
         }
 
         // if (type === 'quote') {

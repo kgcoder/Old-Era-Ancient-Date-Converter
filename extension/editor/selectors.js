@@ -178,6 +178,7 @@ function selectRange() {
    
     let element = document.createElement("selection")
     element.style.backgroundColor = 'red'
+    element.style.color = 'white'
     element.className = 'marker'
     window.getSelection().getRangeAt(0).surroundContents(element)
     currentHTML = new XMLSerializer().serializeToString(document.body)

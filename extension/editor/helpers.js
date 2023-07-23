@@ -347,7 +347,7 @@ function markTextsMatchingRegExp(reg, matchNumber) {
             if (array) return text
 
         }
-        let replacementText = text.replace(reg, `{---{selection class="marker" data-t="" style="background-color: red;"}---}${matchNumber}{---{/selection}---}`)
+        let replacementText = text.replace(reg, `{---{selection class="marker" data-t="" style="background-color: red;color:white;"}---}${matchNumber}{---{/selection}---}`)
 
 
         const reg1 = new RegExp('<span.*?>', 'g')

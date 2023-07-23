@@ -16,7 +16,7 @@ function commitADYears() {
 
 
 function commitDecades() {
-    replaceMarkers('bc-d', 'olive')
+    replaceMarkers('bc-d', 'olive;color:white')
 }
 
 
