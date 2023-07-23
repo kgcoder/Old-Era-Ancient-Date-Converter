@@ -442,7 +442,7 @@ function replaceCurlyBracesWithMarkup(html) {
             case 'bc-y':
             case 'bc-y-r1':
             case 'bc-y-r2':
-                color = 'green'
+                color = 'green;color:white'
                 break
             case 'ad-y':
                 color = 'rosyBrown'
@@ -468,13 +468,13 @@ function replaceCurlyBracesWithMarkup(html) {
                 color = 'coral'
                 break
             case 'bc-m':
-                color = 'darkcyan'
+                color = 'darkcyan;color:white'
                 break
             case 'bc-000s':
                 color = 'blueViolet'
                 break
             case 'bc-r':
-                color = 'brown'
+                color = 'brown;color:white'
                 break
             case 'bc-tn':
                 color = 'aqua'
@@ -537,7 +537,7 @@ function addListenersToSelections() {
                     color = 'dimgray'
                 } else if (sel.className === 'bc-y2') {
                     newClassName = 'bc-y'
-                    color = 'green'
+                    color = 'green;color:white'
                 } else {
                     return
                 }
@@ -549,7 +549,7 @@ function addListenersToSelections() {
                 }
                 if (!['bc-y','bc-i'].includes(sel.className)) return
                 const newClassName = ['bc-y',].includes(sel.className) ? 'bc-i' : 'bc-y'
-                const color = newClassName === 'bc-y' ? 'green' : 'pink'
+                const color = newClassName === 'bc-y' ? 'green;color:white' : 'pink'
                 sel.outerHTML = `<selection class="${newClassName}" data-t="${sel.outerHTML.includes('data-t="true"') ? 'true' : '' }" style="background-color:${color};">` + sel.innerHTML + '</selection>'
             }
 

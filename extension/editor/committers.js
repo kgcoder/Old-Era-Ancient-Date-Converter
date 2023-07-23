@@ -7,7 +7,7 @@
 
 
 function commitYears() {
-    replaceMarkers('bc-y', 'green')
+    replaceMarkers('bc-y', 'green;color:white')
 }
 
 function commitADYears() {
@@ -16,7 +16,6 @@ function commitADYears() {
 
 
 function commitDecades() {
-
     replaceMarkers('bc-d', 'olive')
 }
 
@@ -30,7 +29,7 @@ function commit00s() {
 }
 
 function commitMillennia() {
-    replaceMarkers('bc-m', 'darkcyan')
+    replaceMarkers('bc-m', 'darkcyan;color:white')
 }
 
 function commit000s() {
@@ -38,7 +37,7 @@ function commit000s() {
 }
 
 function commitRemovals() {
-    replaceMarkers('bc-r', 'brown')
+    replaceMarkers('bc-r', 'brown;color:white')
 }
 
 

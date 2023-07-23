@@ -92,7 +92,7 @@ function selectNumbers(digits) {
 
 function findRoundYears() {
     if(shouldReturnBecauseOfTestingMode())return
-    const pattern = new RegExp('<selection class="bc-y" data-t="(.*?)" style="background-color:green;">(\\b\\d+0\\b.*?)</selection>', 'g')
+    const pattern = new RegExp('<selection class="bc-y" data-t="(.*?)" style="background-color:green;color:white;">(\\b\\d+0\\b.*?)</selection>', 'g')
     currentHTML = currentHTML.replace(pattern, (match, fromTemplate, inner) => {
         return `<selection class="bc-i" data-t="${fromTemplate}" style="background-color:pink;">${inner}</selection>`
     })
@@ -207,7 +207,7 @@ function clearSelection() {
     if (selectionMode === 'markerMode') {
         const pattern = new RegExp('<selection class="bc-i" data-t="(.*?)".*?>(.*?)</selection>', 'g')
         currentHTML = chunks[0] + chunks[1].replace(/<selection class="marker".*?>(.*?)<\/selection>/gm, '$1')
-            .replace(pattern, '<selection class="bc-y" data-t="$1" style="background-color:green;">$2</selection>') + chunks[2]
+            .replace(pattern, '<selection class="bc-y" data-t="$1" style="background-color:green;color:white;">$2</selection>') + chunks[2]
 
     } else if (selectionMode === 'bookTitleMode') {
         const pattern = new RegExp(`<selection class="(${allClassesString})" data-t="(.*?)".*?>(.*?)</selection>`, 'g')
