@@ -50,7 +50,7 @@ function commitOfOE() {
 }
 
 function commitIgnoredPart() {
-    replaceMarkers('bc-ig', 'dimgray')
+    replaceMarkers('bc-ig', 'dimgray;color:white')
 }
 
 

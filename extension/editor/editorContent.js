@@ -451,7 +451,7 @@ function replaceCurlyBracesWithMarkup(html) {
                 color = 'gainsboro'
                 break
             case 'bc-y2':
-                color = 'dimgray'
+                color = 'lightslategray;color:white'
                 break
             case 'bc-i':
             case 'bc-i-r1':
@@ -483,7 +483,7 @@ function replaceCurlyBracesWithMarkup(html) {
                 color = 'lime'
                 break
             case 'bc-ig':
-                color = 'dimgray'
+                color = 'dimgray;color:white'
                 break
             default:
                 color = 'red;color:white'
@@ -534,7 +534,7 @@ function addListenersToSelections() {
                     color = 'gainsboro'
                 } else if (sel.className === 'bc-y1') {
                     newClassName = 'bc-y2'
-                    color = 'dimgray'
+                    color = 'lightslategray;color:white'
                 } else if (sel.className === 'bc-y2') {
                     newClassName = 'bc-y'
                     color = 'green;color:white'
