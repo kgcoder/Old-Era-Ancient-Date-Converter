@@ -13,6 +13,7 @@ let editsFromServer = []
 
 let isTestingMode = false
 let selectionMode = 'markerMode'
+let isEditingWikitext = false
 //let isServerDataReady = false
 
 let originalHTML = ''
@@ -27,6 +28,7 @@ let tags = []
 
 let localReplacementsArray = []
 
+let isDefaultPopupActive = false
 
 const allClassesString = allClasses.join('|')
 
@@ -245,7 +247,11 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         case 'sendToServer':
             sendToServer()
             break
-        
+        case 'startWikitextEditing':
+            isEditingWikitext = true
+            startWikitextEditing()
+            sendResponse({isEditingWikitext})
+            break
         case 'toggleTestingModeFromShortcut':
             toggleTestingModeFromShortcut()
             break
@@ -268,7 +274,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
             commitIgnoredPart()
             break
         case 'giveMeCurrentState':
-            sendResponse({isTestingMode,selectionMode})
+            sendResponse({isTestingMode,selectionMode,isEditingWikitext})
             break
         case 'toggleTestingMode':{
             isTestingMode = !isTestingMode
@@ -310,10 +316,18 @@ function loadEdits(editsFromServer,shouldFixBrokenEdits = false,showOnlyFixed = 
     
 
 
-    setBodyFromCurrentHTML()
+    setBodyFromCurrentHTML(true)
     addToHistory(currentHTML)
 
     instructions = editsFromServer
+
+ 
+    if(!dontShowPopupAgain){
+        showDefaultPopup('In editing mode all links are disabled to prevent you from losing your progress by accidentally clicking one of them. To enable links click "Stop editing" in the OE extension pupup.')
+    }
+
+
+    addListenerToDefaultPopupCloseButton()
 }
 
 
@@ -904,6 +918,30 @@ async function sendToServer() {
     }
 
     
+
+}
+
+
+async function startWikitextEditing(){
+    if(!isOnWikipedia)return
+    console.log('yes')
+
+    const popup = document.createElement('div')
+    popup.className = 'wikitextPopup'
+    popup.innerHTML = `
+        <a href="#" id="wikitextPopupCloseButton" class="popup-close">&times;</a>
+		<textarea class="popup-input">hello</textarea>
+		<a href="#" class="popup-link">Copy to clipboard and open data page on the server</a>
+    `
+    document.body.appendChild(popup)
+
+    const closeButton = popup.getElementsByClassName('popup-close')[0]
+    closeButton.addEventListener('click', () => {
+        console.log('click')
+        chrome.storage.local.set({ isEditingWikitext:false }, function () {})
+        chrome.runtime.sendMessage('wikitextEditingPopupClosed')
+        popup.parentElement.removeChild(popup)
+    })
 
 }
 

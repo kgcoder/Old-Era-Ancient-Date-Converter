@@ -9,6 +9,8 @@ let isEditingMode = false
 
 let isTestingMode = false
 
+let isEditingWikitext = false
+
 
 let shouldTranslateYearsPrecisely = false
 let shouldTranslateDatesInBookTitles = false
@@ -42,6 +44,10 @@ let abbreviatedTimelineName = abbreviatedTimelineName_default
 chrome.runtime.onMessage.addListener(function (message) {
     if(message === 'pageMetadataIsReady'){
         getPageMetadata()
+    }
+    if(message === 'wikitextEditingPopupClosed'){
+        isEditingWikitext = false
+        updateButtons()
     }
 })
 
@@ -292,10 +298,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-    chrome.storage.local.get(['isExtensionOff','isEditingMode', 'shouldNotUseServer', 'shouldTranslateYearsPrecisely', 'shouldTranslateDatesInBookTitles', 'shouldTranslateDatesInQuotes','sitesData','firstYearOfOldEra','lastTranslatedYearWithLabel','timelineName','ofTimeline','abbreviatedTimelineName'], function (result) {
+    chrome.storage.local.get(['isExtensionOff','isEditingMode', 'shouldNotUseServer', 'shouldTranslateYearsPrecisely', 'shouldTranslateDatesInBookTitles', 'shouldTranslateDatesInQuotes','sitesData','firstYearOfOldEra','lastTranslatedYearWithLabel','timelineName','ofTimeline','abbreviatedTimelineName','isEditingWikitext'], function (result) {
         
         isExtensionOff = !!result.isExtensionOff
         isEditingMode = !!result.isEditingMode
+
+        isEditingWikitext = !!result.isEditingWikitext
 
         if(result.firstYearOfOldEra){
             firstYearOfOldEra = result.firstYearOfOldEra
@@ -344,6 +352,8 @@ document.addEventListener('DOMContentLoaded', function () {
         updateInputTexts()
         updateSettingsButtons()
         updateUIInAccordanceWithMode()
+
+        updateButtons()
 
     })
 
@@ -411,6 +421,7 @@ function updatePageMetadata(response){
     const link1 = document.getElementById("aboutLink")
     const link2 = document.getElementById("whitePaperLink")
     const link3 = document.getElementById("timelineLink")
+    const wikitextButton = document.getElementById('startWikitextEditing')
     if (!response) {
         updatePageStatus('Wrong site, page doesn\'t exist in the database, or page update is needed')
         link1.style = link2.style = link3.style = "pointer-events: none; color:lightgray"
@@ -418,12 +429,14 @@ function updatePageMetadata(response){
         return
     }
 
+    
     link1.style = link2.style = link3.style = ""
-
+    
     const { lastOkVersion, translatedForVersion,
         currentVersionSeemsOK, isCurrentVersionVerified,
-        pageHasNoBCDates, pageIsNotTranslatedYet, pageNotAnalysedYet, isThisSiteAllowed, domain, isOnWikipedia } = response
-
+        pageHasNoBCDates, pageIsNotTranslatedYet, pageNotAnalysedYet, isThisSiteAllowed, domain, isOnWikipedia, kIsDevEnv } = response
+        
+    wikitextButton.hidden = !kIsDevEnv
     
     isCurrentSiteAllowed = isThisSiteAllowed
     currentDomain = domain
@@ -487,7 +500,8 @@ function toggleExtension() {
 
 function toggleEditingMode() {
     isEditingMode = !isEditingMode
-    chrome.storage.local.set({ isEditingMode }, function () {
+    if(!isEditingMode)isEditingWikitext = false
+    chrome.storage.local.set({ isEditingMode, isEditingWikitext }, function () {
 
         updateUIInAccordanceWithMode()
 

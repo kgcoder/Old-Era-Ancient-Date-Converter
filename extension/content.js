@@ -51,6 +51,8 @@ let pageIsLoaded = false
 let sitesSupportedByBackend = []
 let allowedSites = []
 
+let dontShowPopupAgain = false
+
 let isThisSiteAllowed = false
 
 let images = []
@@ -78,8 +80,11 @@ let timelineName = timelineName_default
 let ofTimeline = ofTimeline_default
 let abbreviatedTimelineName = abbreviatedTimelineName_default
 
-
-
+if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", onContentLoad);
+}else(
+    onContentLoad()
+)
 
 
 function getConfigFromLocalStorage(callback){
@@ -87,13 +92,14 @@ function getConfigFromLocalStorage(callback){
         'shouldTranslateYearsPrecisely', 'shouldTranslateDatesInBookTitles', 
         'shouldTranslateDatesInQuotes','sitesData',
         'firstYearOfOldEra','lastTranslatedYearWithLabel',
-        'timelineName','ofTimeline','abbreviatedTimelineName'], function (result) {
+        'timelineName','ofTimeline','abbreviatedTimelineName','dontShowPopupAgain'], function (result) {
         isExtensionOff = !!result.isExtensionOff
         isEditingMode = !!result.isEditingMode
         shouldNotUseServer = !!result.shouldNotUseServer
         shouldTranslateYearsPrecisely = !!result.shouldTranslateYearsPrecisely
         shouldTranslateDatesInBookTitles = !!result.shouldTranslateDatesInBookTitles
         shouldTranslateDatesInQuotes = !!result.shouldTranslateDatesInQuotes
+        dontShowPopupAgain = !!result.dontShowPopupAgain
         
         if(result.firstYearOfOldEra){
             firstYearOfOldEra = result.firstYearOfOldEra
@@ -251,17 +257,16 @@ function sendPageMetadata(sendResponse) {
         pageNotAnalysedYet,
         isThisSiteAllowed,
         domain,
-        isOnWikipedia
+        isOnWikipedia,
+        kIsDevEnv
     })
 }
 
 
 
-window.onload = async () => {
 
 
- 
-
+ async function onContentLoad() {
 
     pageIsLoaded = true
 
@@ -280,9 +285,7 @@ window.onload = async () => {
             return
         }
 
-        if(isEditingMode){
-            alert('In editing mode all links are disabled to prevent you from losing your progress by accidentally clicking one of them. To enable links click "Stop editing" in the OE extension pupup.')
-        }
+       
 
 
         navigator.permissions.query({ name: "clipboard-write" }).then((result) => {

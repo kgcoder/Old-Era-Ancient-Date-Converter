@@ -256,14 +256,15 @@ function setBodyFromCurrentHTML() {
 }
 
 function setBodyFromHTML(html) {
+    if(isDefaultPopupActive)return
     let currentLocation = window.location.toString()
     if (currentLocation.includes('localhost')) {
         document.body.innerHTML = html
     } else {
         const parser = new DOMParser();
-        const bodyDOM = parser.parseFromString(html, "text/xml");
-        //document.body = bodyDOM.documentElement
+      //  const bodyDOM = parser.parseFromString(html, "text/xml");
         document.body.innerHTML = html
+
 
     }
 }

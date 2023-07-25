@@ -276,3 +276,49 @@ function getPageUrlOnMyServerForEditing(){
     const uriComponent = currentLocation.replace('https://','').replace('http://','').replace('www.','')
     return `${webBaseUrl}/wiki/index.php?title=Dates/${uriComponent}&action=edit`
 }
+
+
+
+function showDefaultPopup(message){
+
+    const popup = document.createElement('div')
+    popup.className = 'defaultPopup'
+    popup.innerHTML = `
+        <p>${message}</p>
+        <label>
+        <input type="checkbox" id="dontShowAgain"> Don't show this popup again
+        </label>
+        <button id="closeDefaultPopup">Close</button>
+    `
+    document.body.appendChild(popup)
+    isDefaultPopupActive = true
+
+  
+
+
+    
+  
+}
+
+function addListenerToDefaultPopupCloseButton(){
+    const closeButton = document.getElementById('closeDefaultPopup')   
+    if(!closeButton)return
+
+    const popup = document.getElementsByClassName("defaultPopup")[0]
+
+ closeButton.addEventListener('click', function (event) {
+   event.stopPropagation()
+
+     const input = document.getElementById("dontShowAgain")
+
+
+     if(input.checked){
+         chrome.storage.local.set({ dontShowPopupAgain:true }, function () {})
+     }
+
+     popup.parentElement.removeChild(popup)
+     isDefaultPopupActive = false
+ })
+
+}
+

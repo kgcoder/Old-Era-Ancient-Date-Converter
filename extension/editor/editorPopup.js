@@ -32,16 +32,20 @@ const buttonIDs = [
     // 'bookTitleMode',
     // 'quoteMode',
     'test',
-    'sendToServer'
+    'sendToServer',
+    'startWikitextEditing'
 ]
+
+
 
 
 function addListenersToEditorButtons(){
     buttonIDs.forEach(id => {
-        if(id === "sendToServer"){
+        if(["sendToServer"].includes(id) ){
             const button = document.getElementById(id)
             button.disabled = true
         }
+
         document.getElementById(id).addEventListener('click', () => sendMsg(id), false)
     })
 }
@@ -65,6 +69,14 @@ async function sendMsg(message) {
       //  })
         return
     }
+    if(message === 'startWikitextEditing'){
+        isEditingWikitext = true
+        updateButtons()
+
+        chrome.storage.local.set({ isEditingWikitext }, function () {
+
+        })
+    }
     if (message === 'markerMode' || message === 'bookTitleMode' || message === 'quoteMode') {
    
         chrome.runtime.sendMessage(message,(response) => {
@@ -81,7 +93,9 @@ async function sendMsg(message) {
 function updateButtons() {
     buttonIDs.forEach(id => {
         const button = document.getElementById(id)
-        if(id === 'loadFromServer' || id === 'loadFromServerOnlyFixed' || id === 'loadFromServerWithoutFixed'){
+        if(id === 'startWikitextEditing'){
+            button.disabled = isEditingWikitext
+        }else if(id === 'loadFromServer' || id === 'loadFromServerOnlyFixed' || id === 'loadFromServerWithoutFixed'){
             button.disabled = isTestingMode || !isServerDataReady
         }else if (id === 'test') {
             button.innerHTML = isTestingMode ? 'Back to editing' : 'Test'

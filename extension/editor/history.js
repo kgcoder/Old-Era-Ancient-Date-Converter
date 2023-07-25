@@ -10,6 +10,7 @@ let currentIndexInHistory = -1
 
 
 function addToHistory(html) {
+    if(isDefaultPopupActive)return
     if (currentIndexInHistory < browserHistory.length - 1) {
         browserHistory = browserHistory.slice(0, currentIndexInHistory + 1)
     }
