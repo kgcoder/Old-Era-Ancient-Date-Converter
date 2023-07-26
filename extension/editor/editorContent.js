@@ -931,22 +931,12 @@ async function startWikitextEditing(){
     finalInstructions = finalInstructions.map(instruction => ({...instruction,string:removeEscapesFromSemicolons(instruction.string)}))
     console.log('final instructions',finalInstructions)
 
-   // chrome.runtime.sendMessage({"action": "openOptionsPage"});
 
-   
-    // chrome.runtime.sendMessage('openLocalPage',function(a){
-    //     console.log('a',a)
-    // })
-
-
-
-
-   // return
 
    let wikitext = ''
 
    try{
-       const response = await fetch(`https://en.wikipedia.org/w/api.php?action=parse&origin=*&page=${'Julius_Caesar'}&prop=wikitext&format=json&formatversion=2`)
+       const response = await fetch(`https://en.wikipedia.org/w/api.php?action=parse&origin=*&page=${titleInURL}&prop=wikitext&format=json&formatversion=2`)
     
        const json = await response.json()
        console.log('json',json)
@@ -966,8 +956,8 @@ async function startWikitextEditing(){
 
 
 
-    const regGT = new RegExp(">","g")
-    const regLT = new RegExp("<","g")
+    // const regGT = new RegExp(">","g")
+    // const regLT = new RegExp("<","g")
     const popup = document.createElement('div')
     popup.className = 'wikitextPopup'
     popup.innerHTML = `
@@ -975,8 +965,8 @@ async function startWikitextEditing(){
 		<textarea class="wikitextPopup-textarea" style="display: none;"></textarea>
         <iframe name="wikitextEditor" id="wikitextEditor" width="1000px" height="90%"></iframe>
 
-        <div style="overflow-y:scroll;width:400px;">
-        ${finalInstructions.map(item => `<p>${item.string.replace(regGT,"&gt;").replace(regLT,"&lt;")}</p>`).join("\n")}
+        <div class="sidebarWithDates">
+        ${finalInstructions.map(item => `<p>${markupDateInSideList(item.string,item.target,item.method,item.order,item.originalSubstitute)/*.replace(regGT,"&gt;").replace(regLT,"&lt;")*/}</p>`).join("\n")}
         </div>
     `
     document.body.appendChild(popup)
@@ -990,6 +980,43 @@ async function startWikitextEditing(){
         popup.parentElement.removeChild(popup)
     })
 
+}
+
+
+function markupDateInSideList(string,target,method,order,originalSubstitute){
+
+    if (!order) order = '1.1.1.1'
+
+    const orderChunks = order.split('.').map(chunk => parseInt(chunk, 10))
+    if (orderChunks.length !== 4) {
+        console.log('orderChunks.length !== 4')
+        return string
+    }
+
+    const target_oc = orderChunks[3]
+
+
+    const index = findIndexOfSubstringOccurrence(string, target, target_oc)
+
+    const left =  string.substr(0, index)
+
+    const right = string.substr(index + target.length,string.length - 1)
+
+
+    const finalString = left + `<span class="${method}" s="${originalSubstitute}">${target}</span>` + right
+
+    console.log('final',finalString)
+
+    console.log('string',string)
+    console.log('target',target)
+    console.log("left: @",left + "@")
+    console.log("right: @",right + "@")
+
+    console.log('index',index)
+
+
+
+    return finalString
 }
 
 
@@ -1041,6 +1068,8 @@ function showPopupWithInstructions(){
         window.open(url)
     })
 }
+
+
 
 
 

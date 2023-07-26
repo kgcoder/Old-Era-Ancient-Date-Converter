@@ -85,6 +85,14 @@ a.disabledLink{
     z-index: 9999;
 }
 
+.sidebarWithDates{
+    display: flex;
+    overflow-y:scroll;
+    width:400px;
+    flex-direction: column;
+    align-items: center;
+}
+
 .wikitextPopup-textarea{
     height:90%
 }
@@ -100,3 +108,65 @@ a.disabledLink{
     border: 1px solid #ccc;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
+
+
+.bc-y{
+    background-color: green;
+    color: white;
+}
+
+.bc-i{
+    background-color: pink;
+}
+
+.bc-y1{
+    background-color: gainsboro;
+}
+
+.bc-y2{
+    background-color: lightslategray;
+    color: white;
+}
+
+.bc-d{
+    background-color: olive;
+    color: white;
+}
+
+.bc-c{
+    background-color: orange;
+}
+
+.bc-00s{
+    background-color: coral;
+}
+
+.bc-m{
+    background-color: darkcyan;
+    color: white;
+}
+
+.bc-000s{
+    background-color: blueViolet;
+}
+
+.bc-r{
+    background-color: brown;
+    color: white;
+}
+
+.bc-tn{
+    background-color: aqua;
+}
+
+.bc-ot{
+    background-color: lime;
+}
+
+
+.bc-id{
+    background-color: dimgray;
+    color: white;
+
+}
+
