@@ -110,61 +110,61 @@ a.disabledLink{
 }
 
 
-.bc-y{
+.bc-editing-y{
     background-color: green;
     color: white;
 }
 
-.bc-i{
+.bc-editing-i{
     background-color: pink;
 }
 
-.bc-y1{
+.bc-editing-y1{
     background-color: gainsboro;
 }
 
-.bc-y2{
+.bc-editing-y2{
     background-color: lightslategray;
     color: white;
 }
 
-.bc-d{
+.bc-editing-d{
     background-color: olive;
     color: white;
 }
 
-.bc-c{
+.bc-editing-c{
     background-color: orange;
 }
 
-.bc-00s{
+.bc-editing-00s{
     background-color: coral;
 }
 
-.bc-m{
+.bc-editing-m{
     background-color: darkcyan;
     color: white;
 }
 
-.bc-000s{
+.bc-editing-000s{
     background-color: blueViolet;
 }
 
-.bc-r{
+.bc-editing-r{
     background-color: brown;
     color: white;
 }
 
-.bc-tn{
+.bc-editing-tn{
     background-color: aqua;
 }
 
-.bc-ot{
+.bc-editing-ot{
     background-color: lime;
 }
 
 
-.bc-id{
+.bc-editing-id{
     background-color: dimgray;
     color: white;
 

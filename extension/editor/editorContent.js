@@ -1003,7 +1003,7 @@ function markupDateInSideList(string,target,method,order,originalSubstitute){
     const right = string.substr(index + target.length,string.length - 1)
 
 
-    const finalString = left + `<span class="${method}" s="${originalSubstitute}">${target}</span>` + right
+    const finalString = left + `<span class="${method.replace('-','-editing-')}" s="${originalSubstitute}">${target}</span>` + right
 
     console.log('final',finalString)
 
