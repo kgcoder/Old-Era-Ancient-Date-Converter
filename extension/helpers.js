@@ -148,6 +148,10 @@ function addEscapesToSemicolons(text) {
     return text.replace(/;/g, '\\;')
 }
 
+function removeEscapesFromSemicolons(text){
+    return text.replace(/\\;/g,';')
+}
+
 
 function getEditFromLine(line){
     const chunks = chunksFromLine(line)

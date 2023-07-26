@@ -590,7 +590,7 @@ function removeListeners(node) {
 
 
 
-function createInstructions() {
+function createInstructions(noHtml = false) {
 
     const occurrencesOfRawStrings = []
 
@@ -661,7 +661,7 @@ function createInstructions() {
 
     
     
-    if(!isOnWikipedia){
+    if(!isOnWikipedia || noHtml){
         const filteredCleanTexts = cleanTexts.filter(cleanTextObj => cleanTextObj.method !== 'text')
         const instructions = getFinalReplacementsForWeb(cleanHTML,filteredCleanTexts)
         return instructions
@@ -922,28 +922,76 @@ async function sendToServer() {
 }
 
 
+
+
 async function startWikitextEditing(){
     if(!isOnWikipedia)return
-    console.log('yes')
 
+    finalInstructions = createInstructions(true)
+    finalInstructions = finalInstructions.map(instruction => ({...instruction,string:removeEscapesFromSemicolons(instruction.string)}))
+    console.log('final instructions',finalInstructions)
+
+   // chrome.runtime.sendMessage({"action": "openOptionsPage"});
+
+   
+    // chrome.runtime.sendMessage('openLocalPage',function(a){
+    //     console.log('a',a)
+    // })
+
+
+
+
+   // return
+
+   let wikitext = ''
+
+   try{
+       const response = await fetch(`https://en.wikipedia.org/w/api.php?action=parse&origin=*&page=${'Julius_Caesar'}&prop=wikitext&format=json&formatversion=2`)
+    
+       const json = await response.json()
+       console.log('json',json)
+       wikitext = json.parse.wikitext
+
+   }catch(e){
+    console.log(e)
+    return
+   }
+
+
+   if(!wikitext)return
+
+   wikitext = moveRefsToBottom(wikitext)
+
+
+
+
+
+    const regGT = new RegExp(">","g")
+    const regLT = new RegExp("<","g")
     const popup = document.createElement('div')
     popup.className = 'wikitextPopup'
     popup.innerHTML = `
         <a href="#" id="wikitextPopupCloseButton" class="popup-close">&times;</a>
-		<textarea class="popup-input">hello</textarea>
-		<a href="#" class="popup-link">Copy to clipboard and open data page on the server</a>
+		<textarea class="wikitextPopup-textarea" style="display: none;"></textarea>
+        <iframe name="wikitextEditor" id="wikitextEditor" width="1000px" height="90%"></iframe>
+
+        <div style="overflow-y:scroll;width:400px;">
+        ${finalInstructions.map(item => `<p>${item.string.replace(regGT,"&gt;").replace(regLT,"&lt;")}</p>`).join("\n")}
+        </div>
     `
     document.body.appendChild(popup)
+    wikitextEditor.document.designMode = "on";
+    wikitextEditor.document.body.innerHTML = wikitext
 
     const closeButton = popup.getElementsByClassName('popup-close')[0]
     closeButton.addEventListener('click', () => {
-        console.log('click')
         chrome.storage.local.set({ isEditingWikitext:false }, function () {})
         chrome.runtime.sendMessage('wikitextEditingPopupClosed')
         popup.parentElement.removeChild(popup)
     })
 
 }
+
 
 
 function showPopupWithInstructions(){

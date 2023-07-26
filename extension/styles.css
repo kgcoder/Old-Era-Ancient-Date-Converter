@@ -69,18 +69,24 @@ a.disabledLink{
 
 .wikitextPopup {
     position: fixed;
+    display: flex;
+
     bottom: 20px;
     left: 20px;
     background-color: #fff;
     border: 1px solid #ccc;
     padding: 20px;
     box-shadow: 0 0 10px rgba(0,0,0,0.3);
-    width:1000px;
-    height:600px;
-    max-width: 80%;
+    width:90%;
+    height:60%;
+    max-width: 100%;
     max-height: 80%;
     overflow: auto;
     z-index: 9999;
+}
+
+.wikitextPopup-textarea{
+    height:90%
 }
 
 .defaultPopup {
