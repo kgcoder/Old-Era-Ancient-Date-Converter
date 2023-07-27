@@ -448,68 +448,12 @@ function createHTMLWithMarkersForEditor(editsFromServer,shouldFixBrokenEdits = f
 function replaceCurlyBracesWithMarkup(html) {
     const pattern = new RegExp('\\{\\{(.*?)\\|(.*?)\\|(.*?)\\|(.*?)\\|(.*?)\\}\\}', 'g')
     return html.replace(pattern, (match, method, target, type, originalSubstitute,fromTemplate) => {
-        let color = 'red;color:white'
         if (originalSubstitute) {
             target = target + '_substitute_' + originalSubstitute
         }
-        switch (method) {
-            case 'bc-y':
-            case 'bc-y-r1':
-            case 'bc-y-r2':
-                color = 'green;color:white'
-                break
-            case 'ad-y':
-                color = 'rosyBrown'
-                break
-            case 'bc-y1':
-                color = 'gainsboro'
-                break
-            case 'bc-y2':
-                color = 'lightslategray;color:white'
-                break
-            case 'bc-i':
-            case 'bc-i-r1':
-            case 'bc-i-r2':
-                color = 'pink'
-                break
-            case 'bc-d':
-                color = 'olive;color:white'
-                break
-            case 'bc-c':
-                color = 'orange'
-                break
-            case 'bc-00s':
-                color = 'coral'
-                break
-            case 'bc-m':
-                color = 'darkcyan;color:white'
-                break
-            case 'bc-000s':
-                color = 'blueViolet'
-                break
-            case 'bc-r':
-                color = 'brown;color:white'
-                break
-            case 'bc-tn':
-                color = 'aqua'
-                break
-            case 'bc-ot':
-                color = 'lime'
-                break
-            case 'bc-ig':
-                color = 'dimgray;color:white'
-                break
-            default:
-                color = 'red;color:white'
-        }
 
-        // if (type === 'quote') {
-        //     color = 'violet'
-        // } else if (type === 'bookTitle') {
-        //     color = 'blue'
-        // }
-     
-
+        const color = getColorForMethod(method)
+       
         return `<selection class="${method}" data-t="${fromTemplate}" style="background-color:${color};">${target}</selection>`
     })
 
@@ -950,14 +894,30 @@ async function startWikitextEditing(){
 
    if(!wikitext)return
 
+  // console.log('original wikitext',wikitext)
+
+   wikitext = escapeHtml(wikitext)
+
+   //const originalText = wikitext
+
+  // console.log('escaped wikitext:',wikitext)
    wikitext = moveRefsToBottom(wikitext)
 
 
+   //const testWikitext = moveRefsBack(wikitext)
+
+//    if(originalText == testWikitext){
+//     console.log('texts are equal')
+//    }else{
+//     console.log('texts are not equal')
+//    }
 
 
 
-    // const regGT = new RegExp(">","g")
-    // const regLT = new RegExp("<","g")
+  // console.log(' wikitext with moved refs',wikitext)
+
+
+
     const popup = document.createElement('div')
     popup.className = 'wikitextPopup'
     popup.innerHTML = `
@@ -971,6 +931,9 @@ async function startWikitextEditing(){
     `
     document.body.appendChild(popup)
     wikitextEditor.document.designMode = "on";
+
+    wikitext = findDatesInWikitext(finalInstructions,wikitext)
+
     wikitextEditor.document.body.innerHTML = wikitext
 
     const closeButton = popup.getElementsByClassName('popup-close')[0]
@@ -989,7 +952,7 @@ function markupDateInSideList(string,target,method,order,originalSubstitute){
 
     const orderChunks = order.split('.').map(chunk => parseInt(chunk, 10))
     if (orderChunks.length !== 4) {
-        console.log('orderChunks.length !== 4')
+        console.log('orderChunks.length !== 4 (in a date for wikitext)')
         return string
     }
 
@@ -1004,17 +967,6 @@ function markupDateInSideList(string,target,method,order,originalSubstitute){
 
 
     const finalString = left + `<span class="${method.replace('-','-editing-')}" s="${originalSubstitute}">${target}</span>` + right
-
-    console.log('final',finalString)
-
-    console.log('string',string)
-    console.log('target',target)
-    console.log("left: @",left + "@")
-    console.log("right: @",right + "@")
-
-    console.log('index',index)
-
-
 
     return finalString
 }

@@ -595,3 +595,43 @@ function getThreeChunksFromHtml(){
     }
     return chunks
 }
+
+
+function getColorForMethod(method){
+    switch (method) {
+        case 'bc-y':
+        case 'bc-y-r1':
+        case 'bc-y-r2':
+            return 'green;color:white'
+        case 'ad-y':
+            return 'rosyBrown'
+        case 'bc-y1':
+            return 'gainsboro'
+        case 'bc-y2':
+            return 'lightslategray;color:white'
+        case 'bc-i':
+        case 'bc-i-r1':
+        case 'bc-i-r2':
+            return 'pink'
+        case 'bc-d':
+            return 'olive;color:white'
+        case 'bc-c':
+            return 'orange'
+        case 'bc-00s':
+            return 'coral'
+        case 'bc-m':
+            return 'darkcyan;color:white'
+        case 'bc-000s':
+            return 'blueViolet'
+        case 'bc-r':
+            return 'brown;color:white'
+        case 'bc-tn':
+            return 'aqua'
+        case 'bc-ot':
+            return 'lime'
+        case 'bc-ig':
+            return 'dimgray;color:white'
+        default:
+            return 'red;color:white'
+    }
+}
