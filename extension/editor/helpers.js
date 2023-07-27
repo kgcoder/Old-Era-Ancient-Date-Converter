@@ -571,23 +571,25 @@ function getThreeChunksFromHtml(){
     const text1 = startContainer.data
     if (!text1) return null
 
-    const newText1 = text1.slice(0, startOffset) + '__selection__' + text1.slice(startOffset, text1.length)
+    const selectionLabel = '__selection__'
+
+    const newText1 = text1.slice(0, startOffset) + selectionLabel + text1.slice(startOffset, text1.length)
     
 
     const text2 = endContainer.data
     if (!text2) return null
     if (startContainer === endContainer) {
-        endOffset += 13
+        endOffset += selectionLabel.length
     }
     startContainer.data = newText1
-    const newText2 = text2.slice(0, endOffset) + '__selection__' + text2.slice(endOffset, text2.length)
+    const newText2 = text2.slice(0, endOffset) + selectionLabel + text2.slice(endOffset, text2.length)
 
     endContainer.data = newText2
 
 
     let html = new XMLSerializer().serializeToString(document.body)
     html = removeProblematicPartsFromHtml(html)
-    const chunks = html.split('__selection__')
+    const chunks = html.split(selectionLabel)
     if(chunks.length != 3){
         currentHTML = chunks.join("")
         setBodyFromCurrentHTML()

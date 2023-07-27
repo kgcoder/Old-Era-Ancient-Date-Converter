@@ -5,52 +5,55 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+function commitColor(className,color){
+    isEditingWikitext ? addColorToWikitext(color) : replaceMarkers(className, color)
 
+}
 function commitYears() {
-    replaceMarkers('bc-y', 'green;color:white')
+    commitColor('bc-y', 'green;color:white')
 }
 
 function commitADYears() {
-    replaceMarkers('ad-y', 'rosyBrown')
+    commitColor('ad-y', 'rosyBrown')
 }
 
 
 function commitDecades() {
-    replaceMarkers('bc-d', 'olive;color:white')
+    commitColor('bc-d', 'olive;color:white')
 }
 
 
 function commitCenturies() {
-    replaceMarkers('bc-c', 'orange')
+    commitColor('bc-c', 'orange')
 }
 
 function commit00s() {
-    replaceMarkers('bc-00s', 'coral')
+    commitColor('bc-00s', 'coral')
 }
 
 function commitMillennia() {
-    replaceMarkers('bc-m', 'darkcyan;color:white')
+    commitColor('bc-m', 'darkcyan;color:white')
 }
 
 function commit000s() {
-    replaceMarkers('bc-000s', 'blueViolet')
+    commitColor('bc-000s', 'blueViolet')
 }
 
 function commitRemovals() {
-    replaceMarkers('bc-r', 'brown;color:white')
+    commitColor('bc-r', 'brown;color:white')
 }
 
 
 function commitOE() {
-    replaceMarkers('bc-tn', 'aqua')
+    commitColor('bc-tn', 'aqua')
 }
 
 function commitOfOE() {
-    replaceMarkers('bc-ot', 'lime')
+    commitColor('bc-ot', 'lime')
 }
 
 function commitIgnoredPart() {
-    replaceMarkers('bc-ig', 'dimgray;color:white')
+    commitColor('bc-ig', 'dimgray;color:white')
 }
 
 

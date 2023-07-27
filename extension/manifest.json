@@ -22,8 +22,8 @@
                 "pageChecker.js",
                 "summaryManager.js",
                 "editor/history.js",
-                "editor/wikitextEditor.js",
                 "editor/editorContent.js",
+                "editor/wikitextEditor.js",
                 "editor/selectors.js",
                 "editor/committers.js",
                 "content.js"

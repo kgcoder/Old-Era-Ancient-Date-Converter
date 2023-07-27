@@ -70,7 +70,6 @@ function moveRefsBack(wikitext) {
   console.log('refsText',refsText)
   
   let index = 1
-  //let result
   while (1) {
       const reg = new RegExp(`REFERENCE_NUMBER_${index}:([\\s\\S]*?)END_OF_REFERENCE_NUMBER_${index}`,'m')
     const result = refsText.match(reg)
@@ -97,6 +96,7 @@ function findDatesInWikitext(instructions, wikitext){
     let replacements = []
 
 
+    console.log('instructions inside findDatesInWikitext',instructions)
     let indexOfLastFoundDate = 0
     for(let i = 0;i < instructions.length; i++){
         const instruction = instructions[i]
@@ -108,8 +108,8 @@ function findDatesInWikitext(instructions, wikitext){
 
     replacements = replacements.sort((a,b) => a.index - b.index)
 
-    console.log('instructions!',instructions)
-    console.log('replacements',replacements)
+   // console.log('instructions!',instructions)
+    //console.log('replacements',replacements)
 
 
     let result = ''
@@ -127,6 +127,8 @@ function findDatesInWikitext(instructions, wikitext){
     })
 
     result += wikitext.substr(lastIndex, wikitext.length - lastIndex)
+
+    console.log('instructions by the end of findDatesInWikitext',instructions)
 
     return result
 }
@@ -150,8 +152,7 @@ function findOneDateInWikitext(instruction, wikitext,replacements, indexOfLastFo
     const reg = new RegExp(escapeText(target),'gm')
 
     let allCounts = []// {count,index}[]
-    let highestCount = 0
-    let closestIndex = -1
+
     let result;
     while ((result = reg.exec(wikitext))){
 
@@ -172,9 +173,7 @@ function findOneDateInWikitext(instruction, wikitext,replacements, indexOfLastFo
         const leftSnapshot = wikitext.substr(firstIndex, innerIndex)
         const rightSnapshot = wikitext.substr(result.index + target.length,string.length - innerIndex - target.length)
 
-        // console.log("string",string)
        
-        
         const leftCount = testLeftPartSimilarity(leftString,leftSnapshot)
         const rightCount = testRightPartSimilarity(rightString,rightSnapshot)
 
@@ -182,48 +181,17 @@ function findOneDateInWikitext(instruction, wikitext,replacements, indexOfLastFo
         const totalCount = leftCount + rightCount
 
 
-        console.log('testing:',string)
-        console.log('target:',target)
-        console.log('result',result)
 
-        const snapshot = wikitext.substr(result.index - 15, 15 + target.length + 15)
-        console.log('snap:',snapshot)
-        console.log('score:',totalCount)
-
-        if(totalCount > 10){
-            console.log("leftString",leftString)
-            console.log('leftSnapshot',leftSnapshot)
-            console.log('leftCount',leftCount)
-    
-            console.log("rightString",rightString)
-            console.log("rightSnapshot",rightSnapshot)
-            console.log('rightCount',rightCount)
-        }
-
-     
-
-      //  console.log('total count',totalCount)
-
-
-      if(totalCount > 8 && result.index > indexOfLastFoundDate){
+      if(totalCount > 8){
           allCounts.push({count:totalCount,index:result.index})
       }
 
 
-        // if(totalCount > highestCount){
-        //     highestCount = totalCount
-        //     closestIndex = result.index
-        // }
-
+   
     }
-   // console.log('highest count',highestCount)
 
     allCounts = allCounts.sort((a,b) => b.count - a.count)
 
-
-   // allCounts = allCounts.slice(0,string_num_of_oc)
-    console.log('string_num_of_oc',string_num_of_oc)
-    console.log('trimmed array', allCounts)
 
     allCounts = allCounts.sort((a,b) => a.index - b.index)
 
@@ -232,28 +200,19 @@ function findOneDateInWikitext(instruction, wikitext,replacements, indexOfLastFo
         
         const foundIndex = allCounts[indexInAllCounts].index
         const exists = replacements.findIndex(rep => rep.index === foundIndex)
-        if(exists === -1){
+        if(exists === -1 && foundIndex > indexOfLastFoundDate){
             replacements.push({
                 instruction,
                 index:foundIndex
             })
             return foundIndex
         }else{
+            instruction.isSus = true
             indexInAllCounts++
         }
     }
-
+    instruction.notFound = true
     return -1
-
-
-   // console.log('allCounts',allCounts)
-
-
-   // if(highestCount < 8)return -1
-  // if(!allCounts.length) return -1
-
-  //  return allCounts[string_oc - 1].index
-
 
 }
 
@@ -308,36 +267,72 @@ function testRightPartSimilarity(mainRightString,rightSampleString){
     return count
 }
 
-// function testStringSimilarity(mainString, sampleString){
-
-//     let highestCount = 0
-
-//     for(let shift = -mainString.length + 1; shift <= mainString.length - 1;shift++){
-//         let counter = 0
-//         for(let i = 0; i < mainString.length;i++){
-//             const charToFind = mainString[i]
-//             const indexInSample = -shift + i
-//             if(indexInSample < 0 || indexInSample > sampleString.length - 1)continue
-//             const charInSample = sampleString[indexInSample]
-//             if(charInSample === charToFind){
-//                 counter++
-//             }
-    
-//         }
-
-//         if(counter > highestCount){
-//             highestCount = counter
-//         }
-
-//     }
 
 
-//     return highestCount
 
 
-// }
+
+function addColorToWikitext(color){
+    const selection = wikitextEditor.getSelection()
+    const range = selection.getRangeAt(0)
+
+    const {startOffset, endOffset,startContainer} = range
+
+    const selectedText = startContainer.data.substr(startOffset,endOffset - startOffset)
 
 
+
+    wikitextEditor.document.execCommand('insertHTML', false, `<span style="background-color:${color};">${selectedText}</span>`);
+
+
+   currentWikitext = wikitextEditor.document.body.innerHTML
+
+   
+
+}
+
+
+async function clearSelectionInWikitext() {
+
+
+
+   wikitextEditor.document.execCommand("backColor", false, "yellow");
+
+
+    const newWikitext = wikitextEditor.document.body.innerHTML;
+
+    const twoChunks = newWikitext.split('<span style="background-color: yellow;">')
+    if(twoChunks.length != 2)return
+
+    const reg = new RegExp('(<span style="color: white;">([\\s\\S]*?)</span>|</span>)', 'gm')
+
+    let rightSide = twoChunks[1]
+
+
+   let reachedEndOfYellowText = false
+
+   rightSide = rightSide.replace(reg, (match, all,inner) => {
+   
+    if(reachedEndOfYellowText)return match
+    if(match === '</span>'){
+        reachedEndOfYellowText = true
+        return ""
+    }
+
+    return inner
+    })
+
+
+
+    currentWikitext = twoChunks[0] + rightSide
+
+    renderCurrentWikitext()
+  
+  }
+
+function renderCurrentWikitext(){
+    wikitextEditor.document.body.innerHTML = currentWikitext
+}
 
 
 

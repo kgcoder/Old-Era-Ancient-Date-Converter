@@ -243,6 +243,13 @@ function roundYearsInRange(){
 
 function deleteInRange() {
     if(shouldReturnBecauseOfTestingMode())return
+
+    if(isEditingWikitext){
+        clearSelectionInWikitext()
+        return
+    }
+
+
     const chunks = getThreeChunksFromHtml()
     if(!chunks) return
     const pattern = new RegExp('<selection class=".*?".*?>(.*?)(_substitute_.*?)?</selection>', 'g')

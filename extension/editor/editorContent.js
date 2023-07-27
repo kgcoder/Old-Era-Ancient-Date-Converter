@@ -30,6 +30,8 @@ let localReplacementsArray = []
 
 let isDefaultPopupActive = false
 
+let currentWikitext = ""
+
 const allClassesString = allClasses.join('|')
 
 
@@ -916,6 +918,12 @@ async function startWikitextEditing(){
 
   // console.log(' wikitext with moved refs',wikitext)
 
+  finalInstructions.push({string:"fsfsfsfsgqqss",target:"fsfsg",method:"bc-y"})
+    currentWikitext = findDatesInWikitext(finalInstructions,wikitext)
+
+    
+
+   // console.log('instructions!',instructions)
 
 
     const popup = document.createElement('div')
@@ -926,19 +934,26 @@ async function startWikitextEditing(){
         <iframe name="wikitextEditor" id="wikitextEditor" width="1000px" height="90%"></iframe>
 
         <div class="sidebarWithDates">
-        ${finalInstructions.map(item => `<p>${markupDateInSideList(item.string,item.target,item.method,item.order,item.originalSubstitute)/*.replace(regGT,"&gt;").replace(regLT,"&lt;")*/}</p>`).join("\n")}
+            
+            ${finalInstructions.map(item => `
+            <div class="sideListRow">
+                <span class="sideListExclamation">${item.isSus ? "!" : (item.notFound ? "!!" : " ")}</span>
+                <div class="sideListTextContainer"><p>${markupDateInSideList(item.string,item.target,item.method,item.order,item.originalSubstitute)}</p></div>
+            </div>
+            `).join("\n")}
+           
         </div>
     `
     document.body.appendChild(popup)
     wikitextEditor.document.designMode = "on";
 
-    wikitext = findDatesInWikitext(finalInstructions,wikitext)
 
-    wikitextEditor.document.body.innerHTML = wikitext
+    renderCurrentWikitext()
 
     const closeButton = popup.getElementsByClassName('popup-close')[0]
     closeButton.addEventListener('click', () => {
-        chrome.storage.local.set({ isEditingWikitext:false }, function () {})
+        isEditingWikitext = false
+        chrome.storage.local.set({ isEditingWikitext }, function () {})
         chrome.runtime.sendMessage('wikitextEditingPopupClosed')
         popup.parentElement.removeChild(popup)
     })
