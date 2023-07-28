@@ -616,6 +616,8 @@ function getColorForMethod(method){
         case 'bc-i-r2':
             return 'pink'
         case 'bc-d':
+        case 'bc-sd':
+        case 'bc-dp':
             return 'olive;color:white'
         case 'bc-c':
             return 'orange'
