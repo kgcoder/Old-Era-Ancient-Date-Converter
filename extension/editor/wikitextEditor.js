@@ -1,30 +1,8 @@
 let wikiCache = "";
-const SEPARATION_LINE = "<br/>==!!!DON'T CHANGE THIS LINE OR ANY REFERENCE LABEL TAGS!!!==<br/>"
-// function iframe() {
-//   editor.document.designMode = "on";
-//   editor.document.addEventListener("keydown", function onEvent(event) {
-//     if (event.key === "Alt") {
-//       clearSelection();
-//     } else if (event.key === "Control") {
-//       makeRed();
-//     } else {
-//       //console.log(event.key);
-//     }
-//   });
-// }
+const SEPARATION_LINE = "==!!!DON'T CHANGE THIS LINE OR ANY REFERENCE LABEL TAGS!!!=="
 
+let markupGenerated = false
 
-
-
-
-
-
-
-// function makeRed() {
-//   const html = editor.document.body.innerHTML;
-//   cache = html;
-//   editor.document.execCommand("backColor", false, "red");
-// }
 
 function goBack() {
   if (cache) {
@@ -64,10 +42,6 @@ function moveRefsBack(wikitext) {
   wikiCache = wikitext;
 
   let [mainText, refsText] = wikitext.split(SEPARATION_LINE)
-
-  console.log('mainText',mainText)
-
-  console.log('refsText',refsText)
   
   let index = 1
   while (1) {
@@ -90,13 +64,11 @@ function moveRefsBack(wikitext) {
 }
 
 function findDatesInWikitext(instructions, wikitext){
-    console.log('findDatesInWikitext')
     if(!instructions.length)return wikitext
 
     let replacements = []
 
 
-    console.log('instructions inside findDatesInWikitext',instructions)
     let indexOfLastFoundDate = 0
     for(let i = 0;i < instructions.length; i++){
         const instruction = instructions[i]
@@ -108,8 +80,6 @@ function findDatesInWikitext(instructions, wikitext){
 
     replacements = replacements.sort((a,b) => a.index - b.index)
 
-   // console.log('instructions!',instructions)
-    //console.log('replacements',replacements)
 
 
     let result = ''
@@ -287,14 +257,11 @@ function addColorToWikitext(color){
 
    currentWikitext = wikitextEditor.document.body.innerHTML
 
-   
 
 }
 
 
 async function clearSelectionInWikitext() {
-
-
 
    wikitextEditor.document.execCommand("backColor", false, "yellow");
 
@@ -322,8 +289,6 @@ async function clearSelectionInWikitext() {
     return inner
     })
 
-
-
     currentWikitext = twoChunks[0] + rightSide
 
     renderCurrentWikitext()
@@ -335,5 +300,81 @@ function renderCurrentWikitext(){
 }
 
 
+function addSubstituteInWikitext(){
+    wikitextEditor.document.execCommand("insertText", false, "_substitute_");
+}
 
+function addBCInWikitext(){
+    wikitextEditor.document.execCommand("insertText", false, "&nbsp;BC");
+}
+
+function addBCEInWikitext(){
+    wikitextEditor.document.execCommand("insertText", false, "&nbsp;BCE");
+}
+
+function generateWikiMarkup(){
+    const existingWikitext = wikitextEditor.document.body.innerHTML;
+
+    const reg = new RegExp('<span style="background-color:(.*?);">(.*?)</span>','gm')
+
+    const intermediateWiki = existingWikitext.replace(reg, (match,color,content) => {
+        // console.log('match',match)
+        // console.log('color',color)
+        // console.log('content',content)
+
+        const markupClass = colorToMarkupClass[color]
+
+        return `{{${markupClass}|${content}}}`
+
+
+    })
+
+    wikitextEditor.document.body.innerHTML = moveRefsBack(intermediateWiki)
+
+
+    markupGenerated = true
+
+
+
+
+}
+
+function copyWikitextToClipboard(){
+    showToast()
+}
+
+function openEditorOnWikipedia(){
+    const url = `https://en.wikipedia.org/w/index.php?title=${titleInURL}&action=edit`
+    window.open(url)
+}
+
+
+
+async function showToast() {
+
+    const toast = document.createElement('div');
+    toast.className = 'toast'
+
+    try {
+        if(markupGenerated){
+        await navigator.clipboard.writeText(wikitextEditor.document.body.innerHTML);
+            toast.innerText = "Wikitext copied to clipboard"
+        }else{
+            toast.innerText = "Wikitext is not ready to be copied"
+        }
+
+
+    } catch (err) {
+        toast.innerText = "Copy to clipboard failed"
+
+        console.error('Failed to copy to clipboard: ', err);
+    }
+
+    document.body.appendChild(toast)
+    setTimeout(() => {
+
+        toast.parentElement.removeChild(toast)
+     // toast.classList.add('hide');
+    }, 3000); // Hide the toast after 3 seconds
+  }
 

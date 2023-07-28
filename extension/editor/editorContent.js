@@ -32,6 +32,8 @@ let isDefaultPopupActive = false
 
 let currentWikitext = ""
 
+
+
 const allClassesString = allClasses.join('|')
 
 
@@ -901,8 +903,6 @@ function findTemplatesInHtml(html){
     let result 
     while((result = reg.exec(html))){
         if(result[0] === "</table>"){
-            //console.log('stack before pop',stack)
-            console.log('about to remove. in stack:',stack.length)
             if(!stack.length)continue 
             const currentTable = stack[stack.length - 1]
             currentTable.endIndex = result.index + "</table>".length
@@ -912,7 +912,6 @@ function findTemplatesInHtml(html){
             const currentTable = stack[stack.length - 1]
             currentTable.isTemplate = true
         }else{
-            console.log('found this:',result[0])
             const startIndex = result.index
             const tableObj = {startIndex,endIndex:-1,childTables:[],isTemplate:false}
             if(stack.length){
@@ -923,15 +922,8 @@ function findTemplatesInHtml(html){
             }
             stack.push(tableObj)
 
-            console.log('add. in stack:',stack.length)
-
-           //console.log('after adding table',allTablesArray)
-            //console.log('stack',stack)
         }
     }
-
-
-    console.log('tables info:',allTablesArray)
 
 
 
@@ -939,13 +931,10 @@ function findTemplatesInHtml(html){
     for(let tableInfo of allTablesArray){
       
         const ranges = getProhibitedRangesFromTemplateInfo(tableInfo)
-        console.log('found ranges',ranges)
         if(ranges && ranges.length){
-            console.log('concatinating')
             prohibitedRanges = prohibitedRanges.concat(ranges)
         }
     }
-   // console.log('prohibitedRanges',prohibitedRanges)
 
 
     return prohibitedRanges
@@ -955,7 +944,6 @@ function findTemplatesInHtml(html){
 
 
 function getProhibitedRangesFromTemplateInfo(oneTableInfo){
-    console.log('checking tableInfo:',oneTableInfo)
     if(oneTableInfo.isTemplate) return [{startIndex:oneTableInfo.startIndex, endIndex:oneTableInfo.endIndex}]
     let result = []
     for(let childTable of oneTableInfo.childTables){
@@ -976,10 +964,6 @@ async function startWikitextEditing(){
 
     finalInstructions = createInstructions(true)
     finalInstructions = finalInstructions.map(instruction => ({...instruction,string:removeEscapesFromSemicolons(instruction.string)}))
-    console.log('final instructions',finalInstructions)
-
-
-  //  findTemplatesInHtml()
 
 
    let wikitext = ''
@@ -988,7 +972,6 @@ async function startWikitextEditing(){
        const response = await fetch(`https://en.wikipedia.org/w/api.php?action=parse&origin=*&page=${titleInURL}&prop=wikitext&format=json&formatversion=2`)
     
        const json = await response.json()
-       console.log('json',json)
        wikitext = json.parse.wikitext
 
    }catch(e){
@@ -999,42 +982,37 @@ async function startWikitextEditing(){
 
    if(!wikitext)return
 
-  // console.log('original wikitext',wikitext)
 
    wikitext = escapeHtml(wikitext)
 
-   //const originalText = wikitext
 
-  // console.log('escaped wikitext:',wikitext)
    wikitext = moveRefsToBottom(wikitext)
 
-
-   //const testWikitext = moveRefsBack(wikitext)
-
-//    if(originalText == testWikitext){
-//     console.log('texts are equal')
-//    }else{
-//     console.log('texts are not equal')
-//    }
-
-
-
-  // console.log(' wikitext with moved refs',wikitext)
-
-//  finalInstructions.push({string:"fsfsfsfsgqqss",target:"fsfsg",method:"bc-y"})
     currentWikitext = findDatesInWikitext(finalInstructions,wikitext)
 
     
-
-   // console.log('instructions!',instructions)
-
 
     const popup = document.createElement('div')
     popup.className = 'wikitextPopup'
     popup.innerHTML = `
         <a href="#" id="wikitextPopupCloseButton" class="popup-close">&times;</a>
-		<textarea class="wikitextPopup-textarea" style="display: none;"></textarea>
-        <iframe name="wikitextEditor" id="wikitextEditor" width="1000px" height="90%"></iframe>
+        <div class="wikitextPopupLeftColumn">
+            <textarea class="wikitextPopup-textarea" style="display: none;"></textarea>
+            <iframe name="wikitextEditor" id="wikitextEditor" width="100%" height="90%"></iframe>
+       
+            <div class="wikitextPopupBottomBar">
+                <button id="wikitextPopupSubsButton">__substitute__</button>
+                <button id="wikitextPopupBCButton">&amp;nbsp;BC</button>
+                <button id="wikitextPopupBCEButton">&amp;nbsp;BCE</button>
+                <button id="generateMarkupButton">Generate markup</button>
+                <button id="copyWikitextButton">Copy</button>
+                <button id="gotoWikipediaButton">Go to Wikipedia</button>
+
+
+
+            </div>
+       
+         </div>
 
         <div class="sidebarWithDates">
             
@@ -1050,6 +1028,8 @@ async function startWikitextEditing(){
     document.body.appendChild(popup)
     wikitextEditor.document.designMode = "on";
 
+    markupGenerated = false
+
 
     renderCurrentWikitext()
 
@@ -1061,6 +1041,28 @@ async function startWikitextEditing(){
         popup.parentElement.removeChild(popup)
     })
 
+
+    const subsButton = document.getElementById('wikitextPopupSubsButton')
+    subsButton.addEventListener('click', addSubstituteInWikitext)
+    
+    const bcButton = document.getElementById('wikitextPopupBCButton')
+    bcButton.addEventListener('click', addBCInWikitext)
+
+    const bceButton = document.getElementById('wikitextPopupBCEButton')
+    bceButton.addEventListener('click', addBCEInWikitext)
+
+    const generateWikiMarkupButton = document.getElementById('generateMarkupButton')
+    generateWikiMarkupButton.addEventListener('click', generateWikiMarkup)
+
+    const copyWikitextButton = document.getElementById('copyWikitextButton')
+    copyWikitextButton.addEventListener('click', copyWikitextToClipboard)
+
+    const openWikipediaButton = document.getElementById('gotoWikipediaButton')
+    openWikipediaButton.addEventListener('click', openEditorOnWikipedia)
+
+
+  
+    
 }
 
 

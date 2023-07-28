@@ -87,6 +87,8 @@ if(document.readyState === "loading"){
 )
 
 
+chrome.storage.local.set({isEditingWikitext:false})
+
 function getConfigFromLocalStorage(callback){
         chrome.storage.local.get(['isExtensionOff', 'isEditingMode', 'shouldNotUseServer', 
         'shouldTranslateYearsPrecisely', 'shouldTranslateDatesInBookTitles', 
