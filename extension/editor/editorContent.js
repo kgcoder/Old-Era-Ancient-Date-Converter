@@ -554,11 +554,6 @@ function createInstructions(forWikitext = false) {
     }
 
 
-
-    console.log('igHtml',ignHtml)
-
-
-
     while ((result = pattern.exec(ignHtml))) {
         const method = result[1]
         const fromTemplate = result[2]
@@ -619,11 +614,9 @@ function createInstructions(forWikitext = false) {
     if(!isOnWikipedia || forWikitext){
         let filteredCleanTexts = cleanTexts.filter(cleanTextObj => cleanTextObj.method !== 'text')
        
-        console.log('filteredCleanTexts',filteredCleanTexts)
 
         if(forWikitext && !titleInURL.includes("Template:")){
             const prohibitedRanges = findTemplatesInHtml(ignHtml)
-            console.log('prohibitedRanges',prohibitedRanges)
             filteredCleanTexts = filteredCleanTexts.filter(item => {
                 for(let prohibitedRange of prohibitedRanges){
                     if(item.index > prohibitedRange.startIndex && item.index < prohibitedRange.endIndex) return false

@@ -47,10 +47,9 @@ function moveRefsBack(wikitext) {
   while (1) {
       const reg = new RegExp(`REFERENCE_NUMBER_${index}:([\\s\\S]*?)END_OF_REFERENCE_NUMBER_${index}`,'m')
     const result = refsText.match(reg)
-    console.log('ref result',result)
     if (!result){ 
-        console.log("didn't find ref " + index)
-        break;}
+        break
+    }
 
     const string = result[1].replace(/>/gm, "&gt;").replace(/</gm,"&lt;")
     mainText = mainText.replace(`@@@REFERENCE_NUMBER_${index}@@@`, string)
@@ -98,7 +97,6 @@ function findDatesInWikitext(instructions, wikitext){
 
     result += wikitext.substr(lastIndex, wikitext.length - lastIndex)
 
-    console.log('instructions by the end of findDatesInWikitext',instructions)
 
     return result
 }
@@ -318,13 +316,17 @@ function generateWikiMarkup(){
     const reg = new RegExp('<span style="background-color:(.*?);">(.*?)</span>','gm')
 
     const intermediateWiki = existingWikitext.replace(reg, (match,color,content) => {
-        // console.log('match',match)
-        // console.log('color',color)
-        // console.log('content',content)
-
+ 
         const markupClass = colorToMarkupClass[color]
 
-        return `{{${markupClass}|${content}}}`
+        const chunks = content.split("_substitute_")
+
+        if(chunks.length === 2){
+            return `{{${markupClass}|${chunks[0]}|${chunks[1]}}}`
+        }else{
+            return `{{${markupClass}|${content}}}`
+        }
+
 
 
     })
