@@ -536,7 +536,7 @@ function removeListeners(node) {
 
 
 
-function createInstructions(noHtml = false) {
+function createInstructions(forWikitext = false) {
 
     const occurrencesOfRawStrings = []
 
@@ -544,9 +544,16 @@ function createInstructions(noHtml = false) {
     const pattern = new RegExp(`<selection class="(${allClassesString.replace('marker|', '')})" data-t="(.*?)".*?:(.*?);">(.*?)</selection>`, 'gm')  //(<span.*?>.*?</span>)?
 
 
+    let ignHtml = currentHTML
+    if(!forWikitext){
+        const { htmlWithIgParts } = htmlWithIgnoredParts(currentHTML)
+        ignHtml = htmlWithIgParts
 
-    const { htmlWithIgParts: ignHtml } = htmlWithIgnoredParts(currentHTML)
+    }
 
+
+
+    console.log('igHtml',ignHtml)
 
 
 
@@ -607,9 +614,26 @@ function createInstructions(noHtml = false) {
 
     
     
-    if(!isOnWikipedia || noHtml){
-        const filteredCleanTexts = cleanTexts.filter(cleanTextObj => cleanTextObj.method !== 'text')
+    if(!isOnWikipedia || forWikitext){
+        let filteredCleanTexts = cleanTexts.filter(cleanTextObj => cleanTextObj.method !== 'text')
+       
+        console.log('filteredCleanTexts',filteredCleanTexts)
+
+        if(forWikitext && !titleInURL.includes("Template:")){
+            const prohibitedRanges = findTemplatesInHtml(ignHtml)
+            console.log('prohibitedRanges',prohibitedRanges)
+            filteredCleanTexts = filteredCleanTexts.filter(item => {
+                for(let prohibitedRange of prohibitedRanges){
+                    if(item.index > prohibitedRange.startIndex && item.index < prohibitedRange.endIndex) return false
+                }
+                return true
+            })
+        }
+       
         const instructions = getFinalReplacementsForWeb(cleanHTML,filteredCleanTexts)
+        
+
+        
         return instructions
     }
 
@@ -868,6 +892,83 @@ async function sendToServer() {
 }
 
 
+function findTemplatesInHtml(html){
+    const reg = new RegExp("(<table[\\s\\S]*?>|Template:|</table>)","gm")
+
+
+    let allTablesArray = [] //{startIndex,endIndex,childTables:[],isTemplate}[]
+    let stack = []
+    let result 
+    while((result = reg.exec(html))){
+        if(result[0] === "</table>"){
+            //console.log('stack before pop',stack)
+            console.log('about to remove. in stack:',stack.length)
+            if(!stack.length)continue 
+            const currentTable = stack[stack.length - 1]
+            currentTable.endIndex = result.index + "</table>".length
+            stack.pop()
+        }else if(result[0] === "Template:"){
+            if(!stack.length)continue
+            const currentTable = stack[stack.length - 1]
+            currentTable.isTemplate = true
+        }else{
+            console.log('found this:',result[0])
+            const startIndex = result.index
+            const tableObj = {startIndex,endIndex:-1,childTables:[],isTemplate:false}
+            if(stack.length){
+                const parent = stack[stack.length - 1]
+                parent.childTables.push(tableObj)
+            }else{
+                allTablesArray.push(tableObj)
+            }
+            stack.push(tableObj)
+
+            console.log('add. in stack:',stack.length)
+
+           //console.log('after adding table',allTablesArray)
+            //console.log('stack',stack)
+        }
+    }
+
+
+    console.log('tables info:',allTablesArray)
+
+
+
+    let prohibitedRanges = []
+    for(let tableInfo of allTablesArray){
+      
+        const ranges = getProhibitedRangesFromTemplateInfo(tableInfo)
+        console.log('found ranges',ranges)
+        if(ranges && ranges.length){
+            console.log('concatinating')
+            prohibitedRanges = prohibitedRanges.concat(ranges)
+        }
+    }
+   // console.log('prohibitedRanges',prohibitedRanges)
+
+
+    return prohibitedRanges
+
+    
+}
+
+
+function getProhibitedRangesFromTemplateInfo(oneTableInfo){
+    console.log('checking tableInfo:',oneTableInfo)
+    if(oneTableInfo.isTemplate) return [{startIndex:oneTableInfo.startIndex, endIndex:oneTableInfo.endIndex}]
+    let result = []
+    for(let childTable of oneTableInfo.childTables){
+        const childRanges = getProhibitedRangesFromTemplateInfo(childTable)
+        if(childRanges){
+            result = result.concat(childRanges)
+        }
+    }
+    if(result.length)return result
+    return null
+}
+
+
 
 
 async function startWikitextEditing(){
@@ -877,6 +978,8 @@ async function startWikitextEditing(){
     finalInstructions = finalInstructions.map(instruction => ({...instruction,string:removeEscapesFromSemicolons(instruction.string)}))
     console.log('final instructions',finalInstructions)
 
+
+  //  findTemplatesInHtml()
 
 
    let wikitext = ''
@@ -918,7 +1021,7 @@ async function startWikitextEditing(){
 
   // console.log(' wikitext with moved refs',wikitext)
 
-  finalInstructions.push({string:"fsfsfsfsgqqss",target:"fsfsg",method:"bc-y"})
+//  finalInstructions.push({string:"fsfsfsfsgqqss",target:"fsfsg",method:"bc-y"})
     currentWikitext = findDatesInWikitext(finalInstructions,wikitext)
 
     

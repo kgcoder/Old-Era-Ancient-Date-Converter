@@ -224,7 +224,7 @@ function testLeftPartSimilarity(mainLeftString,leftSampleString){
     let count = 0
     while(index >= 0 && indexInSample >= 0){
         const mainChar = mainLeftString[index]
-        if(!mainChar.trim()){
+        if(!mainChar.trim() || mainChar === "@"){
             index--
             continue
         }
@@ -250,7 +250,7 @@ function testRightPartSimilarity(mainRightString,rightSampleString){
     let count = 0
     while(index < mainRightString.length && indexInSample < rightSampleString.length){
         const mainChar = mainRightString[index]
-        if(!mainChar.trim()){
+        if(!mainChar.trim() || mainChar === "@"){
             index++
             continue
         }
