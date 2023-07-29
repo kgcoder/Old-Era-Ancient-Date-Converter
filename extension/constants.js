@@ -231,7 +231,7 @@ const allClasses = [
 const colorToMarkupClass = {
     'green;color:white': 'bc-y',
     'rosyBrown': 'ad-y',
-    'ping': 'bc-i',
+    'pink': 'bc-i',
     'olive;color:white': 'bc-d',
     'orange': 'bc-c',
     'coral': 'bc-00s',

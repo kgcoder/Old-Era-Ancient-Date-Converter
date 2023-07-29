@@ -18,8 +18,16 @@ function escapeHtml(htmlStr) {
           .replace(/>/gm, "&gt;")
           .replace(/"/gm, "&quot;")
           .replace(/'/gm, "&#39;");        
- 
- }
+}
+
+
+function unescapeHTML(htmlStr){
+    return htmlStr.replace(/&amp;/gm, "&")
+          .replace(/&lt;/gm, "<")
+          .replace(/&gt;/gm, ">")
+          .replace(/&quot;/gm, '"')
+          .replace(/&#39;/gm, "'"); 
+}
 
 
 function moveRefsToBottom(wikitext) {
@@ -341,9 +349,7 @@ function generateWikiMarkup(){
 
 }
 
-function copyWikitextToClipboard(){
-    showToast()
-}
+
 
 function openEditorOnWikipedia(){
     const url = `https://en.wikipedia.org/w/index.php?title=${titleInURL}&action=edit`
@@ -352,14 +358,14 @@ function openEditorOnWikipedia(){
 
 
 
-async function showToast() {
+async function copyWikitextToClipboard() {
 
     const toast = document.createElement('div');
     toast.className = 'toast'
 
     try {
         if(markupGenerated){
-        await navigator.clipboard.writeText(wikitextEditor.document.body.innerHTML);
+        await navigator.clipboard.writeText(unescapeHTML(wikitextEditor.document.body.innerHTML));
             toast.innerText = "Wikitext copied to clipboard"
         }else{
             toast.innerText = "Wikitext is not ready to be copied"
