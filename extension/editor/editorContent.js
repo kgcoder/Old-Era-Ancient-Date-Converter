@@ -14,12 +14,16 @@ let editsFromServer = []
 let isTestingMode = false
 let selectionMode = 'markerMode'
 let isEditingWikitext = false
+
+let initialWikitext = ''
+let initialInstructionsForWikitext = []
 //let isServerDataReady = false
 
 let originalHTML = ''
 
 let htmlBeforeTesting = ''
 
+let threshold = 18
 
 let instructions = []
 let finalInstructions = []
@@ -959,18 +963,8 @@ async function startWikitextEditing(){
     finalInstructions = finalInstructions.map(instruction => ({...instruction,string:removeEscapesFromSemicolons(instruction.string)}))
 
 
-   let wikitext = ''
+   let wikitext = await getWikitextForPage()
 
-   try{
-       const response = await fetch(`https://en.wikipedia.org/w/api.php?action=parse&origin=*&page=${titleInURL}&prop=wikitext&format=json&formatversion=2`)
-    
-       const json = await response.json()
-       wikitext = json.parse.wikitext
-
-   }catch(e){
-    console.log(e)
-    return
-   }
 
 
    if(!wikitext)return
@@ -981,8 +975,16 @@ async function startWikitextEditing(){
 
    wikitext = moveRefsToBottom(wikitext)
 
-    currentWikitext = findDatesInWikitext(finalInstructions,wikitext)
 
+   initialWikitext = wikitext
+
+
+   initialInstructionsForWikitext = finalInstructions
+
+
+   const {wikitextWithDates,updatedInstructions} = findDatesInWikitext(finalInstructions,wikitext)
+
+   currentWikitext = wikitextWithDates
     
 
     const popup = document.createElement('div')
@@ -994,6 +996,9 @@ async function startWikitextEditing(){
             <iframe name="wikitextEditor" id="wikitextEditor" width="100%" height="90%"></iframe>
        
             <div class="wikitextPopupBottomBar">
+                <span>Threshhold:</span>
+                <input id="thresholdInput" style="width:50px;"/>
+                <button id="recalculateButton" disabled>Recalculate</button>
                 <button id="wikitextPopupSubsButton">__substitute__</button>
                 <button id="wikitextPopupBCButton">&amp;nbsp;BC</button>
                 <button id="wikitextPopupBCEButton">&amp;nbsp;BCE</button>
@@ -1008,14 +1013,7 @@ async function startWikitextEditing(){
          </div>
 
         <div class="sidebarWithDates">
-            
-            ${finalInstructions.map(item => `
-            <div class="sideListRow">
-                <span class="sideListExclamation">${item.isSus ? "!" : (item.notFound ? "!!" : " ")}</span>
-                <div class="sideListTextContainer"><p>${markupDateInSideList(item.string,item.target,item.method,item.order,item.originalSubstitute)}</p></div>
-            </div>
-            `).join("\n")}
-           
+            ${renderListOfEditsInSideBar(updatedInstructions)}   
         </div>
     `
     document.body.appendChild(popup)
@@ -1053,9 +1051,26 @@ async function startWikitextEditing(){
     const openWikipediaButton = document.getElementById('gotoWikipediaButton')
     openWikipediaButton.addEventListener('click', openEditorOnWikipedia)
 
+    const thresholdInput = document.getElementById('thresholdInput')
+    const recalculateButton = document.getElementById('recalculateButton')
+
+    thresholdInput.value = `${threshold}`
+    thresholdInput.addEventListener('input', thresholdInputDidChange)
+    recalculateButton.addEventListener('click', recalculateButtonPressed)
+
 
   
     
+}
+
+
+function renderListOfEditsInSideBar(instructions){
+    return instructions.map(item => `
+            <div class="sideListRow">
+                <div class="sideListTextContainer"><p>${markupDateInSideList(item.string,item.target,item.method,item.order,item.originalSubstitute)}</p></div>
+                <span class="sideListExclamation">${item.isSus ? "!" : (item.notFound ? "!!" : " ")}</span>
+            </div>
+            `).join("\n")
 }
 
 

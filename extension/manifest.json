@@ -142,6 +142,9 @@
         },
         "clearCache":{
             "description":"clear cache"
+        },
+        "startWikitextEditing":{
+            "description":"open wikitext editor"
         }
     }
 }

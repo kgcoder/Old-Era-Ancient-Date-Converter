@@ -71,7 +71,8 @@ function moveRefsBack(wikitext) {
 }
 
 function findDatesInWikitext(instructions, wikitext){
-    if(!instructions.length)return wikitext
+    if(!instructions.length)return {wikitextWithDates:wikitext,updatedInstructions:[]}
+    instructions = JSON.parse(JSON.stringify(instructions))
 
     let replacements = []
 
@@ -106,7 +107,7 @@ function findDatesInWikitext(instructions, wikitext){
     result += wikitext.substr(lastIndex, wikitext.length - lastIndex)
 
 
-    return result
+    return  {wikitextWithDates:result,updatedInstructions:instructions}
 }
 
 function findOneDateInWikitext(instruction, wikitext,replacements, indexOfLastFoundDate){
@@ -154,7 +155,7 @@ function findOneDateInWikitext(instruction, wikitext,replacements, indexOfLastFo
 
 
 
-      if(totalCount > 18 ){
+      if(totalCount > threshold ){
           allCounts.push({count:totalCount,index:result.index})
       }
 
@@ -179,6 +180,7 @@ function findOneDateInWikitext(instruction, wikitext,replacements, indexOfLastFo
             })
             return foundIndex
         }else{
+           // break
             instruction.isSus = true
             indexInAllCounts++
         }
@@ -303,6 +305,62 @@ function renderCurrentWikitext(){
     wikitextEditor.document.body.innerHTML = currentWikitext
 }
 
+
+async function getWikitextForPage(){
+    try{
+        const response = await fetch(`https://en.wikipedia.org/w/api.php?action=parse&origin=*&page=${titleInURL}&prop=wikitext&format=json&formatversion=2`)
+     
+        const json = await response.json()
+        return json.parse.wikitext
+    
+    }catch(e){
+     console.log(e)
+     return ""
+    }
+
+}
+
+
+
+//user actions
+
+
+function thresholdInputDidChange() {
+    const thresholdInput = document.getElementById('thresholdInput')
+    const recalculateButton = document.getElementById('recalculateButton')
+    const reg = new RegExp('[^\\d]','g')
+    const text = thresholdInput.value
+    thresholdInput.value = text.replace(reg,'')
+    if(thresholdInput.value == "0")thresholdInput.value = ""
+
+    if(thresholdInput.value){
+        const newNumber = parseInt(thresholdInput.value,10)
+        recalculateButton.disabled = newNumber == threshold
+    }else{
+        recalculateButton.disabled = true
+    }
+
+}
+
+
+function recalculateButtonPressed(){
+    const thresholdInput = document.getElementById('thresholdInput')
+    threshold = parseInt(thresholdInput.value,10)
+
+    const  {wikitextWithDates,updatedInstructions} = findDatesInWikitext(finalInstructions,initialWikitext)
+
+    const sidebar = document.getElementsByClassName('sidebarWithDates')[0]
+    sidebar.innerHTML = renderListOfEditsInSideBar(updatedInstructions)
+
+    currentWikitext = wikitextWithDates
+    renderCurrentWikitext()
+
+    const recalculateButton = document.getElementById('recalculateButton')
+
+    recalculateButton.disabled = true
+
+
+}
 
 function addSubstituteInWikitext(){
     wikitextEditor.document.execCommand("insertText", false, "_substitute_");
