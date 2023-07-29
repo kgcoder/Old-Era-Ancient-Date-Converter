@@ -39,7 +39,7 @@ function moveRefsToBottom(wikitext) {
   const newHTML = wikitext.replace(pattern, (match) => {
     index += 1
     refs.push(`REFERENCE_NUMBER_${index}:${match}END_OF_REFERENCE_NUMBER_${index}`)
-    return `@@@REFERENCE_NUMBER_${index}@@@` 
+    return `@REF_${index}@` 
   })
 
   return newHTML + SEPARATION_LINE + refs.join('<br/><br/>')
@@ -60,7 +60,7 @@ function moveRefsBack(wikitext) {
     }
 
     const string = result[1].replace(/>/gm, "&gt;").replace(/</gm,"&lt;")
-    mainText = mainText.replace(`@@@REFERENCE_NUMBER_${index}@@@`, string)
+    mainText = mainText.replace(`@REF_${index}@`, string)
     index++
   }
 
@@ -146,19 +146,15 @@ function findOneDateInWikitext(instruction, wikitext,replacements, indexOfLastFo
         const rightString = string.substr(innerIndex + target.length,string.length - innerIndex - target.length)
 
 
-        const leftSnapshot = wikitext.substr(firstIndex, innerIndex)
-        const rightSnapshot = wikitext.substr(result.index + target.length,string.length - innerIndex - target.length)
-
        
-        const leftCount = testLeftPartSimilarity(leftString,leftSnapshot)
-        const rightCount = testRightPartSimilarity(rightString,rightSnapshot)
-
+        const leftCount = testLeftPartSimilarity(leftString,wikitext,result.index)
+        const rightCount = testRightPartSimilarity(rightString,wikitext,result.index + target.length)
 
         const totalCount = leftCount + rightCount
 
 
 
-      if(totalCount > 8){
+      if(totalCount > 18 ){
           allCounts.push({count:totalCount,index:result.index})
       }
 
@@ -166,10 +162,10 @@ function findOneDateInWikitext(instruction, wikitext,replacements, indexOfLastFo
    
     }
 
-    allCounts = allCounts.sort((a,b) => b.count - a.count)
-
 
     allCounts = allCounts.sort((a,b) => a.index - b.index)
+   
+
 
     let indexInAllCounts = string_oc - 1
     while(indexInAllCounts < allCounts.length){
@@ -187,24 +183,26 @@ function findOneDateInWikitext(instruction, wikitext,replacements, indexOfLastFo
             indexInAllCounts++
         }
     }
+    instruction.isSus = undefined
     instruction.notFound = true
+
     return -1
 
 }
 
-function testLeftPartSimilarity(mainLeftString,leftSampleString){
+function testLeftPartSimilarity(mainLeftString,wikitext,startIndex){
     let index = mainLeftString.length - 1
 
-    let indexInSample = leftSampleString.length - 1
+    let indexInSample = startIndex - 1
 
     let count = 0
-    while(index >= 0 && indexInSample >= 0){
+    while(index >= 0 && indexInSample >= startIndex - 100){
         const mainChar = mainLeftString[index]
         if(!mainChar.trim() || mainChar === "@"){
             index--
             continue
         }
-        const sampleChar = leftSampleString[indexInSample]
+        const sampleChar = wikitext[indexInSample]
 
         if(mainChar === sampleChar){
             count++
@@ -218,19 +216,19 @@ function testLeftPartSimilarity(mainLeftString,leftSampleString){
 }
 
 
-function testRightPartSimilarity(mainRightString,rightSampleString){
+function testRightPartSimilarity(mainRightString,wikitext,startIndex){
     let index = 0
 
-    let indexInSample = 0
+    let indexInSample = startIndex
 
     let count = 0
-    while(index < mainRightString.length && indexInSample < rightSampleString.length){
+    while(index < mainRightString.length && indexInSample < startIndex + 100){
         const mainChar = mainRightString[index]
         if(!mainChar.trim() || mainChar === "@"){
             index++
             continue
         }
-        const sampleChar = rightSampleString[indexInSample]
+        const sampleChar = wikitext[indexInSample]
 
         if(mainChar === sampleChar){
             count++
@@ -339,6 +337,8 @@ function generateWikiMarkup(){
 
     })
 
+
+
     wikitextEditor.document.body.innerHTML = moveRefsBack(intermediateWiki)
 
 
@@ -363,9 +363,17 @@ async function copyWikitextToClipboard() {
     const toast = document.createElement('div');
     toast.className = 'toast'
 
+    let unescapedHTML = unescapeHTML(wikitextEditor.document.body.innerHTML)
+
+    const reg = new RegExp("(&nbsp;)?({{bc-.*?}})(&nbsp;)?","gm")
+    unescapedHTML = unescapedHTML.replace(reg, (match,firstBreak,content,secondBreak) => {
+        return (firstBreak ? " " : "") + content + (secondBreak ? " " : "")
+    })
+
+
     try {
         if(markupGenerated){
-        await navigator.clipboard.writeText(unescapeHTML(wikitextEditor.document.body.innerHTML));
+        await navigator.clipboard.writeText(unescapedHTML);
             toast.innerText = "Wikitext copied to clipboard"
         }else{
             toast.innerText = "Wikitext is not ready to be copied"
