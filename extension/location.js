@@ -23,6 +23,8 @@ function prepareLocation() {
     domain = domain.split('/')[0]
 
 
+
+
     isOnWikipedia = domain === 'en.wikipedia.org'
 
 
@@ -34,7 +36,7 @@ function prepareLocation() {
     }
 
     const action = getParamFromURL('action')
-    if (action) {
+    if (action || prohibitedPages.includes(currentLocation)) {
         currentLocation = null
     } else {
         currentLocation = currentLocation.split('?')[0].split('#')[0]

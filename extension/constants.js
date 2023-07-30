@@ -248,3 +248,6 @@ const colorToMarkupClass = {
 
 
 
+const prohibitedPages = [
+    "https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Detectable_BC/BCE_dates"
+]

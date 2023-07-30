@@ -238,7 +238,6 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 })
 
 
-prepareListOfWebsitesSupportedByBackend()
 
 
 
@@ -269,6 +268,9 @@ function sendPageMetadata(sendResponse) {
 
 
  async function onContentLoad() {
+    if(!isOnWikipedia){
+        await prepareListOfWebsitesSupportedByBackend()
+    }
 
     pageIsLoaded = true
 
@@ -435,6 +437,7 @@ async function startWebRequest() {
 
         const r = await fetch(url)
         const json = r.status !== 200 ? {} : await r.json()
+
         
         if(json.error){
             translateEverythingOnWeb(null)
