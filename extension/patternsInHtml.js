@@ -9,7 +9,7 @@ const completeSpacePatternInHtml = `(<span[^>]*?>)(${spacePattern})(</span>)|${s
 const bcPatternInHtml = `(${completeSpacePatternInHtml}|-)((b\\.(${completeSpacePatternInHtml})?c\\.?|bc)e?|(<small>)(bce?)</small>)`
 const methods = Object.keys(shortToLongMethodConversions).join('|')
 
-const nakedYearPatternInHtml = '\\b([1-9][0-9]{0,2},[0-9]{3}|[0-9]{1,4}|10000|10,000)(?!\\])\\b'
+const nakedYearPatternInHtml = '\\b([1-9][0-9]{0,2},[0-9]{3}|[0-9]{1,5}|10000|10,000)(?!\\])\\b'
 
 // const altCenturiesAndMillenniaMarkupPattern = `((bc-c|bc-m)( data-t="([^>]*?)")?( data-s="[^>]*?")?>)([^<]*?)</(bc-c|bc-m)>(${completeSpacePattern}|-)(century|centuries|cent\\.|c\\.|millennium|millennia))(${bcPattern})`
 // const altMarkupWithInnerSpansPattern = `(<(${methods})( data-t="([^>]*?)")?( data-s="([^>]*?)")?>)([^<]*?)(<span[^>]*?>)(.)(</span>)([^<]*?)</(${methods})>`

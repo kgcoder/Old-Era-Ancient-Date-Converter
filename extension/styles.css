@@ -200,8 +200,14 @@ a.disabledLink{
     align-items: center;
 }
 
+.wikiWarning{
+    color:red;
+    margin-bottom: 10px;
+}
 
-
+.wikitextPopupBottomBar{
+    margin-top: 10px;
+}
 
 
 .toast {

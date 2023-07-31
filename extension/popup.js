@@ -421,7 +421,6 @@ function updatePageMetadata(response){
     const link1 = document.getElementById("aboutLink")
     const link2 = document.getElementById("whitePaperLink")
     const link3 = document.getElementById("timelineLink")
-    const wikitextButton = document.getElementById('startWikitextEditing')
     if (!response) {
         updatePageStatus('Wrong site, page doesn\'t exist in the database, or page update is needed')
         link1.style = link2.style = link3.style = "pointer-events: none; color:lightgray"
@@ -436,7 +435,7 @@ function updatePageMetadata(response){
         currentVersionSeemsOK, isCurrentVersionVerified,
         pageHasNoBCDates, pageIsNotTranslatedYet, pageNotAnalysedYet, isThisSiteAllowed, domain, isOnWikipedia, kIsDevEnv } = response
         
-    wikitextButton.hidden = !kIsDevEnv
+    
     
     isCurrentSiteAllowed = isThisSiteAllowed
     currentDomain = domain

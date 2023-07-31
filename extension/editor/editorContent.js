@@ -992,6 +992,7 @@ async function startWikitextEditing(){
     popup.innerHTML = `
         <a href="#" id="wikitextPopupCloseButton" class="popup-close">&times;</a>
         <div class="wikitextPopupLeftColumn">
+            <span class="wikiWarning">Warning! This is only a demo. Don't use wikitext generated here on Wikipedia.</span>
             <textarea class="wikitextPopup-textarea" style="display: none;"></textarea>
             <iframe name="wikitextEditor" id="wikitextEditor" width="100%" height="90%"></iframe>
        

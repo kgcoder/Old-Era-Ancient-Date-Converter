@@ -9,7 +9,7 @@ const rangePattern = `(${spacePattern})?(—|−|–|-|— ?early|− ?early|–
 const supPattern = '\\[\\d*?\\]'
 const circaPattern = 'c\\.|circa|circa\\.|ca\\.'
 
-const nakedYearPattern = '([1-9][0-9]{0,2},[0-9]{3}|[0-9]{1,4}|10000|10,000|[0-9]{1,3},?000)(?!\\])'
+const nakedYearPattern = '([1-9][0-9]{0,2},[0-9]{3}|[0-9]{1,5}|10000|10,000|[0-9]{1,3},?000)(?!\\])'
 
 const nakedDatePattern = '[0-9]{1,2}(?!\\])'
 const nakedDecadePattern = "[0-9]{0,3}0'?s"
