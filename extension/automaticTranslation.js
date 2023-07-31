@@ -71,9 +71,7 @@ function createAutomaticReplacements(html, replacementsArray, pageData) {
 
     intermediaryReplacementsArray = intermediaryReplacementsArray.sort((a,b) => a.index - b.index).map(item => ({index:item.index,edit:item}))
 
-
     moveReplacementsFromTextToHtml(text,html,intermediaryReplacementsArray, rawReplacementsInHtmlArray, insertions)
-
 
     const normalReplacementsInHtml = mergeReplacements(rawReplacementsInHtmlArray)
 
@@ -238,6 +236,11 @@ function moveReplacementsFromTextToHtml(text,html,replacementsInTextArray,finalR
                     error = true
                     indexInText++
                     indexInHtml++
+                    indexOfReplacement++
+                    if(indexOfReplacement >= replacementsInTextArray.length){
+                        break;
+                    }
+                    indexInTextToLookFor = replacementsInTextArray[indexOfReplacement].index
                     continue
                 }
 
@@ -245,7 +248,6 @@ function moveReplacementsFromTextToHtml(text,html,replacementsInTextArray,finalR
                 const {target,otherNumberStringInRange, index, method, length, originalSubstitute} = currentReplacementInText.edit
 
                 addReplacement(finalReplacementsArray,method,target,otherNumberStringInRange,indexInHtml,true,'normal',originalSubstitute)
-
 
                 indexInText += targetLength
                 indexInHtml += targetLength
