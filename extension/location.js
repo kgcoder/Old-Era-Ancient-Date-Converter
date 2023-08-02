@@ -12,6 +12,8 @@ const mainBaseURL = 'https://en.wikipedia.org/wiki/'
 const additionalBaseURL = 'https://en.wikipedia.org/w/index.php?'
 let titleInURL = ''
 
+let datesFolder = "https://timeline.oldera.org/wiki/index.php/Dates/"
+
 function prepareLocation() {
 
 
@@ -36,7 +38,7 @@ function prepareLocation() {
     }
 
     const action = getParamFromURL('action')
-    if (action || prohibitedPages.includes(currentLocation)) {
+    if (action || prohibitedPages.includes(currentLocation) || currentLocation.includes(datesFolder)) {
         currentLocation = null
     } else {
         currentLocation = currentLocation.split('?')[0].split('#')[0]

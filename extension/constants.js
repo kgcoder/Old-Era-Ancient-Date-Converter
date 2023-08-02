@@ -9,7 +9,8 @@
  const frontendBaseUrl = 'https://dates.oldera.org'
  const webBaseUrl = 'https://timeline.oldera.org'
  
- const kIsDevEnv = false
+ const kIsDevEnv = true
+ const useNewServer = true
 
  //const baseUrl = 'http://localhost:3250'
  //const frontendBaseUrl = 'http://localhost:3000'

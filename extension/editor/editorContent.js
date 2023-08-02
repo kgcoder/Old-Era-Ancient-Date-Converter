@@ -38,6 +38,7 @@ let currentWikitext = ""
 
 
 
+
 const allClassesString = allClasses.join('|')
 
 
@@ -56,7 +57,6 @@ function onEditorLoad() {
                 return {...edit, string:edit.string.replace(regN,'\n').replace(regT,'\t')} 
             })
     
-        
             loadEdits(editsFromServer,true,false)
         
             if (document.addEventListener) {
@@ -324,7 +324,7 @@ function loadEdits(editsFromServer,shouldFixBrokenEdits = false,showOnlyFixed = 
     
 
 
-    setBodyFromCurrentHTML(true)
+    setBodyFromCurrentHTML()
     addToHistory(currentHTML)
 
     instructions = editsFromServer
@@ -350,7 +350,7 @@ function createHTMLWithMarkersForEditor(editsFromServer,shouldFixBrokenEdits = f
 
     let replacements = []
     const {result:text,insertions} = extractTextFromHtml(htmlWithIgParts)
-    if(isOnWikipedia){
+    if(isOnWikipedia && (!useNewServer || pageNotFoundOnNewServer)){
         replacements = getReplacementsFromEdits(editsFromServer,htmlWithIgParts)
     }else{
         replacements = getReplacementsFromEdits(editsFromServer,text)
@@ -396,7 +396,7 @@ function createHTMLWithMarkersForEditor(editsFromServer,shouldFixBrokenEdits = f
     }
 
     let finalReplacements = replacements
-    if(!isOnWikipedia){
+    if(!isOnWikipedia || (useNewServer && !pageNotFoundOnNewServer)){
         finalReplacements = []
         moveReplacementsFromTextToHtml(text,htmlWithIgParts,replacements, finalReplacements, insertions)
     }
@@ -615,7 +615,7 @@ function createInstructions(forWikitext = false) {
 
     
     
-    if(!isOnWikipedia || forWikitext){
+    if(!isOnWikipedia || forWikitext || useNewServer){
         let filteredCleanTexts = cleanTexts.filter(cleanTextObj => cleanTextObj.method !== 'text')
        
 
@@ -628,6 +628,7 @@ function createInstructions(forWikitext = false) {
                 return true
             })
         }
+
        
         const instructions = getFinalReplacementsForWeb(cleanHTML,filteredCleanTexts)
         
@@ -812,9 +813,8 @@ function test() {
 
     finalInstructions = finalInstructions.map(edit => {
         const newEdit = JSON.parse(JSON.stringify(edit))
-        if(edit.method == 'bc-y-r2')newEdit.method = 'bc-y'
-        if(['bc-y','bc-y-r1','bc-y-r2'].includes(edit.method))edit.method = 'bc-y'
-        if(['bc-i','bc-i-r1','bc-i-r2'].includes(edit.method))edit.method = 'bc-i'
+        if(['bc-y-r1','bc-y-r2'].includes(edit.method))newEdit.method = 'bc-y'
+        if(['bc-i-r1','bc-i-r2'].includes(edit.method))newEdit.method = 'bc-i'
         return newEdit
     })
 
@@ -824,7 +824,7 @@ function test() {
     setBodyFromHTML(originalHTML)
 
 
-    if(isOnWikipedia){
+    if(isOnWikipedia && !useNewServer){
         translateEverything(null,JSON.parse(JSON.stringify(finalInstructions)))
     }else{    
         translateEverythingOnWeb(null,JSON.parse(JSON.stringify(finalInstructions)))
@@ -849,7 +849,7 @@ function backToEditing() {
 async function sendToServer() {
 
 
-    if(!isOnWikipedia){
+    if(!isOnWikipedia || useNewServer){
         showPopupWithInstructions()
         return
     }
@@ -1119,6 +1119,10 @@ function showPopupWithInstructions(){
         `[[Category:${domain}]]`
     ])
 
+    if (isOnWikipedia && titleInURL.includes("Template:")){
+        lines.push('[[Category:Wikipedia templates]]')
+    }
+
     const finalText = lines.join('\n')
 
 
@@ -1173,7 +1177,6 @@ function getFinalReplacementsForWeb(cleanHTML,cleanTexts){
     localReplacementsArray = localReplacementsArray.sort((a, b) => a.edit.targetIndex - b.edit.targetIndex)
 
 
-
     const filteredCleanTexts = []
     cleanTexts.forEach((cleanText) => {
      
@@ -1191,10 +1194,8 @@ function getFinalReplacementsForWeb(cleanHTML,cleanTexts){
     })
 
 
-
     const {result:text,insertions} = extractTextFromHtml(cleanHTML)
     const replacementsInText = moveReplacementsHtmlToText(cleanHTML,text,insertions,filteredCleanTexts)
-
 
     const finalInstructions = []
     replacementsInText.forEach((edit) => {

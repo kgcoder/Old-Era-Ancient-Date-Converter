@@ -305,9 +305,8 @@ function mergeReplacements(rawReplacements){
             targetString += item.edit.target
         })
 
-
-
         addReplacement(resultArray,method,targetString,otherNumberStringInRange,index,true,'normal',originalSubstitute)
+
 
     }
 
@@ -371,7 +370,6 @@ function addReplacement(replacementsArray, method,targetString, otherNumberStrin
         createMarkerForEditor(targetString, method, type, originalSubstitute) :
         createMarker(targetString, method, type, originalSubstitute,otherNumberStringInRange)
     }
-
 
     replacementsArray.push(replacement)
 }

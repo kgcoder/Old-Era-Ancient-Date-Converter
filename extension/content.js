@@ -64,6 +64,9 @@ let domain = ''
 
 let isEditingMode = false
 
+let pageNotFoundOnNewServer = false //temporary flag
+
+
 
 
 const firstYearOfOldEra_default = 10000
@@ -300,16 +303,16 @@ function sendPageMetadata(sendResponse) {
 
     
         if (!isExtensionOff  && currentLocation) {
-            if (!shouldNotUseServer && isOnWikipedia) {
+            if (!shouldNotUseServer && isOnWikipedia && !useNewServer) {
                 isEditingMode ? startRequestForEditor() :  startRequest()
-            }else if(!shouldNotUseServer && sitesSupportedByBackend.includes(domain) ){
+            }else if(!shouldNotUseServer && (sitesSupportedByBackend.includes(domain) || domain === 'en.wikipedia.org') ){
                 isEditingMode ? startWebRequestForEditor() :  startWebRequest()
             } else {
                 if(isEditingMode){
                     editsArray = []
                     onEditorLoad()
                 }else{
-                    if(isOnWikipedia){
+                    if(isOnWikipedia && !useNewServer){
                         translateEverything(null)
                     }else{
                         translateEverythingOnWeb(null)
@@ -367,7 +370,7 @@ async function startRequest() {
         const r = await fetch(`${baseUrl}/api/pages/${encodedUrl}`)
         const json = r.status !== 200 ? {} : await r.json()
 
-        editsArray = json.edits.map(edit => convertMethodNameLongToShort(edit))
+        editsArray = json.edits ? json.edits.map(edit => convertMethodNameLongToShort(edit)) : []
         pageHasIssues = json.hasIssues 
         pageId = json.id
         
@@ -440,6 +443,12 @@ async function startWebRequest() {
 
         
         if(json.error){
+            if(useNewServer && isOnWikipedia && json.error.code === "missingtitle"){
+                requestHasStarted = false
+                pageNotFoundOnNewServer = true
+                startRequest()
+                return
+            }
             translateEverythingOnWeb(null)
             return 
         }
@@ -499,7 +508,6 @@ async function startRequestForEditor(){
         const r = await fetch(url)
         const json = r.status !== 200 ? {} : await r.json()
 
-        
 
         editsArray = json.edits.map(edit => convertMethodNameLongToShort(edit))
       
@@ -537,6 +545,13 @@ async function startWebRequestForEditor(){
         const json = r.status !== 200 ? {} : await r.json()
 
         if(json.error){
+            if(useNewServer && isOnWikipedia && json.error.code === "missingtitle"){
+                requestHasStarted = false
+                pageNotFoundOnNewServer = true
+                startRequestForEditor()
+                return
+            }
+
             editsArray = []
             if(isEditingMode){
                 onEditorLoad()
@@ -711,6 +726,7 @@ function translateEverythingOnWeb(r,finalInstructions = []) {
         moveReplacementsFromTextToHtml(text,htmlWithIgParts,JSON.parse(JSON.stringify(repsFromServer)), rawRepsInHtmlArray, insertions)
 
         const normalReplacementsInHtmlFromServer = mergeReplacements(rawRepsInHtmlArray)
+
         replacementsArray = resolveReplacements(replacementsArray, normalReplacementsInHtmlFromServer)
 
     }
@@ -807,7 +823,7 @@ function resolveReplacements(replacementsArray, repsFromServer) {
                     if(!isEditingMode && localMethod === 'bc-y-r1' || localMethod === 'bc-y-r2' || localMethod === 'bc-i-r1' || localMethod === 'bc-i-r2'){
                         properMethod = localMethod
                     }
-                    if(!isEditingMode && serverMethod === 'bc-i' ){
+                    if((!isEditingMode || isTestingMode) && serverMethod === 'bc-i' ){
                         if(localMethod === 'bc-y-r1')properMethod = 'bc-i-r1'
                         if(localMethod === 'bc-y-r2')properMethod = 'bc-i-r2'
                     }
