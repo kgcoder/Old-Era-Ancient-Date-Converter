@@ -54,6 +54,7 @@ function onEditorLoad() {
             const regT = new RegExp('\\\\t','g')
 
             editsFromServer = editsArray.map(edit => {
+                if(edit.isTemplate)return edit
                 return {...edit, string:edit.string.replace(regN,'\n').replace(regT,'\t')} 
             })
     
@@ -353,7 +354,7 @@ function createHTMLWithMarkersForEditor(editsFromServer,shouldFixBrokenEdits = f
     if(isOnWikipedia && (!useNewServer || pageNotFoundOnNewServer)){
         replacements = getReplacementsFromEdits(editsFromServer,htmlWithIgParts)
     }else{
-        replacements = getReplacementsFromEdits(editsFromServer,text)
+        replacements = prepareServerReplacements(editsFromServer,text)
     }
 
    

@@ -435,6 +435,7 @@ async function startWebRequest() {
     requestHasStarted = true
 
     const url = getWikitextUrlOnMyServer()
+
       
     try{
 
@@ -460,18 +461,15 @@ async function startWebRequest() {
         }
         
         const lines = wikitext.split('\n')
-        const regN = new RegExp('\\\\n','g')
-        const regT = new RegExp('\\\\t','g')
-
         
-        editsArray = lines.map(line => getEditFromLine(line))
-        .filter(obj => obj !== null)
-        .map(edit => convertMethodNameLongToShort(edit))
-        .map(edit => {
-            return {...edit, string:edit.string.replace(regN,'\n').replace(regT,'\t')} 
-        })
+        editsArray = getEditsFromLines(lines)
+        
+      
+
        
-  
+        await getTemplatesInfoFromServer(editsArray)
+       
+
 
         try{
             if(!isEditingMode){
@@ -571,6 +569,8 @@ async function startWebRequestForEditor(){
         const lines = wikitext.split('\n')
 
         editsArray = lines.map(line => getEditFromLine(line)).filter(obj => obj !== null).map(edit => convertMethodNameLongToShort(edit))
+
+        await getTemplatesInfoFromServer(editsArray)
 
         try{
             if(isEditingMode){
@@ -714,11 +714,12 @@ function translateEverythingOnWeb(r,finalInstructions = []) {
 
 
     if (finalInstructions.length) {
-        const editsToUse = finalInstructions.length ? finalInstructions : editsArray
+        const allEdits = finalInstructions.length ? finalInstructions : editsArray
+ 
         const {result:text,insertions} = extractTextFromHtml(htmlWithIgParts)
-        let repsFromServer = getReplacementsFromServerForWeb(editsToUse, text)
 
-        repsFromServer = repsFromServer.sort((a,b) => a.index - b.index)
+        let repsFromServer = prepareServerReplacements(allEdits,text)
+
 
         pageIsNotTranslatedYet = repsFromServer.length == 0
 
@@ -728,6 +729,7 @@ function translateEverythingOnWeb(r,finalInstructions = []) {
         const normalReplacementsInHtmlFromServer = mergeReplacements(rawRepsInHtmlArray)
 
         replacementsArray = resolveReplacements(replacementsArray, normalReplacementsInHtmlFromServer)
+
 
     }
 
