@@ -36,8 +36,11 @@ let isDefaultPopupActive = false
 
 let currentWikitext = ""
 
+let editsLoadedFromServerForEditor = []
 
+let templatesToLoadAtStartup = []
 
+let preloadedTemplates = []
 
 const allClassesString = allClasses.join('|')
 
@@ -319,7 +322,10 @@ function loadEdits(editsFromServer,shouldFixBrokenEdits = false,showOnlyFixed = 
     }
 
 
-    const htmlWithMarkers = createHTMLWithMarkersForEditor(editsFromServer,shouldFixBrokenEdits,showOnlyFixed)
+    let editsForMarkers = !pageNotFoundOnNewServer && preloadedTemplates.length ? editsFromServer.concat(preloadedTemplates) : editsFromServer
+
+
+    const htmlWithMarkers = createHTMLWithMarkersForEditor(editsForMarkers,shouldFixBrokenEdits,showOnlyFixed)
     currentHTML = replaceCurlyBracesWithMarkup(htmlWithMarkers)
 
     
@@ -356,6 +362,7 @@ function createHTMLWithMarkersForEditor(editsFromServer,shouldFixBrokenEdits = f
     }else{
         replacements = prepareServerReplacements(editsFromServer,text)
     }
+
 
    
     let currentGap = null
@@ -991,7 +998,7 @@ async function startWikitextEditing(){
     const popup = document.createElement('div')
     popup.className = 'wikitextPopup'
     popup.innerHTML = `
-        <a href="#" id="wikitextPopupCloseButton" class="popup-close">&times;</a>
+        <a href="#" id="wikitextPopupCloseButton" class="editorPopup-close">&times;</a>
         <div class="wikitextPopupLeftColumn">
             <span class="wikiWarning">Warning! This is only a demo. Don't use wikitext generated here on Wikipedia.</span>
             <textarea class="wikitextPopup-textarea" style="display: none;"></textarea>
@@ -1015,7 +1022,7 @@ async function startWikitextEditing(){
          </div>
 
         <div class="sidebarWithDates">
-            ${renderListOfEditsInSideBar(updatedInstructions)}   
+            ${renderListOfEditsInWikitextSideBar(updatedInstructions)}   
         </div>
     `
     document.body.appendChild(popup)
@@ -1066,7 +1073,18 @@ async function startWikitextEditing(){
 }
 
 
-function renderListOfEditsInSideBar(instructions){
+function renderListOfEditsInEditorSideBar(instructions){
+    return instructions.map(item => `${item.isTitle ? `<span class="templateNameSpan">${item.templateName}</span>` : ""}
+            <div class="sideListRow${item.isTemplate ? " fadedRow" : ""}${item.isTitle ? " titleRow" : ""}">
+                <div class="sideListTextContainer"><p>${markupDateInSideList(item.string,item.target,item.method,item.order,item.originalSubstitute)}</p></div>
+                <span class="sideListExclamation">${item.isSus ? "!" : (item.notFound ? "!!" : " ")}</span>
+            </div>
+            `).join("\n")
+}
+
+
+
+function renderListOfEditsInWikitextSideBar(instructions){
     return instructions.map(item => `
             <div class="sideListRow">
                 <div class="sideListTextContainer"><p>${markupDateInSideList(item.string,item.target,item.method,item.order,item.originalSubstitute)}</p></div>
@@ -1104,13 +1122,52 @@ function markupDateInSideList(string,target,method,order,originalSubstitute){
 
 
 function showPopupWithInstructions(){
+    if(!isTestingMode){
+        finalInstructions = createInstructions()
+    }
     const nReg = new RegExp('\n','g')
     const tReg = new RegExp('\t','g')
-    let lines = finalInstructions.map(({string,target,method,type,originalSubstitute,order,fromTemplate}) => {
+   
+    let templates = []
 
+    if(preloadedTemplates.length){
+        templates = preloadedTemplates
+    }else{
+        templates = editsLoadedFromServerForEditor.filter(item => item.isTemplate)
+    }
+
+
+
+    for(let template of templates){
+        for(let templateEdit of template.subEdits){
+            const edit = finalInstructions.find(item => areEditsInSamePlace(item,templateEdit))
+            if(edit){
+                edit.isTemplate = true
+                edit.templateName = template.name
+            }
+        }
+    }
+
+    let lastTemplateName = ""
+    for(let instruction of finalInstructions){
+        if(instruction.templateName && instruction.templateName != lastTemplateName){
+            instruction.isTitle = true
+            lastTemplateName = instruction.templateName
+        }
+    }
+
+    finalInstructions = finalInstructions.map(instruction => ({...instruction,string:removeEscapesFromSemicolons(instruction.string)}))
+
+
+
+
+
+    let lines = finalInstructions.filter(item=> !item.isTemplate || (item.isTemplate && item.isTitle)).map(({string,target,method,originalSubstitute,order,fromTemplate,isTemplate,templateName,isTitle}) => {
+
+        if(isTemplate)return templateName
         string = string.replace(nReg,'\\n').replace(tReg,'\\t')
 
-        return `${string};${target};${method};${type ?? ""};${order ? order : ""};${originalSubstitute ? originalSubstitute : ""};${fromTemplate ? "1" : ""}`
+        return `${string};${target};${method};;${order ? order : ""};${originalSubstitute ? originalSubstitute : ""};`
     })
 
 
@@ -1127,34 +1184,79 @@ function showPopupWithInstructions(){
     const finalText = lines.join('\n')
 
 
-    const url = getPageUrlOnMyServerForEditing()
 
 
     const popup = document.createElement('div')
-    popup.className = 'popup'
+    popup.className = 'editorPopup'
     popup.innerHTML = `
-        <a href="#" class="popup-close">&times;</a>
-		<textarea class="popup-input">${finalText}</textarea>
-		<a href="#" class="popup-link">Copy to clipboard and open data page on the server</a>
+        <a href="#" class="editorPopup-close">&times;</a>
+        <div class="editorLeftColumn">
+		    <textarea class="editorPopup-input">${finalText}</textarea>
+            <div class="editorBottomBar">
+                <button id="editorLoadTemplatesButton">Load templates</button>
+                <button id="editorCopyButton">Copy</button>
+                <button id="gotoServerButton">Open data page</button>
+            </div>
+        </div>
+        <div class="sidebarWithDates">
+            ${renderListOfEditsInEditorSideBar(finalInstructions)}   
+        </div>
     `
     document.body.appendChild(popup)
 
-    const closeButton = popup.getElementsByClassName('popup-close')[0]
+    const closeButton = popup.getElementsByClassName('editorPopup-close')[0]
     closeButton.addEventListener('click', () => {
         popup.parentElement.removeChild(popup)
     })
 
-    const linkButton = popup.getElementsByClassName('popup-link')[0]
-    linkButton.addEventListener('click', async() => {
-        try {
-            await navigator.clipboard.writeText(finalText);
-        } catch (err) {
-            console.error('Failed to copy to clipboard: ', err);
-        }
-        window.open(url)
-    })
+    const loadTemplatesButton = document.getElementById('editorLoadTemplatesButton')
+    loadTemplatesButton.addEventListener('click', loadTemplates)
+
+    
+
+    const copyButton = document.getElementById('editorCopyButton')
+    copyButton.addEventListener('click', copyEditorContentsToClipboard)
+
+    const gotoServerButton = document.getElementById('gotoServerButton')
+    gotoServerButton.addEventListener('click', openServerPage)
+
+  
 }
 
+
+function loadTemplates(){
+    const input = document.getElementsByClassName("editorPopup-input")[0]
+    const text = input.value
+    chrome.storage.local.set({templatesToLoadAtStartup:text})
+    window.location.reload()
+    // const lines = text.split('\n')
+    // console.log('lines',lines)
+
+}
+
+
+async function copyEditorContentsToClipboard(){
+
+    const input = document.getElementsByClassName("editorPopup-input")[0]
+    try {
+        await navigator.clipboard.writeText(input.value);
+        const toast = document.createElement('div');
+        toast.className = 'toast'
+        toast.innerText = "Text was copied to clipboard"
+        document.body.appendChild(toast)
+        setTimeout(() => {
+            toast.parentElement.removeChild(toast)
+        }, 3000); // Hide the toast after 3 seconds
+    } catch (err) {
+        console.error('Failed to copy to clipboard: ', err);
+    }
+}
+
+
+function openServerPage(){
+    const url = getPageUrlOnMyServerForEditing()
+    window.open(url)
+}
 
 
 

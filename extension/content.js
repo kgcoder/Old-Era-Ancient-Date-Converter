@@ -68,7 +68,6 @@ let pageNotFoundOnNewServer = false //temporary flag
 
 
 
-
 const firstYearOfOldEra_default = 10000
 const lastTranslatedYearWithLabel_default = 6000
 const timelineName_default = "Old Era"
@@ -97,7 +96,7 @@ function getConfigFromLocalStorage(callback){
         'shouldTranslateYearsPrecisely', 'shouldTranslateDatesInBookTitles', 
         'shouldTranslateDatesInQuotes','sitesData',
         'firstYearOfOldEra','lastTranslatedYearWithLabel',
-        'timelineName','ofTimeline','abbreviatedTimelineName','dontShowPopupAgain'], function (result) {
+        'timelineName','ofTimeline','abbreviatedTimelineName','dontShowPopupAgain','templatesToLoadAtStartup'], function (result) {
         isExtensionOff = !!result.isExtensionOff
         isEditingMode = !!result.isEditingMode
         shouldNotUseServer = !!result.shouldNotUseServer
@@ -105,6 +104,18 @@ function getConfigFromLocalStorage(callback){
         shouldTranslateDatesInBookTitles = !!result.shouldTranslateDatesInBookTitles
         shouldTranslateDatesInQuotes = !!result.shouldTranslateDatesInQuotes
         dontShowPopupAgain = !!result.dontShowPopupAgain
+
+        const templateNamesString = result.templatesToLoadAtStartup
+
+        if(templateNamesString){
+            const lines = templateNamesString.split('\n')
+            templatesToLoadAtStartup = lines.filter(line => line.includes('Template:'))
+            console.log('templatesToLoadAtStartup',templatesToLoadAtStartup)
+
+        }
+        chrome.storage.local.set({templatesToLoadAtStartup:""})
+
+
         
         if(result.firstYearOfOldEra){
             firstYearOfOldEra = result.firstYearOfOldEra
@@ -536,6 +547,13 @@ async function startWebRequestForEditor(){
     if(!pageIsLoaded || requestHasStarted)return
     requestHasStarted = true
 
+
+    if(templatesToLoadAtStartup.length){
+        const templates = templatesToLoadAtStartup.map(template => ({isTemplate:true,name:template}))
+        await getTemplatesInfoFromServer(templates)
+        preloadedTemplates = templates
+    }
+
     const url = getWikitextUrlOnMyServer()
     
     try{
@@ -570,7 +588,14 @@ async function startWebRequestForEditor(){
 
         editsArray = lines.map(line => getEditFromLine(line)).filter(obj => obj !== null).map(edit => convertMethodNameLongToShort(edit))
 
+        console.log('edits array',editsArray)
+       
         await getTemplatesInfoFromServer(editsArray)
+
+        
+
+
+        editsLoadedFromServerForEditor = JSON.parse(JSON.stringify(editsArray))
 
         try{
             if(isEditingMode){

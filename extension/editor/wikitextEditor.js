@@ -350,7 +350,7 @@ function recalculateButtonPressed(){
     const  {wikitextWithDates,updatedInstructions} = findDatesInWikitext(finalInstructions,initialWikitext)
 
     const sidebar = document.getElementsByClassName('sidebarWithDates')[0]
-    sidebar.innerHTML = renderListOfEditsInSideBar(updatedInstructions)
+    sidebar.innerHTML = renderListOfEditsInWikitextSideBar(updatedInstructions)
 
     currentWikitext = wikitextWithDates
     renderCurrentWikitext()
@@ -431,7 +431,7 @@ async function copyWikitextToClipboard() {
 
     try {
         if(markupGenerated){
-        await navigator.clipboard.writeText(unescapedHTML);
+            await navigator.clipboard.writeText(unescapedHTML);
             toast.innerText = "Wikitext copied to clipboard"
         }else{
             toast.innerText = "Wikitext is not ready to be copied"
@@ -446,9 +446,7 @@ async function copyWikitextToClipboard() {
 
     document.body.appendChild(toast)
     setTimeout(() => {
-
         toast.parentElement.removeChild(toast)
-     // toast.classList.add('hide');
     }, 3000); // Hide the toast after 3 seconds
   }
 

@@ -12,15 +12,16 @@ a.disabledLink{
     color:lightgray;
 }
 
-.popup {
+.editorPopup {
     position: fixed;
+    display: flex;
     bottom: 20px;
     left: 20px;
     background-color: #fff;
     border: 1px solid #ccc;
     padding: 20px;
     box-shadow: 0 0 10px rgba(0,0,0,0.3);
-    width:500px;
+    width:1000px;
     height:400px;
     max-width: 80%;
     max-height: 80%;
@@ -28,7 +29,17 @@ a.disabledLink{
     z-index: 9999;
 }
 
-.popup-close {
+.editorLeftColumn {
+    display: flex;
+    flex:1;
+    flex-direction: column;
+}
+
+.editorBottomBar {
+    display: flex;
+}
+
+.editorPopup-close {
     position: absolute;
     top: 10px;
     right: 10px;
@@ -39,11 +50,11 @@ a.disabledLink{
     cursor: pointer;
 }
 
-.popup-close:hover {
+.editorPopup-close:hover {
     color: #666;
 }
 
-.popup-input {
+.editorPopup-input {
     width: 100%;
     height: 290px;
     padding: 10px;
@@ -53,7 +64,7 @@ a.disabledLink{
     resize: vertical;
 }
 
-.popup-link {
+.editorPopup-link {
     display: block;
     text-align: center;
     margin-top: 20px;
@@ -65,6 +76,10 @@ a.disabledLink{
     color: #333;
 }
 
+.fadedRow {
+    opacity: 0.3;
+    
+}
 
 
 .wikitextPopup {
@@ -174,17 +189,31 @@ a.disabledLink{
     display: flex;
     overflow-y:scroll;
     width:450px;
+    height: 100%;
     flex-direction: column;
     align-items: center;
 }
 
 
-.sideListRow{
+.sideListRow {
     display:flex;
     width: 350px;
+    height: 300px;
     align-items: center;
     padding-left: 20px;
     padding-right: 20px;
+}
+
+
+.templateNameSpan{
+    margin-top: 20px;
+    margin-bottom: 5px;
+    color:red;
+}
+
+.titleRow {
+    display: flex;
+    height:300px;
 }
 
 .sideListExclamation{

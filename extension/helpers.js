@@ -357,6 +357,8 @@ function prepareServerReplacements(allEdits,text){
 
     let repsFromServer = getReplacementsFromServerForWeb(editsToUse, text)
 
+
+
     repsFromServer = repsFromServer.sort((a,b) => a.index - b.index)
 
     let indexOfEditBeforeTemplate = 0
@@ -364,60 +366,75 @@ function prepareServerReplacements(allEdits,text){
     let indexInFilteredEdits = 0
     let insideTemplate = false
     let lastTemplate = null
-    while (indexInAllEdits < allEdits.length || indexInFilteredEdits < repsFromServer.length){
-        const edit = allEdits[Math.min(indexInAllEdits,allEdits.length - 1)]
-        const replacement = repsFromServer[Math.min(indexInFilteredEdits,repsFromServer.length - 1)]
-        
-        if(replacement.isBroken){
-            indexInAllEdits++
-            indexInFilteredEdits++
-            continue
-        }
 
-        if(edit.isTemplate){
-            if(lastTemplate && !lastTemplate.indexAfter){
-                lastTemplate.indexAfter = -1
-                edit.indexBefore = -1
-            }else{
-                edit.indexBefore = indexOfEditBeforeTemplate
+    console.log('allEdits',allEdits)
+    console.log('repsFromServer',repsFromServer)
+
+    if(repsFromServer.length){
+        while (indexInAllEdits < allEdits.length || indexInFilteredEdits < repsFromServer.length){
+            const edit = allEdits[Math.min(indexInAllEdits,allEdits.length - 1)]
+            const replacement = repsFromServer[Math.min(indexInFilteredEdits,repsFromServer.length - 1)]
+            
+            if(replacement.isBroken){
+                indexInAllEdits++
+                indexInFilteredEdits++
+                continue
+            }
+
+            if(edit.isTemplate){
+                if(lastTemplate && !lastTemplate.indexAfter){
+                    lastTemplate.indexAfter = -1
+                    edit.indexBefore = -1
+                }else{
+                    edit.indexBefore = indexOfEditBeforeTemplate
+
+                }
+                lastTemplate = edit
+                insideTemplate = true
+                indexInAllEdits++
+                continue
+            }
+
+
+            
+            if(edit.string === replacement.edit.string && edit.method === replacement.edit.method && edit.order === replacement.edit.order){
+                
+                if(insideTemplate){
+                    lastTemplate.indexAfter = replacement.index 
+                    insideTemplate = false
+                    lastTemplate = null
+
+                }else{
+                    indexOfEditBeforeTemplate = replacement.index + replacement.edit.target.length
+                }
+                
+                indexInAllEdits++
+                indexInFilteredEdits++
+
 
             }
-            lastTemplate = edit
-            insideTemplate = true
-            indexInAllEdits++
-            continue
-        }
-
-
-        
-        if(edit.string === replacement.edit.string && edit.method === replacement.edit.method && edit.order === replacement.edit.order){
-            
-            if(insideTemplate){
-                lastTemplate.indexAfter = replacement.index 
-                insideTemplate = false
-                lastTemplate = null
-
-            }else{
-                indexOfEditBeforeTemplate = replacement.index + replacement.edit.target.length
+            if(replacement.isBroken){
+                indexInFilteredEdits++
             }
-            
-            indexInAllEdits++
-            indexInFilteredEdits++
-
 
         }
-        if(replacement.isBroken){
-            indexInFilteredEdits++
+
+        if(insideTemplate){
+            lastTemplate.indexAfter = text.length - 1
         }
-
-    }
-
-    if(insideTemplate){
-        lastTemplate.indexAfter = text.length - 1
     }
 
     
-    const templates = allEdits.filter(edit => !!edit.isTemplate)
+    let templates = allEdits.filter(edit => !!edit.isTemplate)
+
+
+    if(!repsFromServer.length){
+        templates = templates.map((item,index) => ({
+            ...item,
+            indexBefore:index == 0 ? 0 : -1,
+            indexAfter:index == templates.length - 1 ? text.length - 1 : -1
+        }))
+    }
 
     let lastIndexBeforeTemplate = 0
     for(let template of templates){
@@ -475,4 +492,23 @@ async function fetchTemplateData(template) {
     } catch (error) {
         return "some error";
     }
+}
+
+
+function areEditsEqual(editA, editB){
+
+    return editA.string === editB.string &&
+        editA.target === editB.target &&
+       ( (editA.order === editB.order || (!editA.order && !editB.order)) )&&
+        editA.method === editB.method &&
+       ( editA.originalSubstitute === editB.originalSubstitute || (!editA.originalSubstitute && !editB.originalSubstitute))
+}
+
+
+function areEditsInSamePlace(editA, editB){
+
+    return editA.string === editB.string &&
+        editA.target === editB.target &&
+       ( (editA.order === editB.order || (!editA.order && !editB.order)) )
+       
 }
