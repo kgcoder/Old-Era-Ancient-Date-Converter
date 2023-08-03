@@ -1224,14 +1224,16 @@ function showPopupWithInstructions(){
 }
 
 
-function loadTemplates(){
-    const input = document.getElementsByClassName("editorPopup-input")[0]
-    const text = input.value
+async function loadTemplates(){
+
+    let templatesOnPage = await getListOfTemplateNamesOnPage()
+    const processedTemplates = await getAllProcessedTemplates()
+    
+    templatesOnPage = templatesOnPage.filter(name => processedTemplates.includes(name))
+
+    const text = templatesOnPage.join('\n')
     chrome.storage.local.set({templatesToLoadAtStartup:text})
     window.location.reload()
-    // const lines = text.split('\n')
-    // console.log('lines',lines)
-
 }
 
 

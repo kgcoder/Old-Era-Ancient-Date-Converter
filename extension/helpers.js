@@ -367,9 +367,6 @@ function prepareServerReplacements(allEdits,text){
     let insideTemplate = false
     let lastTemplate = null
 
-    console.log('allEdits',allEdits)
-    console.log('repsFromServer',repsFromServer)
-
     if(repsFromServer.length){
         while (indexInAllEdits < allEdits.length || indexInFilteredEdits < repsFromServer.length){
             const edit = allEdits[Math.min(indexInAllEdits,allEdits.length - 1)]

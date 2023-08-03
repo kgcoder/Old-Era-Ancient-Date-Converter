@@ -110,8 +110,6 @@ function getConfigFromLocalStorage(callback){
         if(templateNamesString){
             const lines = templateNamesString.split('\n')
             templatesToLoadAtStartup = lines.filter(line => line.includes('Template:'))
-            console.log('templatesToLoadAtStartup',templatesToLoadAtStartup)
-
         }
         chrome.storage.local.set({templatesToLoadAtStartup:""})
 
@@ -587,8 +585,6 @@ async function startWebRequestForEditor(){
         const lines = wikitext.split('\n')
 
         editsArray = lines.map(line => getEditFromLine(line)).filter(obj => obj !== null).map(edit => convertMethodNameLongToShort(edit))
-
-        console.log('edits array',editsArray)
        
         await getTemplatesInfoFromServer(editsArray)
 
