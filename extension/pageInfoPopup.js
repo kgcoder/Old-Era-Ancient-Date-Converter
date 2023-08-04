@@ -62,13 +62,13 @@ function showPageInfoPopup(){
         <div class="sidebarWithDates">
         ${renderListOfEditsInInfoPopup(flattenedListOfEdits)}
         </div>
-        <a href="#" class="pageInfoPopup-close">&times;</a>
+        <a href="#" class="editorPopup-close">&times;</a>
     `
     document.body.appendChild(popup)
 
 
 
-    const closeButton = document.getElementsByClassName('pageInfoPopup-close')[0]
+    const closeButton = document.getElementsByClassName('editorPopup-close')[0]
     closeButton.addEventListener('click', (e) => {
        e.preventDefault()
         popup.parentElement.removeChild(popup)

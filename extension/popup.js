@@ -23,6 +23,8 @@ let allowedSites = []
 let isCurrentSiteAllowed = false
 let currentDomain = ''
 
+let currentLocation = ''
+
 //let lastOkVersion = ''
 
 const firstYearOfOldEra_default = 10000
@@ -147,25 +149,6 @@ document.addEventListener('DOMContentLoaded', function () {
     })
 
 
-
-    // const a1 = document.getElementById("okVersion")
-
-    // a1.addEventListener('click', function () {
-    //     chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
-    //         chrome.tabs.sendMessage(tabs[0].id, 'openLastOKVersion')
-    //         window.close();
-    //     })
-    // })
-
-    // const a2 = document.getElementById("verifiedVersion")
-
-    // a2.addEventListener('click', function () {
-    //     chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
-    //         chrome.tabs.sendMessage(tabs[0].id, 'openLastVerifiedVersion')
-    //         window.close();
-
-    //     })
-    // })
 
     const editsLink = document.getElementById("seeEdits")
 
@@ -421,11 +404,11 @@ function updatePageMetadata(response){
     
     link1.style = link2.style = link3.style = ""
     
-    const { lastOkVersion, translatedForVersion,
-        currentVersionSeemsOK, isCurrentVersionVerified,
-        pageHasNoBCDates, pageIsNotTranslatedYet, pageNotAnalysedYet, isThisSiteAllowed, domain, isOnWikipedia:onWiki, pageStatus } = response
+    const { pageIsNotTranslatedYet,  isThisSiteAllowed, domain,  pageStatus } = response
         
-    isOnWikipedia = onWiki
+    isOnWikipedia = response.isOnWikipedia
+
+    currentLocation = response.currentLocation
     
     isCurrentSiteAllowed = isThisSiteAllowed
     currentDomain = domain
@@ -509,6 +492,7 @@ function updateUIInAccordanceWithMode(){
 
 
 function toggleWebsiteUsage() {
+    if(!currentLocation)return
     isCurrentSiteAllowed = !isCurrentSiteAllowed
     if(!isCurrentSiteAllowed){
         allowedSites = allowedSites.filter(site => site !== currentDomain)

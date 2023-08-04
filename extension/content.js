@@ -144,7 +144,6 @@ function getConfigFromLocalStorage(callback){
         if(result.sitesData){
             const sitesData = JSON.parse(result.sitesData)
             allowedSites = sitesData.allowedSites
-            console.log('allowedSites',allowedSites)
         }else{
             allowedSites = ['en.wikipedia.org']
             chrome.storage.local.set({ ['sitesData']: JSON.stringify({allowedSites}) }).then(() => {
@@ -288,7 +287,8 @@ function sendPageMetadata(sendResponse) {
         domain,
         isOnWikipedia,
         kIsDevEnv,
-        pageStatus
+        pageStatus,
+        currentLocation
     })
 }
 
@@ -399,7 +399,7 @@ async function startRequest() {
         editsArray = json.edits ? json.edits.map(edit => convertMethodNameLongToShort(edit)) : []
 
         pageIsNotTranslatedYet = editsArray.length == 0
-        
+
         pageHasIssues = json.hasIssues 
         pageId = json.id
         
@@ -828,13 +828,14 @@ function translateEverythingOnWeb(r,finalInstructions = []) {
 
       
 
+
         
         doReplacements()
         updateDates()
 
     }
 
-    replaceImages(images)
+    replaceImagesOnWeb()
 
 
 
@@ -1118,6 +1119,46 @@ function replaceImages(images, reverse = false) {
         replaceSrcInImage(image,reverse)
 
     }
+
+}
+
+
+async function replaceImagesOnWeb(){
+    var dataString = await getDataStringFromStorage('OE-imageUrls');
+    if(dataString){
+        parseImageData(dataString);
+        replaceImages(images);
+
+    }else{
+
+        const url = "https://timeline.oldera.org/wiki/api.php?action=parse&prop=wikitext&formatversion=2&format=json&origin=*&page=OldEraImages.csv"
+
+        fetch(url).then(function(res) {return res.json();}).then(function(page) {
+            var wikitext = page.parse.wikitext;
+            if (!wikitext) return;
+    
+            saveTimestampedDataString('OE-imageUrls',wikitext);
+       
+            parseImageData(wikitext);
+        
+            replaceImages(images);
+        
+        }).catch(function(error) {console.log('fetch failed',error);});
+    }
+}
+
+
+function parseImageData(dataString){
+    var lines = dataString.split('\n');
+    
+    var imgArray = [];
+    lines.forEach(function(line) {
+        var [originalImageURL, substituteImageURL] = line.split(';');
+        var imageObj = {originalImageURL,substituteImageURL};
+        imgArray.push(imageObj);
+    });
+
+    images = imgArray;
 
 }
 

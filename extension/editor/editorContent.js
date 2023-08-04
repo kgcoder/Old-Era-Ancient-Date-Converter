@@ -1195,7 +1195,7 @@ function showPopupWithInstructions(){
         <div class="editorLeftColumn">
 		    <textarea class="editorPopup-input">${finalText}</textarea>
             <div class="editorBottomBar">
-                <button id="editorLoadTemplatesButton">Load templates</button>
+                ${isOnWikipedia ? '<button id="editorLoadTemplatesButton">Load templates</button>' : ''}
                 <button id="editorCopyButton">Copy</button>
                 <button id="gotoServerButton">Open data page</button>
             </div>
@@ -1206,13 +1206,17 @@ function showPopupWithInstructions(){
     `
     document.body.appendChild(popup)
 
+
+
     const closeButton = popup.getElementsByClassName('editorPopup-close')[0]
     closeButton.addEventListener('click', () => {
         popup.parentElement.removeChild(popup)
     })
 
     const loadTemplatesButton = document.getElementById('editorLoadTemplatesButton')
-    loadTemplatesButton.addEventListener('click', loadTemplates)
+    if(isOnWikipedia){
+        loadTemplatesButton.addEventListener('click', loadTemplates)
+    }
 
     
 

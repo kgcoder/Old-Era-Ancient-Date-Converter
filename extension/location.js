@@ -31,7 +31,7 @@ function prepareLocation() {
 
 
     if (currentLocation.includes(mainBaseURL)) {
-        titleInURL = currentLocation.replace(mainBaseURL, '')
+        titleInURL = currentLocation.replace(mainBaseURL, '').split('#')[0]
     } else if (currentLocation.includes(additionalBaseURL)) {
         titleInURL = getParamFromURL('title')
         currentLocation = mainBaseURL + titleInURL
