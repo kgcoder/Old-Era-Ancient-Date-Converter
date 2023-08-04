@@ -82,7 +82,14 @@ function updateIcon(tabId){
                 } 
                 chrome.tabs.sendMessage(tabId, 'giveMePageStatus', function (response) {
         
-                    if (!response || response.currentVersionSeemsOK) {
+                    let pageStatus = ''
+                    let currentVersionSeemsOK = false
+                    if(response){
+                        pageStatus = response.pageStatus
+                        currentVersionSeemsOK = response.currentVersionSeemsOK
+                    }
+
+                    if (pageStatus !== 'has issues' && response.currentVersionSeemsOK) {
                         chrome.action.setIcon({ path: "/images/icon16.png" });
                     } else {
                         chrome.action.setIcon({ path: "/images/icon16alert.png" });

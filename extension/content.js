@@ -71,6 +71,8 @@ let editsLoadedFromServer = []
 
 let replacementsLoadedFromServer = []
 
+let pageStatus = 'dates were translated automatically'
+
 
 
 const firstYearOfOldEra_default = 10000
@@ -142,6 +144,7 @@ function getConfigFromLocalStorage(callback){
         if(result.sitesData){
             const sitesData = JSON.parse(result.sitesData)
             allowedSites = sitesData.allowedSites
+            console.log('allowedSites',allowedSites)
         }else{
             allowedSites = ['en.wikipedia.org']
             chrome.storage.local.set({ ['sitesData']: JSON.stringify({allowedSites}) }).then(() => {
@@ -245,7 +248,8 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     if (message === 'giveMePageStatus') {
     
         sendResponse({
-            currentVersionSeemsOK
+            currentVersionSeemsOK,
+            pageStatus
         })
     }
     if (message === 'openLastOKVersion') {
@@ -283,7 +287,8 @@ function sendPageMetadata(sendResponse) {
         isThisSiteAllowed,
         domain,
         isOnWikipedia,
-        kIsDevEnv
+        kIsDevEnv,
+        pageStatus
     })
 }
 
@@ -306,14 +311,14 @@ function sendPageMetadata(sendResponse) {
         }else{
             isThisSiteAllowed = false
         }
-    
-    
+        
         if(!isThisSiteAllowed){
             chrome.runtime.sendMessage('pageMetadataIsReady') //message for the popup script
             return
         }
 
        
+
 
 
         navigator.permissions.query({ name: "clipboard-write" }).then((result) => {
@@ -392,6 +397,9 @@ async function startRequest() {
         const json = r.status !== 200 ? {} : await r.json()
 
         editsArray = json.edits ? json.edits.map(edit => convertMethodNameLongToShort(edit)) : []
+
+        pageIsNotTranslatedYet = editsArray.length == 0
+        
         pageHasIssues = json.hasIssues 
         pageId = json.id
         
@@ -712,14 +720,16 @@ function translateEverything(r,finalInstructions = []) {
     replaceImages(images)
 
 
-    if (r) {
-        prepareVersionInfo(r)    
-    }
+    // if (r) {
+    //     prepareVersionInfo(r)    
+    // }
 
        
 
 
     allWorkFinishedForPage = true
+
+    updatePageStatus()
 
     updateIcon()
 
@@ -835,6 +845,9 @@ function translateEverythingOnWeb(r,finalInstructions = []) {
 
     allWorkFinishedForPage = true
 
+
+    updatePageStatus()
+
     updateIcon()
 
     updatePageTitle()
@@ -844,6 +857,23 @@ function translateEverythingOnWeb(r,finalInstructions = []) {
 
 }
 
+
+function updatePageStatus(){
+    let hasSmallIssues = false
+    let hasIssues = false
+    for (let edit of flattenedListOfEdits){
+        if(edit.isSus)hasSmallIssues = true
+        if(edit.notFound){
+            hasIssues = true
+            break
+        }
+    }
+
+    pageStatus = hasIssues ? "has issues" : (hasSmallIssues ? "small issues" : "seems OK")
+
+
+
+}
 
 
 function resolveReplacements(replacementsArray, repsFromServer) {
@@ -963,6 +993,7 @@ function findIfPageContainsCenturiesTemplate(){
 }
 
 function updatePageTitle() {
+    if(!isOnWikipedia)return
     try{
         const html = document.body.innerHTML
         const reg = new RegExp('<h1.*>(.*?)</h1>')

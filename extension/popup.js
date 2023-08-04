@@ -148,24 +148,24 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-    const a1 = document.getElementById("okVersion")
+    // const a1 = document.getElementById("okVersion")
 
-    a1.addEventListener('click', function () {
-        chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
-            chrome.tabs.sendMessage(tabs[0].id, 'openLastOKVersion')
-            window.close();
-        })
-    })
+    // a1.addEventListener('click', function () {
+    //     chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
+    //         chrome.tabs.sendMessage(tabs[0].id, 'openLastOKVersion')
+    //         window.close();
+    //     })
+    // })
 
-    const a2 = document.getElementById("verifiedVersion")
+    // const a2 = document.getElementById("verifiedVersion")
 
-    a2.addEventListener('click', function () {
-        chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
-            chrome.tabs.sendMessage(tabs[0].id, 'openLastVerifiedVersion')
-            window.close();
+    // a2.addEventListener('click', function () {
+    //     chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
+    //         chrome.tabs.sendMessage(tabs[0].id, 'openLastVerifiedVersion')
+    //         window.close();
 
-        })
-    })
+    //     })
+    // })
 
     const editsLink = document.getElementById("seeEdits")
 
@@ -177,15 +177,6 @@ document.addEventListener('DOMContentLoaded', function () {
         })
     })
 
-    const nonwikiEditsLink = document.getElementById("seeNonWikiEdits")
-
-    nonwikiEditsLink.addEventListener('click', function () {
-        chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
-            chrome.tabs.sendMessage(tabs[0].id, 'openEdits')
-            window.close();
-
-        })
-    })
 
     //input listeners=========
 
@@ -324,7 +315,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
      
         updatePageInfoVisibility(false)
-        updateNonWikiPageInfoVisibility(false)
 
         if(result.sitesData){
             const sitesData = JSON.parse(result.sitesData)
@@ -433,9 +423,9 @@ function updatePageMetadata(response){
     
     const { lastOkVersion, translatedForVersion,
         currentVersionSeemsOK, isCurrentVersionVerified,
-        pageHasNoBCDates, pageIsNotTranslatedYet, pageNotAnalysedYet, isThisSiteAllowed, domain, isOnWikipedia, kIsDevEnv } = response
+        pageHasNoBCDates, pageIsNotTranslatedYet, pageNotAnalysedYet, isThisSiteAllowed, domain, isOnWikipedia:onWiki, pageStatus } = response
         
-    
+    isOnWikipedia = onWiki
     
     isCurrentSiteAllowed = isThisSiteAllowed
     currentDomain = domain
@@ -443,31 +433,21 @@ function updatePageMetadata(response){
     document.getElementById('UseOnThisSiteCheckbox').checked = isThisSiteAllowed
     document.getElementById('DomainNameLabel').innerText = `Use on this website (${domain})`
 
-    let message = currentVersionSeemsOK ? 'seems OK' : 'may have issues'
-    if (currentVersionSeemsOK && isCurrentVersionVerified) message = 'is OK'
-    if (pageIsNotTranslatedYet) message = 'dates were translated automatically'
-    if (pageNotAnalysedYet) message = 'page hasn\'t been analyzed yet'
-    if (pageHasNoBCDates) message = 'page doesn\'t have BC dates'
-    let messageColor = currentVersionSeemsOK ? 'green' : 'red'
-    if (pageHasNoBCDates || pageNotAnalysedYet || pageNotAnalysedYet) messageColor = 'black'
+    let message = pageStatus
+    let messageColor = pageStatus === 'has issues' ||  pageStatus === 'small issues' ? 'red' : 'green'
+    if(pageIsNotTranslatedYet){
+        message = 'dates were translated automatically'
+        messageColor = 'green'
+    }
+    
     updatePageStatus(message, messageColor)
-
-    const title = document.getElementById("otherVersions")
-    title.style.display = !pageIsNotTranslatedYet && (lastOkVersion || translatedForVersion) ? 'flex' : 'none'
-
-    const a1 = document.getElementById("okVersion")
-    a1.style.display = !pageIsNotTranslatedYet && lastOkVersion ? 'flex' : 'none'
-
-
-    const a2 = document.getElementById("verifiedVersion")
-    a2.style.display = !pageIsNotTranslatedYet && translatedForVersion ? 'flex' : 'none'
 
     const pageInfo = document.getElementById("pageInfo")
     pageInfo.style.display = pageIsNotTranslatedYet ? 'none' : 'flex'
 
-    updatePageInfoVisibility(!isExtensionOff && isOnWikipedia)
-    updateNonWikiPageInfoVisibility(!isExtensionOff && !isOnWikipedia && isThisSiteAllowed && !pageIsNotTranslatedYet)
+    updatePageInfoVisibility(!isExtensionOff)
     updateUIInAccordanceWithMode()
+    updateButtons()
 }
 
 
@@ -487,7 +467,6 @@ function toggleExtension() {
      
         if(isExtensionOff){
             updatePageInfoVisibility(false)
-            updateNonWikiPageInfoVisibility(false)
         }
         chrome.runtime.sendMessage({ message: 'updateIcon' });
         sendMessageToPage(isExtensionOff ? 'turnOff' : 'turnOn')
@@ -540,7 +519,6 @@ function toggleWebsiteUsage() {
 
     updateUIInAccordanceWithMode()
 
-    
     chrome.storage.local.set({ ['sitesData']:JSON.stringify({allowedSites}) }).then(() => {
         sendMessageToPage('toggleSiteUsage')
     })
@@ -594,11 +572,7 @@ function updatePageInfoVisibility(visible){
     currentPageInfoDiv.style.display = visible ? 'flex' : 'none'
 }
 
-function updateNonWikiPageInfoVisibility(visible){
-    const a = document.getElementById("seeNonWikiEdits")
-    const span = a.parentElement
-    span.style.display = visible ? 'flex' : 'none'
-}
+
 
 function updateLinksSectionVisibility(visible){
     const div = document.getElementById("LinksSection")

@@ -9,6 +9,7 @@
 //let isTestingMode = false
 let selectionMode = 'markerMode'
 let isServerDataReady = false
+let isOnWikipedia = false
 
 const buttonIDs = [
     'goBackInHistory',
@@ -102,7 +103,7 @@ function updateButtons() {
     buttonIDs.forEach(id => {
         const button = document.getElementById(id)
         if(id === 'startWikitextEditing'){
-            button.disabled = isEditingWikitext
+            button.disabled = !isOnWikipedia || isEditingWikitext
         }else if(id === 'loadFromServer' || id === 'loadFromServerOnlyFixed' || id === 'loadFromServerWithoutFixed'){
             button.disabled = isTestingMode || !isServerDataReady
         }else if (id === 'test') {
