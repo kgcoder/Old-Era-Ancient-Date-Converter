@@ -1168,6 +1168,8 @@ function showPopupWithInstructions(){
 
         if(isTemplate)return templateName
         string = string.replace(nReg,'\\n').replace(tReg,'\\t')
+        string = addEscapesToSemicolons(string)
+        target = addEscapesToSemicolons(target)
 
         return `${string};${target};${method};;${order ? order : ""};${originalSubstitute ? originalSubstitute : ""};`
     })
