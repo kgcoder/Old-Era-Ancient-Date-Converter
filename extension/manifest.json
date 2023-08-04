@@ -9,6 +9,7 @@
                 "<all_urls>"
             ],
             "js": [
+                "globals.js",
                 "constants.js",
                 "patternsInHtml.js",
                 "patternsInText.js",

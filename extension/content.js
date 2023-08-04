@@ -490,6 +490,8 @@ async function startWebRequest() {
 
         editsLoadedFromServer = editsArray
 
+        
+
 
 
         try{
@@ -756,6 +758,8 @@ function translateEverythingOnWeb(r,finalInstructions = []) {
 
 
         replacementsLoadedFromServer = repsFromServer
+
+        flattenListOfEdits()
 
         pageIsNotTranslatedYet = repsFromServer.length == 0
 

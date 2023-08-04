@@ -1,14 +1,15 @@
+/*
+ * Copyright (c) Karen Grigorian
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
 
-
-
-
-function showPageInfoPopup(){
-
-
-    let flattenedListOfEdits = []
+function flattenListOfEdits(){
+    let result = []
     for(let edit of editsLoadedFromServer){
         if(!edit.isTemplate){
-            flattenedListOfEdits.push(edit)
+            result.push(edit)
             continue
         }
 
@@ -20,14 +21,14 @@ function showPageInfoPopup(){
             isTitle:index === 0
         }))
 
-        flattenedListOfEdits = flattenedListOfEdits.concat(subEdits)
+        result = result.concat(subEdits)
         
     }
 
 
-    for(let i = 0; i < flattenedListOfEdits.length; i++){
+    for(let i = 0; i < result.length; i++){
 
-        const edit = flattenedListOfEdits[i]
+        const edit = result[i]
 
         const rep = replacementsLoadedFromServer.find(rep => areEditsInSamePlace(rep.edit,edit))
         
@@ -42,6 +43,17 @@ function showPageInfoPopup(){
         edit.notFound = false
    
     }
+
+
+    flattenedListOfEdits = result
+}
+
+
+
+function showPageInfoPopup(){
+
+
+   
 
 
     const popup = document.createElement('div')
