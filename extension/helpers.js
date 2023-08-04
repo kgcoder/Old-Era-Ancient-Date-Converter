@@ -355,7 +355,7 @@ function prepareServerReplacements(allEdits,text){
 
     const editsToUse = allEdits.filter(edit => !edit.isTemplate)
 
-    let repsFromServer = getReplacementsFromServerForWeb(editsToUse, text)
+    let {replacementsFromServer:repsFromServer, badReplacements} =  getReplacementsFromServerForWeb(editsToUse, text)
 
 
 
@@ -367,16 +367,15 @@ function prepareServerReplacements(allEdits,text){
     let insideTemplate = false
     let lastTemplate = null
 
+
+
+
+
     if(repsFromServer.length){
         while (indexInAllEdits < allEdits.length || indexInFilteredEdits < repsFromServer.length){
-            const edit = allEdits[Math.min(indexInAllEdits,allEdits.length - 1)]
             const replacement = repsFromServer[Math.min(indexInFilteredEdits,repsFromServer.length - 1)]
+            const edit = allEdits[Math.min(indexInAllEdits,allEdits.length - 1)]
             
-            if(replacement.isBroken){
-                indexInAllEdits++
-                indexInFilteredEdits++
-                continue
-            }
 
             if(edit.isTemplate){
                 if(lastTemplate && !lastTemplate.indexAfter){
@@ -409,9 +408,9 @@ function prepareServerReplacements(allEdits,text){
                 indexInFilteredEdits++
 
 
-            }
-            if(replacement.isBroken){
-                indexInFilteredEdits++
+            }else{
+                indexInAllEdits++
+
             }
 
         }
@@ -439,12 +438,15 @@ function prepareServerReplacements(allEdits,text){
         const endIndex = template.indexAfter == -1 ? text.length - 1 : template.indexAfter
          const textPart = text.substr(startIndex, endIndex - startIndex)
 
-         let templateReps = getReplacementsFromServerForWeb(template.subEdits, textPart)
+         let {replacementsFromServer:templateReps, badReplacements:badRepsInTemplate} =  getReplacementsFromServerForWeb(template.subEdits, textPart)
+
 
          
          templateReps = templateReps.map(rep => ({...rep,index:startIndex + rep.index}))
 
          repsFromServer = repsFromServer.concat(templateReps)
+
+         badReplacements = badReplacements.concat(badRepsInTemplate)
          
 
          const healthyReps = templateReps.filter(rep => !rep.isBroken)
@@ -458,7 +460,7 @@ function prepareServerReplacements(allEdits,text){
     }
 
 
-    return repsFromServer.sort((a,b) => a.index - b.index)
+    return {repsFromServer: repsFromServer.sort((a,b) => a.index - b.index),badReplacements}
 }
 
 

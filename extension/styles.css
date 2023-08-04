@@ -255,3 +255,25 @@ a.disabledLink{
   }
   
  
+
+  .pageInfoPopup {
+    position: fixed;
+    display: flex;
+    top: 20px;
+    left: 20px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    width:500px;
+    height:700px;
+    max-width: 80%;
+    max-height: 80%;
+    overflow: auto;
+    z-index: 9999;
+}
+
+
+.hidden {
+    display: none;
+}

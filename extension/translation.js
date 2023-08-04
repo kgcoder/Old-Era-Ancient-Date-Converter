@@ -252,9 +252,9 @@ function getReplacementsFromServerForWeb(editsArray, text) {
 
     const filteredEdits = replacementsFromServer.filter(rep => !rep.isBroken)
 
-    const badEdits = replacementsFromServer.filter(rep => rep.isBroken)
+    const badReplacements = replacementsFromServer.filter(rep => rep.isBroken)
   
-    issuesInCurrentPageExist = badEdits.length > 0
+    issuesInCurrentPageExist = badReplacements.length > 0
 
     pageHasIssues = pageHasIssues || filteredEdits.replacementsFromServer !== replacementsFromServer.length
     replacementsFromServer = filteredEdits
@@ -268,7 +268,7 @@ function getReplacementsFromServerForWeb(editsArray, text) {
     replacementsFromServer = replacementsFromServer.sort((a, b) => a.edit.targetIndex - b.edit.targetIndex)
 
     //if (!replacements.length) return null
-    return replacementsFromServer
+    return {replacementsFromServer, badReplacements}
 
 
 
@@ -483,7 +483,7 @@ function fixBrokenEdits(gaps,html){
 
     return fixedEdits.map(edit => {
         const {targetIndex, target, method, type, originalSubstitute} = edit
-        return {isBroken:false, edit, index:targetIndex, length: target.length, replacement: createMarker(target, method, type, originalSubstitute) }
+        return {isBroken:false, wasFixed:true, edit, index:targetIndex, length: target.length, replacement: createMarker(target, method, type, originalSubstitute) }
     })
 }
 

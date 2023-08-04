@@ -27,6 +27,7 @@
                 "editor/wikitextEditor.js",
                 "editor/selectors.js",
                 "editor/committers.js",
+                "pageInfoPopup.js",
                 "content.js"
             ],
             "css": [

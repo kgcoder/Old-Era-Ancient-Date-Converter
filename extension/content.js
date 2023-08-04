@@ -67,6 +67,11 @@ let isEditingMode = false
 let pageNotFoundOnNewServer = false //temporary flag
 
 
+let editsLoadedFromServer = []
+
+let replacementsLoadedFromServer = []
+
+
 
 const firstYearOfOldEra_default = 10000
 const lastTranslatedYearWithLabel_default = 6000
@@ -178,6 +183,13 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     }
 
     if (message === 'openEdits') {
+
+        if(useNewServer && !pageNotFoundOnNewServer){
+            showPageInfoPopup()
+            return
+        }
+
+
         const link = isOnWikipedia ? `${frontendBaseUrl}/#/translatedPages/${pageId}/show` :
         getPageUrlOnMyServer()
         window.open(link)
@@ -444,7 +456,6 @@ async function startWebRequest() {
     requestHasStarted = true
 
     const url = getWikitextUrlOnMyServer()
-
       
     try{
 
@@ -473,11 +484,12 @@ async function startWebRequest() {
         
         editsArray = getEditsFromLines(lines)
         
-      
-
        
         await getTemplatesInfoFromServer(editsArray)
        
+
+        editsLoadedFromServer = editsArray
+
 
 
         try{
@@ -739,8 +751,11 @@ function translateEverythingOnWeb(r,finalInstructions = []) {
  
         const {result:text,insertions} = extractTextFromHtml(htmlWithIgParts)
 
-        let repsFromServer = prepareServerReplacements(allEdits,text)
 
+        let {repsFromServer, badReplacements} = prepareServerReplacements(allEdits,text)
+
+
+        replacementsLoadedFromServer = repsFromServer
 
         pageIsNotTranslatedYet = repsFromServer.length == 0
 

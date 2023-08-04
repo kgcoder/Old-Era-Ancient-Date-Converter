@@ -360,7 +360,8 @@ function createHTMLWithMarkersForEditor(editsFromServer,shouldFixBrokenEdits = f
     if(isOnWikipedia && (!useNewServer || pageNotFoundOnNewServer)){
         replacements = getReplacementsFromEdits(editsFromServer,htmlWithIgParts)
     }else{
-        replacements = prepareServerReplacements(editsFromServer,text)
+        let {repsFromServer, badReplacements} = prepareServerReplacements(editsFromServer,text)
+        replacements = repsFromServer
     }
 
 
@@ -564,6 +565,7 @@ function createInstructions(forWikitext = false) {
         ignHtml = htmlWithIgParts
 
     }
+
 
 
     while ((result = pattern.exec(ignHtml))) {
@@ -1033,7 +1035,7 @@ async function startWikitextEditing(){
 
     renderCurrentWikitext()
 
-    const closeButton = popup.getElementsByClassName('popup-close')[0]
+    const closeButton = popup.getElementsByClassName('editorPopup-close')[0]
     closeButton.addEventListener('click', () => {
         isEditingWikitext = false
         chrome.storage.local.set({ isEditingWikitext }, function () {})
