@@ -279,6 +279,18 @@ function mergeReplacements(rawReplacements){
     let lastIndex = 0
     for(let i = 0; i < rawReplacements.length;i++){
         const replacement = rawReplacements[i]
+
+        if(replacement.edit.method === 'bc-ig'){
+            if(currentGroup.length > 0){
+                groupsArray.push(currentGroup)
+            }
+            currentGroup = [replacement]  
+            groupsArray.push(currentGroup)
+            lastIndex = replacement.index + replacement.length
+            currentGroup = []
+            continue
+            
+        }
       
         if(currentGroup.length === 0 || (replacement.index === lastIndex && replacement.edit.method === 'bc-r') ){
             currentGroup.push(replacement)
@@ -292,6 +304,7 @@ function mergeReplacements(rawReplacements){
     if(currentGroup.length > 0){
         groupsArray.push(currentGroup)
     }
+
 
     for(let i = 0; i < groupsArray.length; i++){
         const group = groupsArray[i]
