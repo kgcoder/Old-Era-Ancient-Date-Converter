@@ -1098,9 +1098,8 @@ function renderListOfEditsInWikitextSideBar(instructions){
 
 function markupDateInSideList(string,target,method,order,originalSubstitute){
 
-    if (!order) order = '1.1.1.1'
+    const orderChunks = getOrderChunks(order)
 
-    const orderChunks = order.split('.').map(chunk => parseInt(chunk, 10))
     if (orderChunks.length !== 4) {
         console.log('orderChunks.length !== 4 (in a date for wikitext)')
         return string
@@ -1140,13 +1139,15 @@ function showPopupWithInstructions(){
 
 
 
+
     for(let template of templates){
         for(let templateEdit of template.subEdits){
-            const edit = finalInstructions.find(item => areEditsInSamePlace(item,templateEdit))
+            const edit = finalInstructions.find(item => areEditsInSamePlace(item,templateEdit, true))
             if(edit){
                 edit.isTemplate = true
                 edit.templateName = template.name
             }
+            
         }
     }
 

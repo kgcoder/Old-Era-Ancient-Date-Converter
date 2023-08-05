@@ -47,9 +47,9 @@ function getReplacementsFromServer(editsArray, htmlWithIgParts) {
     
 
         let { string, target, method, order, type, originalSubstitute } = edit
-        if (!order) order = '1.1.1.1'
+        
+        const orderChunks = getOrderChunks(order)
 
-        const orderChunks = order.split('.').map(chunk => parseInt(chunk, 10))
         if (orderChunks.length !== 4) {
             //console.log('orderChunks.length !== 4')
             return {edit,isBroken:true}
@@ -169,9 +169,9 @@ function getReplacementsFromServerForWeb(editsArray, text) {
     
 
         let { string, target, method, order, type, originalSubstitute } = edit
-        if (!order) order = '1.1.1.1'
 
-        const orderChunks = order.split('.').map(chunk => parseInt(chunk, 10))
+        const orderChunks = getOrderChunks(order)
+
         if (orderChunks.length !== 4) {
             //console.log('orderChunks.length !== 4')
             return {edit,isBroken:true}
@@ -437,9 +437,9 @@ function fixBrokenEdits(gaps,html){
     
         gap.brokenEdits.forEach(brokenEdit => {
             let order = brokenEdit.order
-            if (!order) order = '1.1.1.1'
+            const orderChunks = getOrderChunks(order)
+
             let ocNum = 1
-            const orderChunks = order.split('.').map(chunk => parseInt(chunk, 10))
             if (orderChunks.length === 4) {
                 ocNum = orderChunks[3]
             }

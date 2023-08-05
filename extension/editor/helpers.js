@@ -6,6 +6,32 @@
  */
 
 
+function getOrderChunks(order){
+    if (!order) order = '1.1.1.1'
+    let orderChunks = order.split('.')
+    if(orderChunks.length !== 4)return orderChunks
+
+    if(isOnWikipedia && orderChunks[0].includes("t")){
+        const firstChunk = orderChunks[0].replace("t","")
+        orderChunks[0] = firstChunk
+
+        orderChunks = orderChunks.map(chunk => parseInt(chunk, 10))
+
+        if(!titleInURL.includes("Template:")){
+            orderChunks[0] = Math.max(orderChunks[0]/2,1)
+            orderChunks[1] = Math.max(orderChunks[1]/2,1)
+        }
+
+    }else{
+        orderChunks = orderChunks.map(chunk => parseInt(chunk, 10))
+    }
+
+    return orderChunks
+}
+
+
+
+
 function getReplacementsFromEdits(edits, htmlWithIgParts){
     
     if(!edits || !edits.length)return []
@@ -15,9 +41,10 @@ function getReplacementsFromEdits(edits, htmlWithIgParts){
     
 
         let { string, target, method, order, type, originalSubstitute, fromTemplate } = edit
-        if (!order) order = '1.1.1.1'
+        
+        const orderChunks = getOrderChunks(order)
 
-        const orderChunks = order.split('.').map(chunk => parseInt(chunk, 10))
+
         if (orderChunks.length !== 4) {
            // console.log('not 4', edit)
             return {edit,isBroken:true}//"no good"

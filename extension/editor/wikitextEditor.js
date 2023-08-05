@@ -123,15 +123,14 @@ function findOneDateInWikitext(instruction, wikitext,replacements, indexOfLastFo
    
     let {string,target,order} = instruction
 
-    if (!order) order = '1.1.1.1'
+    const orderChunks = getOrderChunks(order)
 
-        const orderChunks = order.split('.').map(chunk => parseInt(chunk, 10))
-        if (orderChunks.length !== 4) {
-            console.log('orderChunks.length !== 4 (in a date for wikitext)')
-            return -1
-        }
-    
-        const [string_num_of_oc, string_oc, target_num_of_oc, target_oc] = orderChunks
+    if (orderChunks.length !== 4) {
+        console.log('orderChunks.length !== 4 (in a date for wikitext)')
+        return -1
+    }
+
+    const [string_num_of_oc, string_oc, target_num_of_oc, target_oc] = orderChunks
 
 
     const reg = new RegExp(escapeText(target),'gm')

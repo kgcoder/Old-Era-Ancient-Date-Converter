@@ -498,16 +498,45 @@ function areEditsEqual(editA, editB){
 
     return editA.string === editB.string &&
         editA.target === editB.target &&
-       ( (editA.order === editB.order || (!editA.order && !editB.order)) )&&
+        ordersAreEqual(editA.order, editB.order) &&
         editA.method === editB.method &&
        ( editA.originalSubstitute === editB.originalSubstitute || (!editA.originalSubstitute && !editB.originalSubstitute))
 }
 
 
-function areEditsInSamePlace(editA, editB){
+function areEditsInSamePlace(editA, editB, checkHideShow = false){
 
-    return editA.string === editB.string &&
+    const normalComparison = editA.string === editB.string &&
+    editA.target === editB.target &&
+    ordersAreEqual(editA.order, editB.order)
+
+    if(checkHideShow && !normalComparison){
+        const stringA = editA.string.replace(/hide/g,"show")
+        const stringB = editB.string.replace(/hide/g,"show")
+
+        return stringA === stringB &&
         editA.target === editB.target &&
-       ( (editA.order === editB.order || (!editA.order && !editB.order)) )
+        ordersAreEqual(editA.order, editB.order)
+
+    }
+
+    return normalComparison
        
+}
+
+
+function ordersAreEqual(orderA,orderB){
+    if(!orderA && !orderB) return true
+
+    if(orderA){
+        orderA = orderA.includes("t") ? getOrderChunks(orderA).join('.') : orderA
+        if(orderA === '1.1.1.1')orderA = ''
+    }
+    if(orderB){
+        orderB = orderB.includes("t") ? getOrderChunks(orderB).join('.') : orderB
+        if(orderB === '1.1.1.1')orderB = ''
+    }
+
+    if(!orderA && !orderB) return true
+    return orderA == orderB
 }
