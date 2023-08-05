@@ -1188,7 +1188,7 @@ function showPopupWithInstructions(){
 
     const finalText = lines.join('\n')
 
-
+    const containsHides = finalText.includes("hide")
 
 
     const popup = document.createElement('div')
@@ -1198,6 +1198,8 @@ function showPopupWithInstructions(){
         <div class="editorLeftColumn">
 		    <textarea class="editorPopup-input">${finalText}</textarea>
             <div class="editorBottomBar">
+            ${containsHides ? `<span style="color:red;">Hides!</span>
+            <button id="hideToShowButton">Hide-&gt;Show</button>` : ''}
                 ${isOnWikipedia ? '<button id="editorLoadTemplatesButton">Load templates</button>' : ''}
                 <button id="editorCopyButton">Copy</button>
                 <button id="gotoServerButton">Open data page</button>
@@ -1221,6 +1223,12 @@ function showPopupWithInstructions(){
         loadTemplatesButton.addEventListener('click', loadTemplates)
     }
 
+
+    if(containsHides){
+        const hideToShowButton = document.getElementById('hideToShowButton')
+        hideToShowButton.addEventListener('click', replaceHideWithShow)
+    }
+    
     
 
     const copyButton = document.getElementById('editorCopyButton')
@@ -1243,6 +1251,11 @@ async function loadTemplates(){
     const text = templatesOnPage.join('\n')
     chrome.storage.local.set({templatesToLoadAtStartup:text})
     window.location.reload()
+}
+
+function replaceHideWithShow(){
+    const input = document.getElementsByClassName("editorPopup-input")[0]
+    input.value = input.value.replace(/hide/gm,"show")
 }
 
 
