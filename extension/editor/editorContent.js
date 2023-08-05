@@ -42,6 +42,8 @@ let templatesToLoadAtStartup = []
 
 let preloadedTemplates = []
 
+let editorIsOpen = false
+
 const allClassesString = allClasses.join('|')
 
 
@@ -256,8 +258,8 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         case 'commit000s':
             commit000s()
             break
-        case 'sendToServer':
-            sendToServer()
+        case 'openEditor':
+            openEditor()
             break
         case 'startWikitextEditing':
             isEditingWikitext = isOnWikipedia
@@ -856,18 +858,18 @@ function backToEditing() {
 }
 
 
-async function sendToServer() {
+async function openEditor() {
 
+    if(shouldReturnBecauseOfTestingMode())return
+
+    if(editorIsOpen)return
+    editorIsOpen = true
 
     if(!isOnWikipedia || useNewServer){
         showPopupWithInstructions()
         return
     }
 
-    if(!kIsDevEnv){
-        alert("You can't save data related to Wikipedia at this moment.")
-        return
-    }
    
     let currentLocation = window.location.toString()
     currentLocation = currentLocation.split('?')[0].split('#')[0]
@@ -967,6 +969,8 @@ function getProhibitedRangesFromTemplateInfo(oneTableInfo){
 
 
 async function startWikitextEditing(){
+    if(shouldReturnBecauseOfTestingMode())return
+
     if(!isOnWikipedia)return
 
     finalInstructions = createInstructions(true)
@@ -1216,6 +1220,7 @@ function showPopupWithInstructions(){
     const closeButton = popup.getElementsByClassName('editorPopup-close')[0]
     closeButton.addEventListener('click', () => {
         popup.parentElement.removeChild(popup)
+        editorIsOpen = false
     })
 
     const loadTemplatesButton = document.getElementById('editorLoadTemplatesButton')
