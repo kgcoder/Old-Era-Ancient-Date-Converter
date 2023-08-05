@@ -11,15 +11,14 @@ function getOrderChunks(order){
     let orderChunks = order.split('.')
     if(orderChunks.length !== 4)return orderChunks
 
-    if(isOnWikipedia && orderChunks[0].includes("t")){
-        const firstChunk = orderChunks[0].replace("t","")
+    if(isOnWikipedia && orderChunks[0].includes("d")){
+        const firstChunk = orderChunks[0].replace("d","")
         orderChunks[0] = firstChunk
 
         orderChunks = orderChunks.map(chunk => parseInt(chunk, 10))
 
         if(!titleInURL.includes("Template:")){
-            orderChunks[0] = Math.max(orderChunks[0]/2,1)
-            orderChunks[1] = Math.max(orderChunks[1]/2,1)
+            orderChunks[0] = Math.max(Math.floor(orderChunks[0]/2),1)
         }
 
     }else{

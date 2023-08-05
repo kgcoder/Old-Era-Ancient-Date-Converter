@@ -529,11 +529,11 @@ function ordersAreEqual(orderA,orderB){
     if(!orderA && !orderB) return true
 
     if(orderA){
-        orderA = orderA.includes("t") ? getOrderChunks(orderA).join('.') : orderA
+        orderA = orderA.includes("d") ? getOrderChunks(orderA).join('.') : orderA
         if(orderA === '1.1.1.1')orderA = ''
     }
     if(orderB){
-        orderB = orderB.includes("t") ? getOrderChunks(orderB).join('.') : orderB
+        orderB = orderB.includes("d") ? getOrderChunks(orderB).join('.') : orderB
         if(orderB === '1.1.1.1')orderB = ''
     }
 
