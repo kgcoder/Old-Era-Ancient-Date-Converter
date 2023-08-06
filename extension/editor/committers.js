@@ -7,8 +7,8 @@
 
 function commitColor(className,color){
     isEditingWikitext ? addColorToWikitext(color) : replaceMarkers(className, color)
-
 }
+
 function commitYears() {
     commitColor('bc-y', 'green;color:white')
 }
@@ -59,16 +59,31 @@ function commitIgnoredPart() {
 
 function replaceMarkers(className, color) {
     if(shouldReturnBecauseOfTestingMode())return
+
+    const selection = window.getSelection()
+    if(!selection || !selection.rangeCount)return
+
+    closePopupOfClass("editorPopup")
     
     const chunks = getThreeChunksFromHtml()
     if(!chunks) {
         currentHTML = replaceMarkersInString(currentHTML,className, color)
 
     }else{
-        currentHTML = chunks[0] + replaceMarkersInString(chunks[1],className, color) + chunks[2]
+
+        let middle = replaceMarkersInString(chunks[1],className, color)
+
+        if(middle === chunks[1]){
+            if(middle.includes('>') || middle.includes('<')){
+                //do nothing
+            }else{
+                middle = `<selection class="${className}" data-t="" style="background-color:${color};">${middle}</selection>`
+            }
+        }
+        
+        currentHTML = chunks[0] + middle + chunks[2]
+
     }
-
-
 
     setBodyFromCurrentHTML()
     addToHistory(currentHTML)

@@ -276,8 +276,23 @@ function escapeText(text) {
     return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+function closePopupOfClass(className){
+    const popups = document.getElementsByClassName(className)
+    if(popups.length){
+        const popup = popups[0]
+        popup.parentElement.removeChild(popup)
+
+        if(className === "editorPopup"){
+            editorIsOpen = false
+        }else if (className === "wikitextPopup"){
+            isEditingWikitext = false
+        }
+    }
+}
 
 function setBodyFromCurrentHTML() {
+
+
     setBodyFromHTML(currentHTML)
 }
 
@@ -593,6 +608,8 @@ function getThreeChunksFromHtml(){
     const selection = window.getSelection()
     if(!selection.rangeCount)return null
     const range = window.getSelection().getRangeAt(0);
+
+
     let { startContainer, endContainer, startOffset, endOffset } = range
     const text1 = startContainer.data
     if (!text1) return null
@@ -600,18 +617,22 @@ function getThreeChunksFromHtml(){
     const selectionLabel = '__selection__'
 
     const newText1 = text1.slice(0, startOffset) + selectionLabel + text1.slice(startOffset, text1.length)
-    
+
 
     const text2 = endContainer.data
+
     if (!text2) return null
+    let newText2 = ''
     if (startContainer === endContainer) {
         endOffset += selectionLabel.length
+        newText2 = newText1.slice(0, endOffset) + selectionLabel + newText1.slice(endOffset, newText1.length)
+        endContainer.data = newText2
+
+    }else{
+        newText2 = text2.slice(0, endOffset) + selectionLabel + text2.slice(endOffset, text2.length)
+        startContainer.data = newText1
+        endContainer.data = newText2
     }
-    startContainer.data = newText1
-    const newText2 = text2.slice(0, endOffset) + selectionLabel + text2.slice(endOffset, text2.length)
-
-    endContainer.data = newText2
-
 
     let html = new XMLSerializer().serializeToString(document.body)
     html = removeProblematicPartsFromHtml(html)

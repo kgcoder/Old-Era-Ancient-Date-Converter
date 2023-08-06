@@ -257,6 +257,8 @@ function testRightPartSimilarity(mainRightString,wikitext,startIndex){
 
 function addColorToWikitext(color){
     const selection = wikitextEditor.getSelection()
+    if(!selection || !selection.rangeCount) return
+    
     const range = selection.getRangeAt(0)
 
     const {startOffset, endOffset,startContainer} = range
