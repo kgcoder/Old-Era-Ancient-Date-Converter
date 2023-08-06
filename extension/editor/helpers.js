@@ -642,7 +642,28 @@ function getThreeChunksFromHtml(){
         setBodyFromCurrentHTML()
         return null
     }
-    return chunks
+
+    let [left, middle, right] = chunks
+
+    const regLeft = new RegExp("<[^>]*?>$")
+    const regRight = new RegExp("^</[^>]*>")
+
+    const leftResult = chunks[0].match(regLeft)
+    const rightResult = chunks[2].match(regRight)
+
+    if(leftResult && !leftResult.includes("</")){
+        left = left.replace(regLeft,"")
+        middle = leftResult[0] + middle
+
+    }
+
+    if(rightResult){
+        right = right.replace(regRight,"")
+        middle = middle + rightResult[0]
+    }
+
+
+    return [left, middle, right]
 }
 
 
