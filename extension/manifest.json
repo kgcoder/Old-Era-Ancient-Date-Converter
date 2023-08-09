@@ -148,6 +148,9 @@
         },
         "startWikitextEditing":{
             "description":"open wikitext editor"
+        },
+        "togglePageInfo":{
+            "description":"toggle page info popup"
         }
     }
 }

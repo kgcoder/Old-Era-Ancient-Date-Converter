@@ -185,6 +185,12 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         turnOn()
     }
 
+    if(message === 'togglePageInfo'){
+        if(useNewServer && !pageNotFoundOnNewServer){
+            togglePageInfoPopup()
+        }
+    }
+
     if (message === 'openEdits') {
 
         if(useNewServer && !pageNotFoundOnNewServer){
@@ -217,6 +223,8 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 
         updateTranslation()
     }
+
+    
     
 
     if (message === 'updateTranslation') {

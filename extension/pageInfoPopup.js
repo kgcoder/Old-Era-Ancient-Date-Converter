@@ -5,6 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+let pageInfoPopupIsShowing = false
+
 function flattenListOfEdits(list){
     let result = []
     for(let edit of list){
@@ -48,10 +50,22 @@ function flattenListOfEdits(list){
 }
 
 
+function togglePageInfoPopup(){
+    if(isEditingMode)return
+    if(pageInfoPopupIsShowing){
+        hidePageInfoPopup()
+    }else{
+        showPageInfoPopup()
+    }
+        
+}
+
 
 function showPageInfoPopup(){
 
 
+    if(pageInfoPopupIsShowing)return
+    pageInfoPopupIsShowing = true
    
 
 
@@ -70,8 +84,18 @@ function showPageInfoPopup(){
     const closeButton = document.getElementsByClassName('editorPopup-close')[0]
     closeButton.addEventListener('click', (e) => {
        e.preventDefault()
-        popup.parentElement.removeChild(popup)
+       hidePageInfoPopup()
     })
+}
+
+
+function hidePageInfoPopup(){
+    const popups = document.getElementsByClassName("pageInfoPopup")
+    if(popups && popups.length ){
+        popups[0].parentElement.removeChild(popups[0])
+    }
+    pageInfoPopupIsShowing = false
+
 }
 
 
