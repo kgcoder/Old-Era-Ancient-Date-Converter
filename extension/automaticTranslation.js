@@ -40,7 +40,7 @@ function getLocalReplacements(htmlWithIgParts, replacementsArray, pageData) {
 
 function createAutomaticReplacements(html, replacementsArray, pageData) {
 
-    const {result:text,insertions} = extractTextFromHtml(html)
+    const {text,insertions} = extractedText
 
     processCenturyOrMillenniumCategoryPattern(html,replacementsArray)
     processDecadeCategoryPattern(html, replacementsArray)
@@ -98,7 +98,7 @@ function createAutomaticReplacements(html, replacementsArray, pageData) {
 
 
 
-function extractTextFromHtml(html){
+function extractTextFromHtml(html,shouldReturn){
    
     let isIgnoring = false
     let result = ''
@@ -174,7 +174,11 @@ function extractTextFromHtml(html){
 
     }
 
-    return {result,insertions}
+    if(!shouldReturn){
+        extractedText = {text:result,insertions}
+    }
+
+    return extractedText
 }
 
 

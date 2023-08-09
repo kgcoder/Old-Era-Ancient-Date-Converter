@@ -5,9 +5,9 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-function flattenListOfEdits(){
+function flattenListOfEdits(list){
     let result = []
-    for(let edit of editsLoadedFromServer){
+    for(let edit of list){
         if(!edit.isTemplate){
             result.push(edit)
             continue
@@ -24,7 +24,6 @@ function flattenListOfEdits(){
         result = result.concat(subEdits)
         
     }
-
 
     for(let i = 0; i < result.length; i++){
 
@@ -45,7 +44,7 @@ function flattenListOfEdits(){
     }
 
 
-    flattenedListOfEdits = result
+    return result
 }
 
 

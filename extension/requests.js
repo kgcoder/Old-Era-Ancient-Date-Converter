@@ -19,7 +19,7 @@ async function getListOfTemplateNamesOnPage(){
 
 
 async function getAllProcessedTemplates(){
-    const url = "https://timeline.oldera.org/wiki/api.php?action=query&list=categorymembers&cmtitle=Category:Wikipedia_templates&prop=categories&cllimit=max&format=json&formatversion=2&cmprop=title&origin=*"
+    const url = "https://timeline.oldera.org/wiki/api.php?action=query&list=categorymembers&cmtitle=Category:Wikipedia_templates&prop=categories&cmlimit=max&format=json&formatversion=2&cmprop=title&origin=*"
     try{
         const resp = await fetch(url)
         const json = resp ? await resp.json() : null

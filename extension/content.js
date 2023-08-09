@@ -114,6 +114,7 @@ function getConfigFromLocalStorage(callback){
 
         const templateNamesString = result.templatesToLoadAtStartup
 
+
         if(templateNamesString){
             const lines = templateNamesString.split('\n')
             templatesToLoadAtStartup = lines.filter(line => line.includes('Template:'))
@@ -613,7 +614,7 @@ async function startWebRequestForEditor(){
         
 
 
-        editsLoadedFromServerForEditor = JSON.parse(JSON.stringify(editsArray))
+        editsLoadedFromServer = JSON.parse(JSON.stringify(editsArray))
 
         try{
             if(isEditingMode){
@@ -751,6 +752,8 @@ function translateEverythingOnWeb(r,finalInstructions = []) {
 
     const { htmlWithIgParts, ignoredParts } = htmlWithIgnoredParts(html)
 
+    extractTextFromHtml(htmlWithIgParts)
+
 
     let replacementsArray = []
     getLocalReplacements(htmlWithIgParts, replacementsArray, currentPageData)
@@ -761,7 +764,7 @@ function translateEverythingOnWeb(r,finalInstructions = []) {
     if (finalInstructions.length) {
         const allEdits = finalInstructions.length ? finalInstructions : editsArray
  
-        const {result:text,insertions} = extractTextFromHtml(htmlWithIgParts)
+        const {text,insertions} = extractedText// extractTextFromHtml(htmlWithIgParts)
 
 
         let {repsFromServer, badReplacements} = prepareServerReplacements(allEdits,text)
@@ -769,7 +772,7 @@ function translateEverythingOnWeb(r,finalInstructions = []) {
 
         replacementsLoadedFromServer = repsFromServer
 
-        flattenListOfEdits()
+        flattenedListOfEdits = flattenListOfEdits(editsLoadedFromServer)
 
         pageIsNotTranslatedYet = repsFromServer.length == 0
 

@@ -36,7 +36,7 @@ let isDefaultPopupActive = false
 
 let currentWikitext = ""
 
-let editsLoadedFromServerForEditor = []
+//let editsLoadedFromServerForEditor = []
 
 let templatesToLoadAtStartup = []
 
@@ -59,7 +59,9 @@ function onEditorLoad() {
             const regT = new RegExp('\\\\t','g')
 
             editsFromServer = editsArray.map(edit => {
-                if(edit.isTemplate)return edit
+                if(edit.isTemplate) {
+                    return {...edit,subEdits:edit.subEdits.map(subEdit => ({...subEdit,string: subEdit.string.replace(regN,'\n').replace(regT,'\t')}))}
+                }
                 return {...edit, string:edit.string.replace(regN,'\n').replace(regT,'\t')} 
             })
     
@@ -323,11 +325,17 @@ function loadEdits(editsFromServer,shouldFixBrokenEdits = false,showOnlyFixed = 
         return
     }
 
+    let editsForMarkers =  preloadedTemplates.length ? editsFromServer.concat(preloadedTemplates) : editsFromServer
 
-    let editsForMarkers = !pageNotFoundOnNewServer && preloadedTemplates.length ? editsFromServer.concat(preloadedTemplates) : editsFromServer
+    let html = new XMLSerializer().serializeToString(document.body)
+    html = removeProblematicPartsFromHtml(html)
 
+    const { htmlWithIgParts, ignoredParts } = htmlWithIgnoredParts(html)
 
-    const htmlWithMarkers = createHTMLWithMarkersForEditor(editsForMarkers,shouldFixBrokenEdits,showOnlyFixed)
+    extractTextFromHtml(htmlWithIgParts)
+
+  
+    const htmlWithMarkers = createHTMLWithMarkersForEditor(editsForMarkers,htmlWithIgParts,ignoredParts,shouldFixBrokenEdits,showOnlyFixed)
     currentHTML = replaceCurlyBracesWithMarkup(htmlWithMarkers)
 
     
@@ -350,23 +358,19 @@ function loadEdits(editsFromServer,shouldFixBrokenEdits = false,showOnlyFixed = 
 
 
 
-function createHTMLWithMarkersForEditor(editsFromServer,shouldFixBrokenEdits = false,showOnlyFixed = false) {
-
-    let html = new XMLSerializer().serializeToString(document.body)
-    html = removeProblematicPartsFromHtml(html)
-
-    const { htmlWithIgParts, ignoredParts } = htmlWithIgnoredParts(html)
+function createHTMLWithMarkersForEditor(editsFromServer,htmlWithIgParts,ignoredParts,shouldFixBrokenEdits = false,showOnlyFixed = false) {
 
     let replacements = []
-    const {result:text,insertions} = extractTextFromHtml(htmlWithIgParts)
+    const {text,insertions} = extractedText
     if(isOnWikipedia && (!useNewServer || pageNotFoundOnNewServer)){
         replacements = getReplacementsFromEdits(editsFromServer,htmlWithIgParts)
     }else{
         let {repsFromServer, badReplacements} = prepareServerReplacements(editsFromServer,text)
         replacements = repsFromServer
+
     }
 
-
+    replacementsLoadedFromServer = replacements
    
     let currentGap = null
     let lastGoodEdit = null
@@ -415,7 +419,7 @@ function createHTMLWithMarkersForEditor(editsFromServer,shouldFixBrokenEdits = f
 
     localReplacementsArray = []
 
-    findIfPageIsAboutEarlyCenturyOrMillennium(html)
+    findIfPageIsAboutEarlyCenturyOrMillennium()
 
 
     getLocalReplacements(htmlWithIgParts, localReplacementsArray, currentPageData)
@@ -1138,11 +1142,8 @@ function showPopupWithInstructions(){
     if(preloadedTemplates.length){
         templates = preloadedTemplates
     }else{
-        templates = editsLoadedFromServerForEditor.filter(item => item.isTemplate)
+        templates = editsLoadedFromServer.filter(item => item.isTemplate)
     }
-
-
-
 
     for(let template of templates){
         for(let templateEdit of template.subEdits){
@@ -1154,6 +1155,8 @@ function showPopupWithInstructions(){
             
         }
     }
+
+
 
     let lastTemplateName = ""
     for(let instruction of finalInstructions){
@@ -1253,6 +1256,8 @@ async function loadTemplates(){
     
     templatesOnPage = templatesOnPage.filter(name => processedTemplates.includes(name))
 
+    
+
     const text = templatesOnPage.join('\n')
     chrome.storage.local.set({templatesToLoadAtStartup:text})
     window.location.reload()
@@ -1326,7 +1331,7 @@ function getFinalReplacementsForWeb(cleanHTML,cleanTexts){
     })
 
 
-    const {result:text,insertions} = extractTextFromHtml(cleanHTML)
+    const {text,insertions} = extractTextFromHtml(cleanHTML, true)
     const replacementsInText = moveReplacementsHtmlToText(cleanHTML,text,insertions,filteredCleanTexts)
 
     const finalInstructions = []
