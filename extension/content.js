@@ -654,6 +654,8 @@ function translateEverything(r,finalInstructions = []) {
 
     const { htmlWithIgParts, ignoredParts } = htmlWithIgnoredParts(html)
 
+    extractTextFromHtml(htmlWithIgParts)
+
 
     let replacementsArray = []
     getLocalReplacements(htmlWithIgParts, replacementsArray, currentPageData)
@@ -1529,7 +1531,7 @@ function getYearReplacementString(originalText, year, isImprecise = false, short
 
 
 function createMarker(text, method, type = 'normal', originalSubstitute = '',otherNumberStringInRange = '') { 
-    return `{{${method}|${text}|${type}|${originalSubstitute}|${otherNumberStringInRange}}}`
+    return `{{${method}|${text}||${originalSubstitute}|${otherNumberStringInRange}}}`
 }
 
 
