@@ -662,11 +662,10 @@ function translateEverything(r,finalInstructions = []) {
 
     const { htmlWithIgParts, ignoredParts } = htmlWithIgnoredParts(html)
 
-    extractTextFromHtml(htmlWithIgParts)
-
+    const {text, insertions} = extractTextFromHtml(htmlWithIgParts)
 
     let replacementsArray = []
-    getLocalReplacements(htmlWithIgParts, replacementsArray, currentPageData)
+    getLocalReplacements(htmlWithIgParts, text, insertions, replacementsArray, currentPageData)
     replacementsArray = replacementsArray.sort((a, b) => a.index - b.index)
  
 
@@ -762,20 +761,17 @@ function translateEverythingOnWeb(r,finalInstructions = []) {
 
     const { htmlWithIgParts, ignoredParts } = htmlWithIgnoredParts(html)
 
-    extractTextFromHtml(htmlWithIgParts)
+    const {text, insertions} = extractTextFromHtml(htmlWithIgParts)
 
 
     let replacementsArray = []
-    getLocalReplacements(htmlWithIgParts, replacementsArray, currentPageData)
+    getLocalReplacements(htmlWithIgParts, text, insertions, replacementsArray, currentPageData)
     replacementsArray = replacementsArray.sort((a, b) => a.index - b.index)
  
 
 
     if (finalInstructions.length) {
         const allEdits = finalInstructions.length ? finalInstructions : editsArray
- 
-        const {text,insertions} = extractedText// extractTextFromHtml(htmlWithIgParts)
-
 
         let {repsFromServer, badReplacements} = prepareServerReplacements(allEdits,text)
 

@@ -6,4 +6,3 @@
  */
 
 let flattenedListOfEdits = []
-let extractedText = {text:'',insertions:[]}

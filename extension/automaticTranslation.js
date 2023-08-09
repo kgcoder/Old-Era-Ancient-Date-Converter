@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-function getLocalReplacements(htmlWithIgParts, replacementsArray, pageData) {
+function getLocalReplacements(htmlWithIgParts, text, insertions, replacementsArray, pageData) {
 
     // createCenturiesAndMillenniaReplacementsFromAltMarkup(htmlWithIgParts, replacementsArray)
     // createYearReplacementsWithInnerSpansFromAltMarkup(htmlWithIgParts, replacementsArray)
@@ -24,7 +24,7 @@ function getLocalReplacements(htmlWithIgParts, replacementsArray, pageData) {
 
 
     
-    createAutomaticReplacements(htmlWithIgParts, replacementsArray, pageData)
+    createAutomaticReplacements(htmlWithIgParts, text, insertions, replacementsArray, pageData)
 
 
 
@@ -38,9 +38,7 @@ function getLocalReplacements(htmlWithIgParts, replacementsArray, pageData) {
 
 
 
-function createAutomaticReplacements(html, replacementsArray, pageData) {
-
-    const {text,insertions} = extractedText
+function createAutomaticReplacements(html, text, insertions, replacementsArray, pageData) {
 
     processCenturyOrMillenniumCategoryPattern(html,replacementsArray)
     processDecadeCategoryPattern(html, replacementsArray)
@@ -98,7 +96,7 @@ function createAutomaticReplacements(html, replacementsArray, pageData) {
 
 
 
-function extractTextFromHtml(html,shouldReturn){
+function extractTextFromHtml(html){
    
     let isIgnoring = false
     let result = ''
@@ -173,12 +171,8 @@ function extractTextFromHtml(html,shouldReturn){
         }
 
     }
-
-    if(!shouldReturn){
-        extractedText = {text:result,insertions}
-    }
-
-    return extractedText
+    
+    return {text:result,insertions}
 }
 
 

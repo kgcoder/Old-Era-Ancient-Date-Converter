@@ -332,10 +332,10 @@ function loadEdits(editsFromServer,shouldFixBrokenEdits = false,showOnlyFixed = 
 
     const { htmlWithIgParts, ignoredParts } = htmlWithIgnoredParts(html)
 
-    extractTextFromHtml(htmlWithIgParts)
+    const {text, insertions} = extractTextFromHtml(htmlWithIgParts)
 
   
-    const htmlWithMarkers = createHTMLWithMarkersForEditor(editsForMarkers,htmlWithIgParts,ignoredParts,shouldFixBrokenEdits,showOnlyFixed)
+    const htmlWithMarkers = createHTMLWithMarkersForEditor(editsForMarkers,htmlWithIgParts,ignoredParts,text, insertions, shouldFixBrokenEdits,showOnlyFixed)
     currentHTML = replaceCurlyBracesWithMarkup(htmlWithMarkers)
 
     
@@ -358,10 +358,9 @@ function loadEdits(editsFromServer,shouldFixBrokenEdits = false,showOnlyFixed = 
 
 
 
-function createHTMLWithMarkersForEditor(editsFromServer,htmlWithIgParts,ignoredParts,shouldFixBrokenEdits = false,showOnlyFixed = false) {
+function createHTMLWithMarkersForEditor(editsFromServer,htmlWithIgParts,ignoredParts, text, insertions, shouldFixBrokenEdits = false,showOnlyFixed = false) {
 
     let replacements = []
-    const {text,insertions} = extractedText
     if(isOnWikipedia && (!useNewServer || pageNotFoundOnNewServer)){
         flattenedListOfEdits = flattenListOfEdits(editsFromServer)
         replacements = getReplacementsFromEdits(flattenedListOfEdits,htmlWithIgParts)
@@ -423,7 +422,7 @@ function createHTMLWithMarkersForEditor(editsFromServer,htmlWithIgParts,ignoredP
     findIfPageIsAboutEarlyCenturyOrMillennium()
 
 
-    getLocalReplacements(htmlWithIgParts, localReplacementsArray, currentPageData)
+    getLocalReplacements(htmlWithIgParts, text, insertions, localReplacementsArray, currentPageData)
     localReplacementsArray = localReplacementsArray.map(item => {
         item.edit.targetIndex = item.index
         if(['bc-y-r1','bc-y-r2'].includes(item.edit.method))item.edit.method = 'bc-y'
@@ -575,6 +574,8 @@ function createInstructions(forWikitext = false) {
 
 
 
+
+
     while ((result = pattern.exec(ignHtml))) {
         const method = result[1]
         const fromTemplate = result[2]
@@ -646,8 +647,10 @@ function createInstructions(forWikitext = false) {
             })
         }
 
+        const {text:cleanText, insertions:insertionsInCleanText} = extractTextFromHtml(cleanHTML)
+
        
-        const instructions = getFinalReplacementsForWeb(cleanHTML,filteredCleanTexts)
+        const instructions = getFinalReplacementsForWeb(cleanHTML,filteredCleanTexts, cleanText, insertionsInCleanText)
         
 
         
@@ -711,7 +714,7 @@ function createInstructions(forWikitext = false) {
 
     localReplacementsArray = []
 
-    getLocalReplacements(cleanHTML, localReplacementsArray, currentPageData)
+    getLocalReplacements(cleanHTML, text, insertions, localReplacementsArray, currentPageData)
     localReplacementsArray = localReplacementsArray.map(item => {
         item.edit.targetIndex = item.index
         if(['bc-y-r1','bc-y-r2'].includes(item.edit.method))item.edit.method = 'bc-y'
@@ -1296,13 +1299,13 @@ function openServerPage(){
 
 
 
-function getFinalReplacementsForWeb(cleanHTML,cleanTexts){
+function getFinalReplacementsForWeb(cleanHTML,cleanTexts, text, insertions){
  
 
 
     localReplacementsArray = []
 
-    getLocalReplacements(cleanHTML, localReplacementsArray, currentPageData)
+    getLocalReplacements(cleanHTML, text, insertions, localReplacementsArray, currentPageData)
     localReplacementsArray = localReplacementsArray.map(item => {
         item.edit.targetIndex = item.index
         if(['bc-y-r1','bc-y-r2'].includes(item.edit.method))item.edit.method = 'bc-y'
@@ -1332,7 +1335,6 @@ function getFinalReplacementsForWeb(cleanHTML,cleanTexts){
     })
 
 
-    const {text,insertions} = extractTextFromHtml(cleanHTML, true)
     const replacementsInText = moveReplacementsHtmlToText(cleanHTML,text,insertions,filteredCleanTexts)
 
     const finalInstructions = []

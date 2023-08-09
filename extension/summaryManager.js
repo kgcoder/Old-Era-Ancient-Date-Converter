@@ -93,16 +93,19 @@ async function editSummaryIfNeeded(node){
 
     let substituteImageUrl = ''
    
-    
 
 
     const { htmlWithIgParts, ignoredParts } = htmlWithIgnoredParts(innerHTML)
+
 
     let replacementsArray = []
 
     const pageData = getPageDataForSummary(innerHTML)
 
-    getLocalReplacements(htmlWithIgParts, replacementsArray, pageData)
+    const {text, insertions} = extractTextFromHtml(htmlWithIgParts) 
+
+
+    getLocalReplacements(htmlWithIgParts, text, insertions, replacementsArray, pageData)
 
     replacementsArray = replacementsArray.filter(replacement => replacement.edit.method !== 'bc-ig')
 
