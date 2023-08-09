@@ -363,7 +363,8 @@ function createHTMLWithMarkersForEditor(editsFromServer,htmlWithIgParts,ignoredP
     let replacements = []
     const {text,insertions} = extractedText
     if(isOnWikipedia && (!useNewServer || pageNotFoundOnNewServer)){
-        replacements = getReplacementsFromEdits(editsFromServer,htmlWithIgParts)
+        flattenedListOfEdits = flattenListOfEdits(editsFromServer)
+        replacements = getReplacementsFromEdits(flattenedListOfEdits,htmlWithIgParts)
     }else{
         let {repsFromServer, badReplacements} = prepareServerReplacements(editsFromServer,text)
         replacements = repsFromServer
