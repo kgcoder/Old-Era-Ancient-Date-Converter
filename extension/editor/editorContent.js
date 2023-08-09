@@ -327,6 +327,8 @@ function loadEdits(editsFromServer,shouldFixBrokenEdits = false,showOnlyFixed = 
 
     let editsForMarkers =  preloadedTemplates.length ? editsFromServer.concat(preloadedTemplates) : editsFromServer
 
+    editsForMarkers = editsForMarkers.map(edit => ({...edit,string:edit.string.replace(/show/g,"hide")}))
+
     let html = new XMLSerializer().serializeToString(document.body)
     html = removeProblematicPartsFromHtml(html)
 
@@ -337,6 +339,7 @@ function loadEdits(editsFromServer,shouldFixBrokenEdits = false,showOnlyFixed = 
   
     const htmlWithMarkers = createHTMLWithMarkersForEditor(editsForMarkers,htmlWithIgParts,ignoredParts,text, insertions, shouldFixBrokenEdits,showOnlyFixed)
     currentHTML = replaceCurlyBracesWithMarkup(htmlWithMarkers)
+
 
     
 
