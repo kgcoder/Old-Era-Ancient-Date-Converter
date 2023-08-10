@@ -87,7 +87,7 @@ function processYearRangePattern(text,replacementsArray, pageData){
 
         
         if (yearA1String) {
-            const { numberOfDigits, realYear } = checkIfSecondYearIsShortened(yearA1, yearA2)
+            const { numberOfDigits, realYear } = checkIfSecondYearIsShortened(yearA1, yearA2, yearA2String)
             
             let methodA1 = methodForYear(yearA1, pageData)
             
@@ -121,7 +121,7 @@ function processYearRangePattern(text,replacementsArray, pageData){
             }
             let methodB1 = methodForYear(yearB1, pageData)
             
-            const { numberOfDigits, realYear } = checkIfSecondYearIsShortened(yearB1, yearB2)
+            const { numberOfDigits, realYear } = checkIfSecondYearIsShortened(yearB1, yearB2, yearB2String)
             
             let methodB2 = methodForYear(realYear, pageData)
             
@@ -231,7 +231,7 @@ function processYearToDecadePattern(text,replacementsArray, pageData){
         const yearA2 = numberFromString(yearA2String)
 
         if (yearA1String) {
-            const { numberOfDigits, realYear } = checkIfSecondYearIsShortened(yearA1, yearA2)
+            const { numberOfDigits, realYear } = checkIfSecondYearIsShortened(yearA1, yearA2, yearA2String)
 
             methodA1 = methodForYear(yearA1, pageData)
             methodA2 = methodForYear(realYear, pageData)
@@ -292,7 +292,7 @@ function processYearPattern(text, replacementsArray,pageData) {
          if(nakedYear2String === '000') continue
 
          if (year1String) {
-            const { numberOfDigits, realYear } = checkIfSecondYearIsShortened(year1, year2)
+            const { numberOfDigits, realYear } = checkIfSecondYearIsShortened(year1, year2, nakedYear2String)
 
             method1 = methodForYear(year1, pageData)
             method2 = methodForYear(realYear, pageData)

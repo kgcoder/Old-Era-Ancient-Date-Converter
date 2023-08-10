@@ -763,7 +763,6 @@ function translateEverythingOnWeb(r,finalInstructions = []) {
 
     const {text, insertions} = extractTextFromHtml(htmlWithIgParts)
 
-
     let replacementsArray = []
     getLocalReplacements(htmlWithIgParts, text, insertions, replacementsArray, currentPageData)
     replacementsArray = replacementsArray.sort((a, b) => a.index - b.index)

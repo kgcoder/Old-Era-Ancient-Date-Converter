@@ -327,7 +327,13 @@ function loadEdits(editsFromServer,shouldFixBrokenEdits = false,showOnlyFixed = 
 
     let editsForMarkers =  preloadedTemplates.length ? editsFromServer.concat(preloadedTemplates) : editsFromServer
 
-    editsForMarkers = editsForMarkers.map(edit => ({...edit,string:edit.string.replace(/show/g,"hide")}))
+    editsForMarkers = editsForMarkers.map(edit => {
+        if(edit.isTemplate){
+            return {...edit,subEdits:edit.subEdits.map(subEdit => ({...subEdit, string:subEdit.string.replace(/show/g,"hide")}))}
+        }else{
+            return {...edit,string:edit.string.replace(/show/g,"hide")}
+        }
+    })
 
     let html = new XMLSerializer().serializeToString(document.body)
     html = removeProblematicPartsFromHtml(html)

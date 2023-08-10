@@ -93,7 +93,7 @@ function getTextWithoutMarkup(text){
 
 
 
-function checkIfSecondYearIsShortened(year1, year2) {
+function checkIfSecondYearIsShortened(year1, year2, year2String) {
  
     if (year2 < 10 && year1 > 9) {
         const lastDigit = year1 % 10
@@ -107,6 +107,10 @@ function checkIfSecondYearIsShortened(year1, year2) {
         }
         if (lastDigit > year2) {
             const realYear = Math.floor(year1 / 10.0) * 10 + year2
+            const [match] = year2String.match(nakedYearPattern)
+            if(match && match[0] === '0'){
+                return { numberOfDigits: 2, realYear }
+            }
             return { numberOfDigits: 1, realYear }
         }
     }
