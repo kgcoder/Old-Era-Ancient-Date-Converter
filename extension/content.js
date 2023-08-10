@@ -314,15 +314,22 @@ function sendPageMetadata(sendResponse) {
 
     getConfigFromLocalStorage(function(){
         updateIcon()
+
+        if(isOnMediaWikiCategoryPage){
+            addLinksToCategoryMembersOnServer()
+        }
+
+        if(isOnMediaWikiDataPage){
+            addLinkToTitleOnMediaWikiPage()
+        }
+
         if(currentLocation){
             const index = allowedSites.findIndex(site => domain === site)
             isThisSiteAllowed = index !== -1
         }else{
             isThisSiteAllowed = false
             
-            if(isOnMediaWikiCategoryPage){
-                addLinksToCategoryMembersOnServer()
-            }
+           
 
         }
         

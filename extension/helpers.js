@@ -564,3 +564,20 @@ function addLinksToCategoryMembersOnServer(){
         }
     }
 }
+
+
+function addLinkToTitleOnMediaWikiPage(){
+    const h1s = document.getElementsByTagName('h1')
+    if(!h1s || !h1s.length)return
+
+    const header = h1s[0].innerText
+
+
+    const reg = new RegExp('^(.*?Dates/)(.*?)("?)$')
+    const newHeader = header.replace(reg, (match, firstPart, link, quotes) => {
+        return `${firstPart}<a href="https://${link}" target="_blank">${link}</a>${quotes}`
+    })
+
+    h1s[0].innerHTML = newHeader
+
+}

@@ -9,6 +9,7 @@ let currentLocation = window.location.toString()
 let isOnWikipedia = false
 
 let isOnMediaWikiCategoryPage = false
+let isOnMediaWikiDataPage = false
 
 const mainBaseURL = 'https://en.wikipedia.org/wiki/'
 const additionalBaseURL = 'https://en.wikipedia.org/w/index.php?'
@@ -34,9 +35,11 @@ function prepareLocation() {
     isOnWikipedia = domain === 'en.wikipedia.org'
 
     isOnMediaWikiCategoryPage = currentLocation && 
-    (currentLocation.includes(`https://${mediawikiDomain}/wiki/index.php/Category:`) ||
-    currentLocation.includes(`https://${mediawikiDomain}/wiki/index.php?title=Category:`))
+    (currentLocation.includes(`https://${mediawikiDomain}/wiki/index.php`) &&
+    currentLocation.includes(`Category:`))
 
+    isOnMediaWikiDataPage = currentLocation && currentLocation.includes(`https://${mediawikiDomain}/wiki/index.php`) &&
+    currentLocation.includes('Dates/')
 
 
     if (currentLocation.includes(mainBaseURL)) {
