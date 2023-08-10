@@ -544,3 +544,23 @@ function ordersAreEqual(orderA,orderB){
     if(!orderA && !orderB) return true
     return orderA == orderB
 }
+
+
+
+function addLinksToCategoryMembersOnServer(){
+     const links = document.getElementsByTagName('a')
+    for (let link of links){
+        if(!link.href.includes(`https://${mediawikiDomain}/wiki/index.php/Dates/`))continue
+        if(link.className == "external-link")continue
+        const parent = link.parentElement
+        if(parent.tagName === 'LI'){
+            const newLink = document.createElement('a')
+            newLink.innerText = "⏵"
+            newLink.className = "external-link"
+            newLink.style.marginLeft = "10px"
+            newLink.href = "https://" + link.href.replace(`https://${mediawikiDomain}/wiki/index.php/Dates/`,"")
+            newLink.target = "_blank"
+            parent.appendChild(newLink)
+        }
+    }
+}

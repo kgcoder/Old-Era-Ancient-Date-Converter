@@ -8,13 +8,17 @@
 let currentLocation = window.location.toString()
 let isOnWikipedia = false
 
+let isOnMediaWikiCategoryPage = false
+
 const mainBaseURL = 'https://en.wikipedia.org/wiki/'
 const additionalBaseURL = 'https://en.wikipedia.org/w/index.php?'
 let titleInURL = ''
 
-let datesFolder = "https://timeline.oldera.org/wiki/index.php/Dates/"
+let datesFolder = `https://${mediawikiDomain}/wiki/index.php/Dates/`
 
 function prepareLocation() {
+
+
 
 
     domain = currentLocation
@@ -28,6 +32,11 @@ function prepareLocation() {
 
 
     isOnWikipedia = domain === 'en.wikipedia.org'
+
+    isOnMediaWikiCategoryPage = currentLocation && 
+    (currentLocation.includes(`https://${mediawikiDomain}/wiki/index.php/Category:`) ||
+    currentLocation.includes(`https://${mediawikiDomain}/wiki/index.php?title=Category:`))
+
 
 
     if (currentLocation.includes(mainBaseURL)) {
@@ -44,7 +53,8 @@ function prepareLocation() {
         currentLocation = currentLocation.split('?')[0].split('#')[0]
     }
 
-
+   
+ 
 
 
 

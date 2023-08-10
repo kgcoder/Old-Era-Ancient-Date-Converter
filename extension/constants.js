@@ -7,7 +7,9 @@
 
  const baseUrl = 'https://dates.oldera.org'
  const frontendBaseUrl = 'https://dates.oldera.org'
- const webBaseUrl = 'https://timeline.oldera.org'
+ 
+ const mediawikiDomain = 'timeline.oldera.org'
+ const webBaseUrl = `https://${mediawikiDomain}`
  
  const kIsDevEnv = false
  const useNewServer = true

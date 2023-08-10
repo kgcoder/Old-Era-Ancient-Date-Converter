@@ -319,6 +319,11 @@ function sendPageMetadata(sendResponse) {
             isThisSiteAllowed = index !== -1
         }else{
             isThisSiteAllowed = false
+            
+            if(isOnMediaWikiCategoryPage){
+                addLinksToCategoryMembersOnServer()
+            }
+
         }
         
         if(!isThisSiteAllowed){
@@ -335,9 +340,8 @@ function sendPageMetadata(sendResponse) {
               //console.log("Write access granted!");
             }
         });
-
     
-        if (!isExtensionOff  && currentLocation) {
+        if (!isExtensionOff  && currentLocation && !isOnMediaWikiCategoryPage) {
             if (!shouldNotUseServer && isOnWikipedia && !useNewServer) {
                 isEditingMode ? startRequestForEditor() :  startRequest()
             }else if(!shouldNotUseServer && (sitesSupportedByBackend.includes(domain) || domain === 'en.wikipedia.org') ){
@@ -355,6 +359,8 @@ function sendPageMetadata(sendResponse) {
                 }
             }
         }
+    
+    
 
       
     })
@@ -1139,7 +1145,7 @@ async function replaceImagesOnWeb(){
 
     }else{
 
-        const url = "https://timeline.oldera.org/wiki/api.php?action=parse&prop=wikitext&formatversion=2&format=json&origin=*&page=OldEraImages.csv"
+        const url = `https://${mediawikiDomain}/wiki/api.php?action=parse&prop=wikitext&formatversion=2&format=json&origin=*&page=OldEraImages.csv`
 
         fetch(url).then(function(res) {return res.json();}).then(function(page) {
             var wikitext = page.parse.wikitext;
