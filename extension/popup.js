@@ -4,6 +4,10 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
+
+const mediawikiDomain = 'timeline.oldera.org'
+
+
 let isExtensionOff = false
 let isEditingMode = false
 
@@ -116,49 +120,21 @@ document.addEventListener('DOMContentLoaded', function () {
     
     }
 
-
-
-
-    
-    const aboutLink = document.getElementById("aboutLink")
-
-    aboutLink.addEventListener('click', function () {
-        chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
-            chrome.tabs.sendMessage(tabs[0].id, 'openAbout')
-            window.close();
-
+    prepareLink("seeSupportedWebsites","openSupportedWebsitesPage")
+    prepareLink("aboutLink","openAbout")
+    prepareLink("whitePaperLink","openWhitePaper")
+    prepareLink("timelineLink","openTimeline")
+    prepareLink("seeEdits","openEdits")
+  
+    function prepareLink(linkId, message){
+        const linkNode = document.getElementById(linkId)
+        linkNode.addEventListener('click', function () {
+            chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
+                chrome.tabs.sendMessage(tabs[0].id, message)
+                window.close();
+            })
         })
-    })
-
-    const whitePaperLink = document.getElementById("whitePaperLink")
-
-    whitePaperLink.addEventListener('click', function () {
-        chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
-            chrome.tabs.sendMessage(tabs[0].id, 'openWhitePaper')
-            window.close();
-        })
-    })
-
-    const timelineLink = document.getElementById("timelineLink")
-
-    timelineLink.addEventListener('click', function () {
-        chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
-            chrome.tabs.sendMessage(tabs[0].id, 'openTimeline')
-            window.close();
-        })
-    })
-
-
-
-    const editsLink = document.getElementById("seeEdits")
-
-    editsLink.addEventListener('click', function () {
-        chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
-            chrome.tabs.sendMessage(tabs[0].id, 'openEdits')
-            window.close();
-
-        })
-    })
+    }
 
 
     //input listeners=========

@@ -575,9 +575,34 @@ function addLinkToTitleOnMediaWikiPage(){
 
     const reg = new RegExp('^(.*?Dates/)(.*?)("?)$')
     const newHeader = header.replace(reg, (match, firstPart, link, quotes) => {
+        if(link === "SupportedWebsites")return match
         return `${firstPart}<a href="https://${link}" target="_blank">${link}</a>${quotes}`
     })
 
     h1s[0].innerHTML = newHeader
+
+}
+
+
+function addLinksToSupportedWebsitesPage(){
+    const p = document.getElementsByTagName('p')[0]
+    let list = p.innerText.split("\n")
+
+    list = ["en.wikipedia.org"].concat(list.filter(domain => !!domain))
+
+    const parent = p.parentNode
+    parent.removeChild(p)
+
+    const listNode = document.createElement('ul')
+    const inner = list.map(domain=> {
+        const externalLink = 'https://' + domain
+        const internalLink = `https://${mediawikiDomain}/wiki/index.php/Category:${domain}`
+        return `<li><a href="${internalLink}">${domain}</a> <a href="${externalLink}" target="_blank">⏵</a></li>`
+    }).join("\n")
+
+    listNode.innerHTML = inner
+
+    parent.appendChild(listNode)
+
 
 }

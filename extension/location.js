@@ -11,6 +11,8 @@ let isOnWikipedia = false
 let isOnMediaWikiCategoryPage = false
 let isOnMediaWikiDataPage = false
 
+let isOnSupportedWebsitesPage = false
+
 const mainBaseURL = 'https://en.wikipedia.org/wiki/'
 const additionalBaseURL = 'https://en.wikipedia.org/w/index.php?'
 let titleInURL = ''
@@ -40,6 +42,9 @@ function prepareLocation() {
 
     isOnMediaWikiDataPage = currentLocation && currentLocation.includes(`https://${mediawikiDomain}/wiki/index.php`) &&
     currentLocation.includes('Dates/')
+
+
+    isOnSupportedWebsitesPage = currentLocation === `https://${mediawikiDomain}/wiki/index.php/Dates/SupportedWebsites`
 
 
     if (currentLocation.includes(mainBaseURL)) {

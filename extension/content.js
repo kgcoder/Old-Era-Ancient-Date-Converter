@@ -219,6 +219,11 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         window.open(link)
     }
 
+    if(message === 'openSupportedWebsitesPage'){
+        const link = `https://${mediawikiDomain}/wiki/index.php/Dates/SupportedWebsites`
+        window.open(link)
+    }
+
     if(message === 'advancedSettingsChanged'){
 
         updateTranslation()
@@ -321,6 +326,10 @@ function sendPageMetadata(sendResponse) {
 
         if(isOnMediaWikiDataPage){
             addLinkToTitleOnMediaWikiPage()
+        }
+
+        if(isOnSupportedWebsitesPage){
+            addLinksToSupportedWebsitesPage()
         }
 
         if(currentLocation){
