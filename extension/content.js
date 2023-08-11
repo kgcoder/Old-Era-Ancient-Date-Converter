@@ -775,6 +775,10 @@ function translateEverything(r,finalInstructions = []) {
 
 
 function translateEverythingOnWeb(r,finalInstructions = []) {
+    findIfPageIsMillenniumOrCenturyCategory()
+    findIfPageIsDecadeCategory()
+    findIfPageIsAboutEarlyCenturyOrMillennium()
+    findIfPageContainsCenturiesTemplate()
   
     
     let html = new XMLSerializer().serializeToString(document.body)
