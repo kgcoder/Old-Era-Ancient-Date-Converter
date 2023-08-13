@@ -102,7 +102,7 @@ function hidePageInfoPopup(){
 
 function renderListOfEditsInInfoPopup(instructions){
     return instructions.map(item => `${item.isTitle ? `<span class="templateNameSpan">${item.templateName}</span>` : ""}
-            <div class="sideListRow${item.isTemplate ? " fadedRow" : ""}${item.isTitle ? " titleRow" : ""}">
+            <div class="sideListRow${item.isTemplate ? " fadedRow" : ""}">
                 <div class="sideListTextContainer"><p>${markupDateInSideList(item.string,item.target,item.method,item.order,item.originalSubstitute)}</p></div>
                 <span class="sideListExclamation">${item.isSus ? "!" : (item.notFound ? "!!" : " ")}</span>
             </div>

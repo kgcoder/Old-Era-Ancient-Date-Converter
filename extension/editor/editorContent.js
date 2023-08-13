@@ -341,11 +341,9 @@ function loadEdits(editsFromServer,shouldFixBrokenEdits = false,showOnlyFixed = 
     const { htmlWithIgParts, ignoredParts } = htmlWithIgnoredParts(html)
 
     const {text, insertions} = extractTextFromHtml(htmlWithIgParts)
-
   
     const htmlWithMarkers = createHTMLWithMarkersForEditor(editsForMarkers,htmlWithIgParts,ignoredParts,text, insertions, shouldFixBrokenEdits,showOnlyFixed)
     currentHTML = replaceCurlyBracesWithMarkup(htmlWithMarkers)
-
 
     
 
@@ -376,7 +374,6 @@ function createHTMLWithMarkersForEditor(editsFromServer,htmlWithIgParts,ignoredP
     }else{
         let {repsFromServer, badReplacements} = prepareServerReplacements(editsFromServer,text)
         replacements = repsFromServer
-
     }
 
     replacementsLoadedFromServer = replacements
@@ -1098,7 +1095,7 @@ async function startWikitextEditing(){
 
 function renderListOfEditsInEditorSideBar(instructions){
     return instructions.map(item => `${item.isTitle ? `<span class="templateNameSpan">${item.templateName}</span>` : ""}
-            <div class="sideListRow${item.isTemplate ? " fadedRow" : ""}${item.isTitle ? " titleRow" : ""}">
+            <div class="sideListRow${item.isTemplate ? " fadedRow" : ""}">
                 <div class="sideListTextContainer"><p>${markupDateInSideList(item.string,item.target,item.method,item.order,item.originalSubstitute)}</p></div>
                 <span class="sideListExclamation">${item.isSus ? "!" : (item.notFound ? "!!" : " ")}</span>
             </div>

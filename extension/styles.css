@@ -189,6 +189,7 @@ a.disabledLink{
     overflow-y:scroll;
     width:450px;
     height: 100%;
+    justify-content: flex-start;
     flex-direction: column;
     align-items: center;
 }
@@ -210,10 +211,7 @@ a.disabledLink{
     color:red;
 }
 
-.titleRow {
-    display: flex;
-    height:300px;
-}
+
 
 .sideListExclamation{
     display: flex;
