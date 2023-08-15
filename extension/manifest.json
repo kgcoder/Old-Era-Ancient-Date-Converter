@@ -151,6 +151,9 @@
         },
         "togglePageInfo":{
             "description":"toggle page info popup"
+        },
+        "shortenDecadesInRange":{
+            "description":"shortedn decades in range"
         }
     }
 }

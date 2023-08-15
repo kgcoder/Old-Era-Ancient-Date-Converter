@@ -118,6 +118,7 @@ function getConfigFromLocalStorage(callback){
         if(templateNamesString){
             const lines = templateNamesString.split('\n')
             templatesToLoadAtStartup = lines.filter(line => line.includes('Template:'))
+            console.log('templatesToLoadAtStartup',templatesToLoadAtStartup)
         }
         chrome.storage.local.set({templatesToLoadAtStartup:""})
 
@@ -603,6 +604,7 @@ async function startWebRequestForEditor(){
         const templates = templatesToLoadAtStartup.map(template => ({isTemplate:true,name:template}))
         await getTemplatesInfoFromServer(templates)
         preloadedTemplates = templates
+        console.log('preloaded',preloadedTemplates)
     }
 
     const url = getWikitextUrlOnMyServer()
@@ -788,12 +790,14 @@ function translateEverythingOnWeb(r,finalInstructions = []) {
     const { htmlWithIgParts, ignoredParts } = htmlWithIgnoredParts(html)
 
     const {text, insertions} = extractTextFromHtml(htmlWithIgParts)
+    console.log('text',text)
 
     let replacementsArray = []
     getLocalReplacements(htmlWithIgParts, text, insertions, replacementsArray, currentPageData)
     replacementsArray = replacementsArray.sort((a, b) => a.index - b.index)
  
 
+    console.log('editsArray',editsArray)
 
     if (finalInstructions.length) {
         const allEdits = finalInstructions.length ? finalInstructions : editsArray

@@ -45,7 +45,7 @@ function getReplacementsFromEdits(edits, htmlWithIgParts){
 
 
         if (orderChunks.length !== 4) {
-           // console.log('not 4', edit)
+            console.log('not 4', edit)
             return {edit,isBroken:true}//"no good"
         }
 
@@ -55,10 +55,14 @@ function getReplacementsFromEdits(edits, htmlWithIgParts){
         const matchesCount = (htmlWithIgParts.match(pattern1) || []).length
 
         if (matchesCount != string_num_of_oc) {
+            console.log('matchesCount != string_num_of_oc',edit)
+            console.log('matchesCount',matchesCount)
+            console.log('string_num_of_oc',string_num_of_oc)
             return {edit,isBroken:true}//"no good"
         }
 
         if (string_oc < 1 || string_oc > string_num_of_oc) {
+            console.log('string_oc < 1 || string_oc > string_num_of_oc')
             return {edit,isBroken:true}//"no good"
         }
 
@@ -66,10 +70,12 @@ function getReplacementsFromEdits(edits, htmlWithIgParts){
         const targetMatchesCount = (string.match(pattern2) || []).length
 
         if (targetMatchesCount != target_num_of_oc) {
+            onsole.log('targetMatchesCount != target_num_of_oc')
             return {edit,isBroken:true}//"no good"
         }
 
         if (target_oc < 1 || target_oc > target_num_of_oc) {
+            onsole.log('target_oc < 1 || target_oc > target_num_of_oc')
             return {edit,isBroken:true}//"no good"
         }
 
@@ -684,9 +690,11 @@ function getColorForMethod(method){
         case 'bc-i-r2':
             return 'pink'
         case 'bc-d':
-        case 'bc-sd':
-        case 'bc-dp':
             return 'olive;color:white'
+        case 'bc-sd':
+            return 'oliveDrab;color:white'
+        case 'bc-dp':
+            return 'peachPuff'
         case 'bc-c':
             return 'orange'
         case 'bc-00s':

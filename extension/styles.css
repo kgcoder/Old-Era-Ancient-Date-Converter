@@ -141,6 +141,15 @@ a.disabledLink{
     color: white;
 }
 
+.bc-editing-sd{
+    background-color: oliveDrab;
+    color: white;
+}
+
+.bc-editing-dp{
+    background-color: peachPuff;
+}
+
 .bc-editing-c{
     background-color: orange;
 }

@@ -309,6 +309,9 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
             selectionMode = 'quoteMode'
             sendResponse({selectionMode})
             break
+        case 'shortenDecadesInRange':
+            shortenDecadesInRange()
+            break
         default:
         //do nothing
     }
@@ -327,6 +330,7 @@ function loadEdits(editsFromServer,shouldFixBrokenEdits = false,showOnlyFixed = 
 
     let editsForMarkers =  preloadedTemplates.length ? editsFromServer.concat(preloadedTemplates) : editsFromServer
 
+    console.log('editsForMarkers',editsForMarkers)
     editsForMarkers = editsForMarkers.map(edit => {
         if(edit.isTemplate){
             return {...edit,subEdits:edit.subEdits.map(subEdit => ({...subEdit, string:subEdit.string.replace(/show/g,"hide")}))}
@@ -370,7 +374,9 @@ function createHTMLWithMarkersForEditor(editsFromServer,htmlWithIgParts,ignoredP
     let replacements = []
     if(isOnWikipedia && (!useNewServer || pageNotFoundOnNewServer)){
         flattenedListOfEdits = flattenListOfEdits(editsFromServer)
+        console.log('flattenedListOfEdits',flattenedListOfEdits)
         replacements = getReplacementsFromEdits(flattenedListOfEdits,htmlWithIgParts)
+        console.log('replacements',replacements)
     }else{
         let {repsFromServer, badReplacements} = prepareServerReplacements(editsFromServer,text)
         replacements = repsFromServer
@@ -843,6 +849,8 @@ function test() {
         if(['bc-i-r1','bc-i-r2'].includes(edit.method))newEdit.method = 'bc-i'
         return newEdit
     })
+
+    console.log('finalInstructions',finalInstructions)
 
     htmlBeforeTesting = currentHTML
 

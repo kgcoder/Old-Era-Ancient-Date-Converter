@@ -173,7 +173,7 @@ function getReplacementsFromServerForWeb(editsArray, text) {
         const orderChunks = getOrderChunks(order)
 
         if (orderChunks.length !== 4) {
-            //console.log('orderChunks.length !== 4')
+            console.log('orderChunks.length !== 4')
             return {edit,isBroken:true}
         }
 
@@ -182,14 +182,14 @@ function getReplacementsFromServerForWeb(editsArray, text) {
         const matchesCount = (text.match(pattern1) || []).length
 
         if (matchesCount != string_num_of_oc) {
-            // console.log('matchesCount != string_num_of_oc')
-            // console.log('matchesCount',matchesCount)
-            // console.log('string_num_of_oc',string_num_of_oc)
+            console.log('matchesCount != string_num_of_oc')
+            console.log('matchesCount',matchesCount)
+            console.log('string_num_of_oc',string_num_of_oc)
             return {edit,isBroken:true}
         }
 
         if (string_oc < 1 || string_oc > string_num_of_oc) {
-            //console.log('string_oc < 1 || string_oc > string_num_of_oc')
+            console.log('string_oc < 1 || string_oc > string_num_of_oc')
             return {edit,isBroken:true}
         }
 
@@ -197,12 +197,12 @@ function getReplacementsFromServerForWeb(editsArray, text) {
         const targetMatchesCount = (string.match(pattern2) || []).length
 
         if (targetMatchesCount != target_num_of_oc) {
-            //console.log('targetMatchesCount != target_num_of_oc')
+            console.log('targetMatchesCount != target_num_of_oc')
             return {edit,isBroken:true}
         }
 
         if (target_oc < 1 || target_oc > target_num_of_oc) {
-            //console.log('target_oc < 1 || target_oc > target_num_of_oc')
+            console.log('target_oc < 1 || target_oc > target_num_of_oc')
             return {edit,isBroken:true}
         }
 
@@ -305,7 +305,7 @@ function htmlWithIgnoredParts(html) {
 
     
 
-    const pattern = new RegExp(`(<body.*?>|</body>|<span class="mw-editsection">.*?</span></span>|<link rel="mw-deduplicated-inline-style"[^>]*?/>|<h1.*?>|<(div|span|table) class="[^>]*?mw-collapsible[^>]*?>|<style[^>]*?>[^<]*?</style>|<script[^>]*?>[^<]*?</script>)`,'gm')
+    const pattern = new RegExp(`(<body.*?>|</body>|<span class="tocnumber">.*?</span>|<span class="vector-toc-numb">.*?</span>|<span class="mw-editsection">.*?</span></span>|<link rel="mw-deduplicated-inline-style"[^>]*?/>|<h1.*?>|<(div|span|table) class="[^>]*?mw-collapsible[^>]*?>|<style[^>]*?>[^<]*?</style>|<script[^>]*?>[^<]*?</script>)`,'gm')
     const ignoredParts = []
     const newHTML = html.replace(pattern, (match) => {
         ignoredParts.push(match)
