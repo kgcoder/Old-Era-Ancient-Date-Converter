@@ -604,7 +604,6 @@ async function startWebRequestForEditor(){
         const templates = templatesToLoadAtStartup.map(template => ({isTemplate:true,name:template}))
         await getTemplatesInfoFromServer(templates)
         preloadedTemplates = templates
-        console.log('preloaded',preloadedTemplates)
     }
 
     const url = getWikitextUrlOnMyServer()
@@ -790,15 +789,11 @@ function translateEverythingOnWeb(r,finalInstructions = []) {
     const { htmlWithIgParts, ignoredParts } = htmlWithIgnoredParts(html)
 
     const {text, insertions} = extractTextFromHtml(htmlWithIgParts)
-    console.log('text',text)
 
     let replacementsArray = []
     getLocalReplacements(htmlWithIgParts, text, insertions, replacementsArray, currentPageData)
     replacementsArray = replacementsArray.sort((a, b) => a.index - b.index)
  
-
-    console.log('editsArray',editsArray)
-
     if (finalInstructions.length) {
         const allEdits = finalInstructions.length ? finalInstructions : editsArray
 

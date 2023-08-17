@@ -330,7 +330,6 @@ function loadEdits(editsFromServer,shouldFixBrokenEdits = false,showOnlyFixed = 
 
     let editsForMarkers =  preloadedTemplates.length ? editsFromServer.concat(preloadedTemplates) : editsFromServer
 
-    console.log('editsForMarkers',editsForMarkers)
     editsForMarkers = editsForMarkers.map(edit => {
         if(edit.isTemplate){
             return {...edit,subEdits:edit.subEdits.map(subEdit => ({...subEdit, string:subEdit.string.replace(/show/g,"hide")}))}
@@ -374,9 +373,7 @@ function createHTMLWithMarkersForEditor(editsFromServer,htmlWithIgParts,ignoredP
     let replacements = []
     if(isOnWikipedia && (!useNewServer || pageNotFoundOnNewServer)){
         flattenedListOfEdits = flattenListOfEdits(editsFromServer)
-        console.log('flattenedListOfEdits',flattenedListOfEdits)
         replacements = getReplacementsFromEdits(flattenedListOfEdits,htmlWithIgParts)
-        console.log('replacements',replacements)
     }else{
         let {repsFromServer, badReplacements} = prepareServerReplacements(editsFromServer,text)
         replacements = repsFromServer
@@ -850,8 +847,6 @@ function test() {
         return newEdit
     })
 
-    console.log('finalInstructions',finalInstructions)
-
     htmlBeforeTesting = currentHTML
 
 
@@ -1185,8 +1180,6 @@ function showPopupWithInstructions(){
     }
 
     finalInstructions = finalInstructions.map(instruction => ({...instruction,string:removeEscapesFromSemicolons(instruction.string)}))
-
-
 
 
 

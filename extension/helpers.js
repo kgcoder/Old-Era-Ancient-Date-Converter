@@ -361,10 +361,6 @@ function prepareServerReplacements(allEdits,text){
 
     let {replacementsFromServer:repsFromServer, badReplacements} =  getReplacementsFromServerForWeb(editsToUse, text)
 
-    console.log('replacementsFromServer',repsFromServer)
-
-    console.log('badReplacements',badReplacements)
-
     repsFromServer = repsFromServer.sort((a,b) => a.index - b.index)
 
     let indexOfEditBeforeTemplate = 0
@@ -402,7 +398,6 @@ function prepareServerReplacements(allEdits,text){
             if(edit.string === replacement.edit.string && edit.method === replacement.edit.method && ordersAreEqual(edit.order,replacement.edit.order)){
                 
                 if(insideTemplate){
-                    console.log('insideTemplate replacement',replacement)
                     lastTemplate.indexAfter = replacement.index 
                     insideTemplate = false
                     lastTemplate = null
@@ -432,7 +427,6 @@ function prepareServerReplacements(allEdits,text){
 
 
     if(!repsFromServer.length){
-        console.log('no repsFromServer')
         templates = templates.map((item,index) => ({
             ...item,
             indexBefore:index == 0 ? 0 : -1,
@@ -441,21 +435,15 @@ function prepareServerReplacements(allEdits,text){
     }
 
     let lastIndexBeforeTemplate = 0
-    console.log('templates',templates)
     for(let template of templates){
-        console.log('template',template)
         const startIndex = template.indexBefore == -1 ? lastIndexBeforeTemplate : template.indexBefore
         const endIndex = template.indexAfter == -1 ? text.length - 1 : template.indexAfter
          const textPart = text.substr(startIndex, endIndex - startIndex)
 
-         console.log('textPart',textPart)
          let {replacementsFromServer:templateReps, badReplacements:badRepsInTemplate} =  getReplacementsFromServerForWeb(template.subEdits, textPart)
 
 
-         
          templateReps = templateReps.map(rep => ({...rep,index:startIndex + rep.index}))
-
-         console.log('templateReps',templateReps)
 
          repsFromServer = repsFromServer.concat(templateReps)
 
