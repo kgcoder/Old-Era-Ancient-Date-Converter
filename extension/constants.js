@@ -11,8 +11,6 @@
  const mediawikiDomain = 'timeline.oldera.org'
  const webBaseUrl = `https://${mediawikiDomain}`
  
- const kIsDevEnv = false
- const useNewServer = true
 
  //const baseUrl = 'http://localhost:3250'
  //const frontendBaseUrl = 'http://localhost:3000'

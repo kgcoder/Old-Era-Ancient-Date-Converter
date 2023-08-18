@@ -177,32 +177,26 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
          })
     }
     if (message === 'turnOff') {
-
-        turnOff()
-      
-        
+        turnOff() 
     }
+
     if (message === 'turnOn') {
         turnOn()
     }
 
     if(message === 'togglePageInfo'){
-        if(useNewServer && !pageNotFoundOnNewServer){
+        if(!pageNotFoundOnNewServer){
             togglePageInfoPopup()
         }
     }
 
     if (message === 'openEdits') {
 
-        if(useNewServer && !pageNotFoundOnNewServer){
+        if(!pageNotFoundOnNewServer){
             showPageInfoPopup()
             return
         }
 
-
-        const link = isOnWikipedia ? `${frontendBaseUrl}/#/translatedPages/${pageId}/show` :
-        getPageUrlOnMyServer()
-        window.open(link)
     }
 
     if (message === 'openAbout') {
@@ -301,7 +295,6 @@ function sendPageMetadata(sendResponse) {
         isThisSiteAllowed,
         domain,
         isOnWikipedia,
-        kIsDevEnv,
         pageStatus,
         currentLocation
     })
@@ -359,20 +352,14 @@ function sendPageMetadata(sendResponse) {
         });
     
         if (!isExtensionOff  && currentLocation && !isOnMediaWikiCategoryPage) {
-            if (!shouldNotUseServer && isOnWikipedia && !useNewServer) {
-                isEditingMode ? startRequestForEditor() :  startRequest()
-            }else if(!shouldNotUseServer && (sitesSupportedByBackend.includes(domain) || domain === 'en.wikipedia.org') ){
+            if(!shouldNotUseServer && (sitesSupportedByBackend.includes(domain) || domain === 'en.wikipedia.org') ){
                 isEditingMode ? startWebRequestForEditor() :  startWebRequest()
             } else {
                 if(isEditingMode){
                     editsArray = []
                     onEditorLoad()
                 }else{
-                    if(isOnWikipedia && !useNewServer){
-                        translateEverything(null)
-                    }else{
-                        translateEverythingOnWeb(null)
-                    }
+                    translateEverythingOnWeb(null) 
                 }
             }
         }
@@ -418,50 +405,7 @@ function getPageVersionFromHtml(html) {
     return result ? result[1] : ''
 }
 
-async function startRequest() {
-    if(!pageIsLoaded || requestHasStarted)return
-    requestHasStarted = true
-    const encodedUrl = encodeURIComponent(currentLocation)
-  
-    try{
 
-        const r = await fetch(`${baseUrl}/api/pages/${encodedUrl}`)
-        const json = r.status !== 200 ? {} : await r.json()
-
-        editsArray = json.edits ? json.edits.map(edit => convertMethodNameLongToShort(edit)) : []
-
-        pageIsNotTranslatedYet = editsArray.length == 0
-
-        pageHasIssues = json.hasIssues 
-        pageId = json.id
-        
-        isTranslated = json.isTranslated
-
-     
-        lastOkVersion = json.lastOkVersion
-        numberOfBCsHasChanged = json.numberOfBCsHasChanged || false
-        editsCount = json.editsCount || 0
-        properBCs = json.properBCs || 0
-        translatedForVersion = json.translatedForVersion
-
-        images = json.images
-
-        try{
-            if(!isEditingMode){
-                translateEverything(json)
-            }
-
-        }catch(e){
-            console.log(e)
-
-        }
-        
-    }catch(e){
-        console.log(e)
-        translateEverything(null)
-    }
-
-}
 
 
 async function requestListOfWebsites() {
@@ -504,11 +448,8 @@ async function startWebRequest() {
 
         
         if(json.error){
-            if(useNewServer && isOnWikipedia && json.error.code === "missingtitle"){
-                requestHasStarted = false
-                pageNotFoundOnNewServer = true
-                startRequest()
-                return
+            if(json.error.code === "missingtitle"){
+                pageNotFoundOnNewServer = true   
             }
             translateEverythingOnWeb(null)
             return 
@@ -553,46 +494,6 @@ async function startWebRequest() {
 
 
 
-async function startRequestForEditor(){
-
-    if(!pageIsLoaded || requestHasStarted)return
-    requestHasStarted = true
-    const encodedUrl = encodeURIComponent(currentLocation)
-
-    try{
-
-
-        const url = kIsDevEnv ? 
-        `http://localhost:3200/api/modify/getPageForParser/${encodedUrl}` :
-        `${baseUrl}/api/pages/${encodedUrl}`
-
-        const r = await fetch(url)
-        const json = r.status !== 200 ? {} : await r.json()
-
-
-        editsArray = json.edits.map(edit => convertMethodNameLongToShort(edit))
-      
-        try{
-            if(isEditingMode){
-                onEditorLoad()
-            }
-
-        }catch(e){
-            console.log(e)
-
-        }
-    }catch(e){
-        console.log(e)
-         editsArray = []
-         if(isEditingMode){
-            onEditorLoad()
-        }
-    }
-
- 
-}
-
-
 
 async function startWebRequestForEditor(){
 
@@ -613,12 +514,9 @@ async function startWebRequestForEditor(){
         const json = r.status !== 200 ? {} : await r.json()
 
         if(json.error){
-            if(useNewServer && isOnWikipedia && json.error.code === "missingtitle"){
-                requestHasStarted = false
-                pageNotFoundOnNewServer = true
-                startRequestForEditor()
-                return
-            }
+             if(json.error.code === "missingtitle"){
+                 pageNotFoundOnNewServer = true
+             }
 
             editsArray = []
             if(isEditingMode){
@@ -668,110 +566,6 @@ async function startWebRequestForEditor(){
 }
 
 
-function translateEverything(r,finalInstructions = []) {
-    findIfPageIsMillenniumOrCenturyCategory()
-    findIfPageIsDecadeCategory()
-    findIfPageIsAboutEarlyCenturyOrMillennium()
-    findIfPageContainsCenturiesTemplate()
-    preparePageMetadata(fullHTML)
-
-    
-    
-    let html = new XMLSerializer().serializeToString(document.body)
-
-    currentVersion = getPageVersionFromHtml(html)
-
-    let htmlWithMarkers
-
-    const { htmlWithIgParts, ignoredParts } = htmlWithIgnoredParts(html)
-
-    const {text, insertions} = extractTextFromHtml(htmlWithIgParts)
-
-    let replacementsArray = []
-    getLocalReplacements(htmlWithIgParts, text, insertions, replacementsArray, currentPageData)
-    replacementsArray = replacementsArray.sort((a, b) => a.index - b.index)
- 
-
-
-    if (isTranslated || finalInstructions.length) {
-        const editsToUse = finalInstructions.length ? finalInstructions : editsArray
-        const repsFromServer = getReplacementsFromServer(editsToUse, htmlWithIgParts)
-        replacementsArray = resolveReplacements(replacementsArray, repsFromServer)
-    }
-
-    
-    replacementsArray = replacementsArray.filter(replacement => replacement.edit.method !== 'bc-ig')
-    replacementsArray = replacementsArray.sort((a, b) => a.index - b.index)
-
-    
-    editsArray = replacementsArray.map(item => item.edit)
-    
-    htmlWithMarkers = createHTMLWithMarkers(replacementsArray, htmlWithIgParts, ignoredParts)
-
-
-
-
-    if (htmlWithMarkers) {
-
-
-        const parser = new DOMParser();
-        const cleanHtml = removeAttributesFromTags(htmlWithMarkers)
-        const bodyDOM = parser.parseFromString(cleanHtml, "text/xml");
-
-
-        textsArray = []
-        getTextsArray(bodyDOM.documentElement)
-
-   
-        textNodesArray = []
-        getTextNodesArray(document.body)
-
-  
-
-        const textInFirstNode = textNodesArray[1].firstNode.data
-  
-        if(textNodesArray.length < textsArray.length){
-      
-            const index = textsArray.findIndex(item => {
-                return textInFirstNode === item
-            })
-
-           
-            if(index > 0){
-                textsArray.splice(0, index);
-            }
-        }
-
-      
-
-        
-        doReplacements()
-        updateDates()
-
-    }
-
-    replaceImages(images)
-
-
-    // if (r) {
-    //     prepareVersionInfo(r)    
-    // }
-
-       
-
-
-    allWorkFinishedForPage = true
-
-    updatePageStatus()
-
-    updateIcon()
-
-    updatePageTitle()
-
-    chrome.runtime.sendMessage('pageMetadataIsReady') //message for the popup script
-    
-
-}
 
 
 
@@ -1136,7 +930,7 @@ function turnOn(){
             replaceImages(images)
             chrome.runtime.sendMessage('pageMetadataIsReady') //message for the popup script  
         } else if (currentLocation && !shouldNotUseServer && isOnWikipedia) {
-            isEditingMode ? startRequestForEditor() : startRequest()
+            isEditingMode ? startWebRequestForEditor() : startWebRequest()
         }
         
     })

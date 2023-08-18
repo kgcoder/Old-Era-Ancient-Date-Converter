@@ -370,14 +370,10 @@ function loadEdits(editsFromServer,shouldFixBrokenEdits = false,showOnlyFixed = 
 
 function createHTMLWithMarkersForEditor(editsFromServer,htmlWithIgParts,ignoredParts, text, insertions, shouldFixBrokenEdits = false,showOnlyFixed = false) {
 
-    let replacements = []
-    if(isOnWikipedia && (!useNewServer || pageNotFoundOnNewServer)){
-        flattenedListOfEdits = flattenListOfEdits(editsFromServer)
-        replacements = getReplacementsFromEdits(flattenedListOfEdits,htmlWithIgParts)
-    }else{
-        let {repsFromServer, badReplacements} = prepareServerReplacements(editsFromServer,text)
-        replacements = repsFromServer
-    }
+    
+    let {repsFromServer, badReplacements} = prepareServerReplacements(editsFromServer,text)
+    let replacements = repsFromServer
+    
 
     replacementsLoadedFromServer = replacements
    
@@ -420,7 +416,7 @@ function createHTMLWithMarkersForEditor(editsFromServer,htmlWithIgParts,ignoredP
     }
 
     let finalReplacements = replacements
-    if(!isOnWikipedia || (useNewServer && !pageNotFoundOnNewServer)){
+    if(!pageNotFoundOnNewServer){
         finalReplacements = []
         moveReplacementsFromTextToHtml(text,htmlWithIgParts,replacements, finalReplacements, insertions)
     }
@@ -639,119 +635,29 @@ function createInstructions(forWikitext = false) {
         cleanHTML += obj.text
     })
 
-
     
+    let filteredCleanTexts = cleanTexts.filter(cleanTextObj => cleanTextObj.method !== 'text')
     
-    if(!isOnWikipedia || forWikitext || useNewServer){
-        let filteredCleanTexts = cleanTexts.filter(cleanTextObj => cleanTextObj.method !== 'text')
-       
 
-        if(forWikitext && !titleInURL.includes("Template:")){
-            const prohibitedRanges = findTemplatesInHtml(ignHtml)
-            filteredCleanTexts = filteredCleanTexts.filter(item => {
-                for(let prohibitedRange of prohibitedRanges){
-                    if(item.index > prohibitedRange.startIndex && item.index < prohibitedRange.endIndex) return false
-                }
-                return true
-            })
-        }
-
-        const {text:cleanText, insertions:insertionsInCleanText} = extractTextFromHtml(cleanHTML)
-
-       
-        const instructions = getFinalReplacementsForWeb(cleanHTML,filteredCleanTexts, cleanText, insertionsInCleanText)
-        
-
-        
-        return instructions
+    if(forWikitext && !titleInURL.includes("Template:")){
+        const prohibitedRanges = findTemplatesInHtml(ignHtml)
+        filteredCleanTexts = filteredCleanTexts.filter(item => {
+            for(let prohibitedRange of prohibitedRanges){
+                if(item.index > prohibitedRange.startIndex && item.index < prohibitedRange.endIndex) return false
+            }
+            return true
+        })
     }
 
+    const {text:cleanText, insertions:insertionsInCleanText} = extractTextFromHtml(cleanHTML)
 
-
-    const instructions = []
-
-
-    cleanTexts.forEach((cleanTextObj, index) => {
     
-        if (cleanTextObj.method === 'text') {
-            // skip
-        } else {
-
-            const left = getLeftSide(cleanTexts, index)
-            const right = getRightSide(cleanTexts, index)
-
-
-            const targetIndex = cleanTextObj.index
-            const bigStringIndex = targetIndex - left.length
-            const bigLine = left + cleanTextObj.text + right
-
-            const stringOccurrences = getOccurrences2(cleanHTML, bigLine)
-
-            let numberOfOccurrence = 1
-
-            if (stringOccurrences.length !== 1) {
-                numberOfOccurrence = getNumberOfOccurrence(stringOccurrences, bigStringIndex)
-            }
-
-            if(!cleanTextObj.text)return
-
-            const targetOccurrences = getOccurrences2(bigLine, cleanTextObj.text)
-            let numberOfTargetOccurrence = 1
-            if (targetOccurrences.length !== 1) {
-                const relTargetIndex = left.length
-                numberOfTargetOccurrence = getNumberOfOccurrence(targetOccurrences, relTargetIndex)
-            }
-
-            const order = `${stringOccurrences.length}.${numberOfOccurrence}.${targetOccurrences.length}.${numberOfTargetOccurrence}`
-
-            const instruction = {
-                string: bigLine,
-                target: cleanTextObj.text,
-                method: cleanTextObj.method,
-            }
-            if (order !== '1.1.1.1') instruction['order'] = order
-            if (cleanTextObj.type !== 'normal') instruction['type'] = cleanTextObj.type
-            if (cleanTextObj.originalSubstitute) instruction['originalSubstitute'] = cleanTextObj.originalSubstitute
-            if(cleanTextObj.fromTemplate)instruction['fromTemplate'] = true
-
-            instructions.push(instruction)
-
-        }
-        
-    })
-
-
-    localReplacementsArray = []
-
-    getLocalReplacements(cleanHTML, text, insertions, localReplacementsArray, currentPageData)
-    localReplacementsArray = localReplacementsArray.map(item => {
-        item.edit.targetIndex = item.index
-        if(['bc-y-r1','bc-y-r2'].includes(item.edit.method))item.edit.method = 'bc-y'
-        if(['bc-i-r1','bc-i-r2'].includes(item.edit.method))item.edit.method = 'bc-i'
-        return item
-    })
-
-
-
-    localReplacementsArray = localReplacementsArray.sort((a, b) => a.edit.targetIndex - b.edit.targetIndex)
-
-
-    const replacementsFromInstructions = getReplacementsFromEdits(instructions,cleanHTML)
-
-
-    const finalInstructions = []
-
-    replacementsFromInstructions.forEach((repFromInstr) => {
-     
-        const localReplacementInTheSamePlace = localReplacementsArray.find(localRep => localRep.index == repFromInstr.index)
-        if(localReplacementInTheSamePlace && repFromInstr.replacement == localReplacementInTheSamePlace.replacement){
-            //no instruction is needed
-        }else{
-            finalInstructions.push(repFromInstr.edit)
-        }
-    })
+    const instructions = getFinalReplacementsForWeb(cleanHTML,filteredCleanTexts, cleanText, insertionsInCleanText)
     
-    return finalInstructions
+
+    
+    return instructions
+    
 }
 
 
@@ -853,11 +759,9 @@ function test() {
     setBodyFromHTML(originalHTML)
 
 
-    if(isOnWikipedia && !useNewServer){
-        translateEverything(null,JSON.parse(JSON.stringify(finalInstructions)))
-    }else{    
-        translateEverythingOnWeb(null,JSON.parse(JSON.stringify(finalInstructions)))
-    }
+     
+    translateEverythingOnWeb(null,JSON.parse(JSON.stringify(finalInstructions)))
+    
 
 
     currentHTML = new XMLSerializer().serializeToString(document.body)
@@ -881,42 +785,8 @@ async function openEditor() {
 
     if(editorIsOpen)return
     editorIsOpen = true
-
-    if(!isOnWikipedia || useNewServer){
-        showPopupWithInstructions()
-        return
-    }
-
-   
-    let currentLocation = window.location.toString()
-    currentLocation = currentLocation.split('?')[0].split('#')[0]
-
-    const editsWithLongMethodNames = finalInstructions.map(edit =>( {...edit,method:shortToLongMethodConversions[edit.method]}))
-
-
-    const data = {
-        url: currentLocation,
-        edits: editsWithLongMethodNames
-    }
-    const result = await fetch('http://localhost:3200/api/pages', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-    })
-
-
-    const json = await result.json()
-    pageId = json.id
-
-
-    if(pageId && kIsDevEnv){
-        window.open(`http://localhost:3000/#/translatedPages/${pageId}/show`)
-    }
-
-    
-
+    showPopupWithInstructions()
+        
 }
 
 
