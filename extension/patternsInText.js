@@ -40,8 +40,8 @@ const longYearListPattern = `(${yearInListPattern}${yearListRange})?(${yearInLis
 const centuriesPattern = `((${nakedCenturyPattern})(${spacePattern}|-)(century|centuries|cent\\.|c\\.))(${bcPattern})`
 const millenniumPattern = `((${nakedCenturyPattern})(${spacePattern}|-)(millennium|millennia))(${bcPattern})`
 
-const centuryRangePattern = `${nakedCenturyPattern}-?${rangePattern}${nakedCenturyPattern}(${spacePattern}|-)(century|centuries)${bcPattern}`
-const centuryRangeWithSlashPattern = `${nakedCenturyPattern}/(early(${spacePattern}|-)|late(${spacePattern}|-))?${nakedCenturyPattern}(${spacePattern}|-)(century|centuries)${bcPattern}`
+const centuryRangePattern = `${nakedCenturyPattern}-?${rangePattern}${nakedCenturyPattern}(${spacePattern}|-)(century|centuries|c\\.)${bcPattern}`
+const centuryRangeWithSlashPattern = `${nakedCenturyPattern}/(early(${spacePattern}|-)|late(${spacePattern}|-))?${nakedCenturyPattern}(${spacePattern}|-)(century|centuries|c\\.)${bcPattern}`
 
 const millenniumRangePattern = `${nakedCenturyPattern}-?${rangePattern}${nakedCenturyPattern}(${spacePattern}|-)(millennium|millennia)${bcPattern}`
 const millenniumRangeWithSlashPattern = `${nakedCenturyPattern}/(early(${spacePattern}|-)|late(${spacePattern}|-))?${nakedCenturyPattern}(${spacePattern}|-)(millennium|millennia)${bcPattern}`
