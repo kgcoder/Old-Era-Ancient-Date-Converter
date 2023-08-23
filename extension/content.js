@@ -64,14 +64,14 @@ let domain = ''
 
 let isEditingMode = false
 
-let pageNotFoundOnNewServer = false //temporary flag
+let pageNotFoundOnServer = false
 
 
 let editsLoadedFromServer = []
 
 let replacementsLoadedFromServer = []
 
-let pageStatus = 'dates were translated automatically'
+let pageStatus = 'page not analysed yet'
 
 
 
@@ -118,7 +118,6 @@ function getConfigFromLocalStorage(callback){
         if(templateNamesString){
             const lines = templateNamesString.split('\n')
             templatesToLoadAtStartup = lines.filter(line => line.includes('Template:'))
-            console.log('templatesToLoadAtStartup',templatesToLoadAtStartup)
         }
         chrome.storage.local.set({templatesToLoadAtStartup:""})
 
@@ -185,14 +184,13 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     }
 
     if(message === 'togglePageInfo'){
-        if(!pageNotFoundOnNewServer){
-            togglePageInfoPopup()
-        }
+        togglePageInfoPopup()
+        
     }
 
     if (message === 'openEdits') {
 
-        if(!pageNotFoundOnNewServer){
+        if(!pageNotFoundOnServer){
             showPageInfoPopup()
             return
         }
@@ -291,11 +289,11 @@ function sendPageMetadata(sendResponse) {
         lastOkVersion, translatedForVersion,
         currentVersionSeemsOK, isCurrentVersionVerified,
         pageHasNoBCDates, pageIsNotTranslatedYet,
-        pageNotAnalysedYet,
         isThisSiteAllowed,
         domain,
         isOnWikipedia,
         pageStatus,
+        pageNotFoundOnServer,
         currentLocation
     })
 }
@@ -445,11 +443,10 @@ async function startWebRequest() {
 
         const r = await fetch(url)
         const json = r.status !== 200 ? {} : await r.json()
-
         
         if(json.error){
             if(json.error.code === "missingtitle"){
-                pageNotFoundOnNewServer = true   
+                pageNotFoundOnServer = true   
             }
             translateEverythingOnWeb(null)
             return 
@@ -515,7 +512,7 @@ async function startWebRequestForEditor(){
 
         if(json.error){
              if(json.error.code === "missingtitle"){
-                 pageNotFoundOnNewServer = true
+                 pageNotFoundOnServer = true
              }
 
             editsArray = []
@@ -697,7 +694,15 @@ function updatePageStatus(){
         }
     }
 
-    pageStatus = hasIssues ? "has issues" : (hasSmallIssues ? "small issues" : "seems OK")
+
+    if(pageNotFoundOnServer){
+        pageStatus = 'page not analysed yet'
+    }else if(!flattenedListOfEdits.length){
+        pageStatus = 'dates were translated automatically'
+    }else{
+        pageStatus = hasIssues ? "has issues" : (hasSmallIssues ? "small issues" : "seems OK")
+    }
+
 
 
 

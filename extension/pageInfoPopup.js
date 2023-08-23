@@ -52,6 +52,23 @@ function flattenListOfEdits(list){
 
 function togglePageInfoPopup(){
     if(isEditingMode)return
+
+
+    if(pageNotFoundOnServer || flattenedListOfEdits.length === 0){
+
+        const toast = document.createElement('div');
+        toast.className = 'toast'
+
+        toast.innerText = pageStatus.charAt(0).toUpperCase() + pageStatus.slice(1);
+
+        document.body.appendChild(toast)
+        setTimeout(() => {
+            toast.parentElement.removeChild(toast)
+        }, 3000); // Hide the toast after 3 seconds
+
+        return
+    }
+
     if(pageInfoPopupIsShowing){
         hidePageInfoPopup()
     }else{

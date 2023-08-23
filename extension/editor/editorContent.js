@@ -44,6 +44,8 @@ let preloadedTemplates = []
 
 let editorIsOpen = false
 
+
+
 const allClassesString = allClasses.join('|')
 
 
@@ -369,9 +371,9 @@ function loadEdits(editsFromServer,shouldFixBrokenEdits = false,showOnlyFixed = 
 
 
 function createHTMLWithMarkersForEditor(editsFromServer,htmlWithIgParts,ignoredParts, text, insertions, shouldFixBrokenEdits = false,showOnlyFixed = false) {
-
     
     let {repsFromServer, badReplacements} = prepareServerReplacements(editsFromServer,text)
+    
     let replacements = repsFromServer
     
 
@@ -416,7 +418,7 @@ function createHTMLWithMarkersForEditor(editsFromServer,htmlWithIgParts,ignoredP
     }
 
     let finalReplacements = replacements
-    if(!pageNotFoundOnNewServer){
+    if(!pageNotFoundOnServer){
         finalReplacements = []
         moveReplacementsFromTextToHtml(text,htmlWithIgParts,replacements, finalReplacements, insertions)
     }
@@ -445,7 +447,7 @@ function createHTMLWithMarkersForEditor(editsFromServer,htmlWithIgParts,ignoredP
 
 
 
-    if (!replacements.length) return null
+    if (!replacements.length) return htmlWithIgParts
 
     let result = ''
     let lastIndex = 0
@@ -1063,12 +1065,22 @@ function showPopupWithInstructions(){
         return `${string};${target};${method};;${order ? order : ""};${originalSubstitute ? originalSubstitute : ""};`
     })
 
+    const isEmpty = lines.length === 0
 
-    lines = ['<poem><nowiki>'].concat(lines).concat([
-        '</nowiki></poem>',
+    const categories = [
         '[[Category:Pages with dates]]',
-        `[[Category:${domain}]]`
-    ])
+        `[[Category:${domain}]]`,
+        `[[Category:Format version ${currentDataFormatVersion}]]`
+    ]
+
+    if(isEmpty){
+        lines = categories
+    }else{
+        lines = ['<poem><nowiki>'].concat(lines).concat([
+            '</nowiki></poem>',
+        ]).concat(categories)
+    }
+
 
     if (isOnWikipedia && titleInURL.includes("Template:")){
         lines.push('[[Category:Wikipedia templates]]')

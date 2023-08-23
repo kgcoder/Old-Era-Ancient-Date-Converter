@@ -380,7 +380,7 @@ function updatePageMetadata(response){
     
     link1.style = link2.style = link3.style = ""
     
-    const { pageIsNotTranslatedYet,  isThisSiteAllowed, domain,  pageStatus } = response
+    const { isThisSiteAllowed, domain,  pageStatus } = response
         
     isOnWikipedia = response.isOnWikipedia
 
@@ -394,15 +394,13 @@ function updatePageMetadata(response){
 
     let message = pageStatus
     let messageColor = pageStatus === 'has issues' ||  pageStatus === 'small issues' ? 'red' : 'green'
-    if(pageIsNotTranslatedYet){
-        message = 'dates were translated automatically'
-        messageColor = 'green'
-    }
+
     
     updatePageStatus(message, messageColor)
 
     const pageInfo = document.getElementById("pageInfo")
-    pageInfo.style.display = pageIsNotTranslatedYet ? 'none' : 'flex'
+    pageInfo.style.display = pageStatus === 'page not analysed yet' || pageStatus === 'dates were translated automatically' ? 'none' : 'flex'
+
 
     updatePageInfoVisibility(!isExtensionOff)
     updateUIInAccordanceWithMode()
