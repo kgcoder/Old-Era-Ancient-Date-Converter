@@ -457,6 +457,9 @@ async function startWebRequest() {
             translateEverythingOnWeb(null)
             return 
         }
+
+
+        currentPageDataFormatVersion = getDataFormatVersionFromDataPage(wikitext)
         
         const lines = wikitext.split('\n')
         
@@ -531,6 +534,8 @@ async function startWebRequestForEditor(){
             return
         }
 
+        currentPageDataFormatVersion = getDataFormatVersionFromDataPage(wikitext)
+
         const lines = wikitext.split('\n')
 
         editsArray = lines.map(line => getEditFromLine(line)).filter(obj => obj !== null).map(edit => convertMethodNameLongToShort(edit))
@@ -579,7 +584,7 @@ function translateEverythingOnWeb(r,finalInstructions = []) {
 
     const { htmlWithIgParts, ignoredParts } = htmlWithIgnoredParts(html)
 
-    const {text, insertions} = extractTextFromHtml(htmlWithIgParts)
+    const {text, insertions} = extractTextFromHtml(htmlWithIgParts, currentPageDataFormatVersion >= 2)
 
     let replacementsArray = []
     getLocalReplacements(htmlWithIgParts, text, insertions, replacementsArray, currentPageData)
@@ -598,6 +603,8 @@ function translateEverythingOnWeb(r,finalInstructions = []) {
         pageIsNotTranslatedYet = repsFromServer.length == 0
 
         const rawRepsInHtmlArray = []
+
+
         moveReplacementsFromTextToHtml(text,htmlWithIgParts,JSON.parse(JSON.stringify(repsFromServer)), rawRepsInHtmlArray, insertions)
 
         const normalReplacementsInHtmlFromServer = mergeReplacements(rawRepsInHtmlArray)

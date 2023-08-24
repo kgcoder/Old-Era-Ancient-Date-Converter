@@ -96,7 +96,7 @@ function createAutomaticReplacements(html, text, insertions, replacementsArray, 
 
 
 
-function extractTextFromHtml(html){
+function extractTextFromHtml(html,unifyRefNumbers = false){
    
     let isIgnoring = false
     let result = ''
@@ -170,6 +170,15 @@ function extractTextFromHtml(html){
             }
         }
 
+    }
+
+    if(unifyRefNumbers){
+        const reg = new RegExp("\\[(\\d{1,3})\\]","gm")
+    
+        result = result.replace(reg, (match, numberString) => {
+            const zerosString = numberString.replace(/./g, '0')
+            return `[${zerosString}]`
+        })
     }
     
     return {text:result,insertions}

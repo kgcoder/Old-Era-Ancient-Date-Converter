@@ -606,3 +606,12 @@ function addLinksToSupportedWebsitesPage(){
 
 
 }
+
+
+function getDataFormatVersionFromDataPage(wikitext){
+    const reg = new RegExp('\\[\\[Category:Format version (.*?)\\]\\]')
+    const match = wikitext.match(reg)
+    if(!match)return 1
+    const version = parseInt(match[1],10)
+    return version
+}

@@ -345,7 +345,7 @@ function loadEdits(editsFromServer,shouldFixBrokenEdits = false,showOnlyFixed = 
 
     const { htmlWithIgParts, ignoredParts } = htmlWithIgnoredParts(html)
 
-    const {text, insertions} = extractTextFromHtml(htmlWithIgParts)
+    const {text, insertions} = extractTextFromHtml(htmlWithIgParts,currentPageDataFormatVersion >= 2)
   
     const htmlWithMarkers = createHTMLWithMarkersForEditor(editsForMarkers,htmlWithIgParts,ignoredParts,text, insertions, shouldFixBrokenEdits,showOnlyFixed)
     currentHTML = replaceCurlyBracesWithMarkup(htmlWithMarkers)
@@ -651,7 +651,7 @@ function createInstructions(forWikitext = false) {
         })
     }
 
-    const {text:cleanText, insertions:insertionsInCleanText} = extractTextFromHtml(cleanHTML)
+    const {text:cleanText, insertions:insertionsInCleanText} = extractTextFromHtml(cleanHTML,true)
 
     
     const instructions = getFinalReplacementsForWeb(cleanHTML,filteredCleanTexts, cleanText, insertionsInCleanText)
@@ -1070,7 +1070,7 @@ function showPopupWithInstructions(){
     const categories = [
         '[[Category:Pages with dates]]',
         `[[Category:${domain}]]`,
-        `[[Category:Format version ${currentDataFormatVersion}]]`
+        `[[Category:Format version ${dataFormatVersionForEditor}]]`
     ]
 
     if(isEmpty){

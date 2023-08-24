@@ -6,3 +6,4 @@
  */
 
 let flattenedListOfEdits = []
+let currentPageDataFormatVersion = 1

@@ -11,7 +11,7 @@
  const mediawikiDomain = 'timeline.oldera.org'
  const webBaseUrl = `https://${mediawikiDomain}`
  
- const currentDataFormatVersion = 1
+ const dataFormatVersionForEditor = 2
 
  //const baseUrl = 'http://localhost:3250'
  //const frontendBaseUrl = 'http://localhost:3000'
