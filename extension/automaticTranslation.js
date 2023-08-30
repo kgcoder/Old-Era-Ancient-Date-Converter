@@ -71,7 +71,7 @@ function createAutomaticReplacements(html, text, insertions, replacementsArray, 
 
     moveReplacementsFromTextToHtml(text,html,intermediaryReplacementsArray, rawReplacementsInHtmlArray, insertions)
 
-    const normalReplacementsInHtml = mergeReplacements(rawReplacementsInHtmlArray)
+    const normalReplacementsInHtml = isEditingMode ? mergeReplacements(rawReplacementsInHtmlArray) : rawReplacementsInHtmlArray
 
     addNewReplacementsToArray(normalReplacementsInHtml,replacementsArray)
 

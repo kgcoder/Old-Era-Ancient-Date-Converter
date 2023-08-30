@@ -620,16 +620,15 @@ function translateEverythingOnWeb(r,finalInstructions = []) {
 
     
     editsArray = replacementsArray.map(item => item.edit)
+
     
     htmlWithMarkers = createHTMLWithMarkers(replacementsArray, htmlWithIgParts, ignoredParts)
-
-
 
 
     if (htmlWithMarkers) {
 
         const parser = new DOMParser();
-        const originalBodyDOM = parser.parseFromString(html, "text/xml");
+        //const originalBodyDOM = parser.parseFromString(html, "text/xml");
         const cleanHtml = removeAttributesFromTags(htmlWithMarkers)
         const bodyDOM = parser.parseFromString(cleanHtml, "text/xml");
 
@@ -717,10 +716,28 @@ function updatePageStatus(){
 
 
 function resolveReplacements(replacementsArray, repsFromServer) {
+
     repsFromServer.forEach(repFromServer => {
-        const localRepIndex = replacementsArray.findIndex(local => local.index === repFromServer.index)
-        if (localRepIndex !== -1) {
-            const sameLocalRep = replacementsArray[localRepIndex]
+        const duplicates = replacementsArray.filter(local =>{ 
+
+            const localStart = local.index
+            const localEnd = local.index + local.length
+
+            const remoteStart = repFromServer.index
+            const remoteEnd = repFromServer.index + repFromServer.length
+
+            // console.log('!!!')
+            // console.log('remote rep',repFromServer)
+            // console.log('local',local)
+                
+            
+
+            return (localStart <= remoteStart && localEnd >= remoteEnd) ||
+            (localStart >= remoteStart && localStart <= remoteEnd) ||
+            (localEnd >= remoteStart && localEnd <= remoteEnd)        
+        })
+
+        duplicates.forEach(sameLocalRep => {
             const serverRepWins = repFromServer.replacement !== sameLocalRep.replacement
             if (serverRepWins) {
                 sameLocalRep["duplicate"] = true
@@ -760,10 +777,12 @@ function resolveReplacements(replacementsArray, repsFromServer) {
             } else {
                 repFromServer["duplicate"] = true
             }
-        }
+        })
+    
     })
 
     replacementsArray = replacementsArray.concat(repsFromServer)
+
     replacementsArray = replacementsArray.filter(item => !item.duplicate)
 
     return replacementsArray   
@@ -870,9 +889,11 @@ function doReplacements() {
             
                 if(cleanText !== textInNode) {
                     // console.log('something is wrong while replacing')
+                    // console.log('text',text)
                     // console.log('clean text:',cleanText)
                     // console.log('text in node',textInNode)
                     // console.log('i',i)
+                
                     j++;
                     continue;
                 }else{
