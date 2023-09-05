@@ -762,7 +762,7 @@ function test() {
 
 
      
-    translateEverythingOnWeb(null,JSON.parse(JSON.stringify(finalInstructions)))
+    translateEverythingOnWeb(JSON.parse(JSON.stringify(finalInstructions)))
     
 
 

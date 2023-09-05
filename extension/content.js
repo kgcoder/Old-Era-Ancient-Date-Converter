@@ -357,7 +357,7 @@ function sendPageMetadata(sendResponse) {
                     editsArray = []
                     onEditorLoad()
                 }else{
-                    translateEverythingOnWeb(null) 
+                    translateEverythingOnWeb() 
                 }
             }
         }
@@ -448,13 +448,13 @@ async function startWebRequest() {
             if(json.error.code === "missingtitle"){
                 pageNotFoundOnServer = true   
             }
-            translateEverythingOnWeb(null)
+            translateEverythingOnWeb()
             return 
         }
         
         const wikitext = json.parse.wikitext
         if (!wikitext) {
-            translateEverythingOnWeb(null)
+            translateEverythingOnWeb()
             return 
         }
 
@@ -477,7 +477,7 @@ async function startWebRequest() {
 
         try{
             if(!isEditingMode){
-                translateEverythingOnWeb(null,editsArray)
+                translateEverythingOnWeb(editsArray)
             }
 
         }catch(e){
@@ -487,7 +487,7 @@ async function startWebRequest() {
         
     }catch(e){
         console.log(e)
-        translateEverythingOnWeb(null)
+        translateEverythingOnWeb()
     }
 
 }
@@ -571,7 +571,7 @@ async function startWebRequestForEditor(){
 
 
 
-function translateEverythingOnWeb(r,finalInstructions = []) {
+function translateEverythingOnWeb(finalInstructions = []) {
     findIfPageIsMillenniumOrCenturyCategory()
     findIfPageIsDecadeCategory()
     findIfPageIsAboutEarlyCenturyOrMillennium()
@@ -591,9 +591,8 @@ function translateEverythingOnWeb(r,finalInstructions = []) {
     replacementsArray = replacementsArray.sort((a, b) => a.index - b.index)
  
     if (finalInstructions.length) {
-        const allEdits = finalInstructions.length ? finalInstructions : editsArray
 
-        let {repsFromServer, badReplacements} = prepareServerReplacements(allEdits,text)
+        let {repsFromServer, badReplacements} = prepareServerReplacements(finalInstructions,text)
 
 
         replacementsLoadedFromServer = repsFromServer
@@ -607,10 +606,9 @@ function translateEverythingOnWeb(r,finalInstructions = []) {
 
         moveReplacementsFromTextToHtml(text,htmlWithIgParts,JSON.parse(JSON.stringify(repsFromServer)), rawRepsInHtmlArray, insertions)
 
-        const normalReplacementsInHtmlFromServer = mergeReplacements(rawRepsInHtmlArray)
+        const normalReplacementsInHtmlFromServer = rawRepsInHtmlArray// mergeReplacements(rawRepsInHtmlArray)
 
         replacementsArray = resolveReplacements(replacementsArray, normalReplacementsInHtmlFromServer)
-
 
     }
 
@@ -623,7 +621,6 @@ function translateEverythingOnWeb(r,finalInstructions = []) {
 
     
     htmlWithMarkers = createHTMLWithMarkers(replacementsArray, htmlWithIgParts, ignoredParts)
-
 
     if (htmlWithMarkers) {
 
@@ -721,16 +718,14 @@ function resolveReplacements(replacementsArray, repsFromServer) {
         const duplicates = replacementsArray.filter(local =>{ 
 
             const localStart = local.index
-            const localEnd = local.index + local.length
+            const localEnd = local.index + local.length - 1
 
             const remoteStart = repFromServer.index
-            const remoteEnd = repFromServer.index + repFromServer.length
+            const remoteEnd = repFromServer.index + repFromServer.length - 1
 
             // console.log('!!!')
             // console.log('remote rep',repFromServer)
             // console.log('local',local)
-                
-            
 
             return (localStart <= remoteStart && localEnd >= remoteEnd) ||
             (localStart >= remoteStart && localStart <= remoteEnd) ||
