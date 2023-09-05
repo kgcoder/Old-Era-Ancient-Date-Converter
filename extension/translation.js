@@ -42,66 +42,7 @@ function updateTranslation() {
 
 function getReplacementsFromServerForWeb(editsArray, text) {
 
-    let replacementsFromServer = editsArray.map((edit) => {
-
-    
-
-        let { string, target, method, order, type, originalSubstitute } = edit
-
-        const orderChunks = getOrderChunks(order)
-
-        if (orderChunks.length !== 4) {
-            console.log('orderChunks.length !== 4')
-            return {edit,isBroken:true}
-        }
-
-        const [string_num_of_oc, string_oc, target_num_of_oc, target_oc] = orderChunks
-        const pattern1 = new RegExp(escapeText(string), 'g')
-        const matchesCount = (text.match(pattern1) || []).length
-
-        if (matchesCount != string_num_of_oc) {
-            console.log('matchesCount != string_num_of_oc')
-            console.log('matchesCount',matchesCount)
-            console.log('string_num_of_oc',string_num_of_oc)
-            return {edit,isBroken:true}
-        }
-
-        if (string_oc < 1 || string_oc > string_num_of_oc) {
-            console.log('string_oc < 1 || string_oc > string_num_of_oc')
-            return {edit,isBroken:true}
-        }
-
-        const pattern2 = new RegExp(escapeText(target), 'g')
-        const targetMatchesCount = (string.match(pattern2) || []).length
-
-        if (targetMatchesCount != target_num_of_oc) {
-            console.log('targetMatchesCount != target_num_of_oc')
-            return {edit,isBroken:true}
-        }
-
-        if (target_oc < 1 || target_oc > target_num_of_oc) {
-            console.log('target_oc < 1 || target_oc > target_num_of_oc')
-            return {edit,isBroken:true}
-        }
-
-
-        const index1 = findIndexOfSubstringOccurrence(text, string, string_oc)
-        const index2 = findIndexOfSubstringOccurrence(string, target, target_oc)
-
-        const index = index1 + index2
-
-        if(index){
-            edit.targetIndex = index
-        }
-
-        
-
-        const length = target.length
-
-        return {isBroken:false, edit, index, length, replacement: createMarker(target, method, type, originalSubstitute) }
-
-
-    })
+    let replacementsFromServer = editsArray.map((edit) => getReplacementFromEdit(edit,text))
 
 
 
@@ -136,7 +77,6 @@ function getReplacementsFromServerForWeb(editsArray, text) {
 
     pageHasIssues = pageHasIssues || filteredEdits.replacementsFromServer !== replacementsFromServer.length
     replacementsFromServer = filteredEdits
-
 
     const fixedEdits = fixBrokenEdits(gaps,text)
 
@@ -306,6 +246,10 @@ function preparePageMetadata(html){
 
 function fixBrokenEdits(gaps,html){
     const fixedEdits = []
+
+    const targetWithBCReg = new RegExp(`^(.*?)${bcPattern}`,'i')
+    const targetWithBCEReg = new RegExp(`^(.*?)${bcePattern}`,'i')
+    const targetWithStrictBCReg = new RegExp(`^(.*?)${strictBCPattern}`,'i')
     gaps.forEach(gap =>{
 
         let firstIndex = gap.firstGoodEdit ? gap.firstGoodEdit.targetIndex + gap.firstGoodEdit.target.length : 0
@@ -324,9 +268,33 @@ function fixBrokenEdits(gaps,html){
 
             let ocNumToTry = ocNum
             let index = undefined
+
+
+            let target = brokenEdit.target
+
+            if(canTargetContainBCLabelBasedOnMethod(brokenEdit.method)){
+               const matches = target.match(targetWithBCEReg)
+                if(matches){
+                    const bcMatches = target.match(targetWithStrictBCReg)
+                    target = bcMatches[0]
+                }
+
+
+            }
+
+
+
             while(true){
 
-                index = findIndexOfSubstringOccurrence(line, brokenEdit.target, ocNumToTry)
+                index = findIndexOfSubstringOccurrence(line, target, ocNumToTry)
+
+                if(canTargetContainBCLabelBasedOnMethod(brokenEdit.method)){
+                    const matches = target.match(targetWithBCReg)
+                    if(matches){
+                        brokenEdit.target = matches[1]
+                    }
+                }
+
                 
                 if(index){
                    const globalIndex = firstIndex + index
@@ -361,7 +329,7 @@ function fixBrokenEdits(gaps,html){
 
     return fixedEdits.map(edit => {
         const {targetIndex, target, method, type, originalSubstitute} = edit
-        return {isBroken:false, wasFixed:true, edit, index:targetIndex, length: target.length, replacement: createMarker(target, method, type, originalSubstitute) }
+        return {isBroken:false, wasFixed:true, edit, index:targetIndex, length: edit.length, replacement: createMarker(target, method, type, originalSubstitute) }
     })
 }
 

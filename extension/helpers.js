@@ -508,18 +508,47 @@ function areEditsEqual(editA, editB){
 }
 
 
-function areEditsInSamePlace(editA, editB, checkHideShow = false){
+function areEditsInSamePlace(text, editA, editB, checkHideShow = false,ignoreBCEndings = false){
 
-    const normalComparison = editA.string === editB.string &&
-    editA.target === editB.target &&
+    let targetA = editA.target
+    let targetB = editB.target
+
+    let stringA = editA.string
+    let stringB = editB.string
+
+    if(ignoreBCEndings){
+
+
+
+        const bcReg = new RegExp(bcPattern,'igm')
+
+        targetA = targetA.replace(bcReg,' BC')
+        stringA = stringA.replace(bcReg,' BC')
+
+        targetB = targetB.replace(bcReg,' BC')
+        stringB = stringB.replace(bcReg,' BC')
+
+
+        const targetAIndex = getTargetIndexInsideString(stringA,targetA,editA.order)
+        const targetBIndex = getTargetIndexInsideString(stringB,targetB,editB.order)
+
+        stringA = stringA.substr(targetAIndex - 10,targetA.length + 2 * 10)
+        stringB = stringB.substr(targetBIndex - 10,targetB.length + 2 * 10)
+
+
+    }
+
+
+    const normalComparison = stringA === stringB &&
+    targetA === targetB &&
     ordersAreEqual(editA.order, editB.order)
 
     if(checkHideShow && !normalComparison){
-        const stringA = editA.string.replace(/hide/g,"show")
-        const stringB = editB.string.replace(/hide/g,"show")
+        stringA = stringA.replace(/hide/g,"show")
+        stringB = stringB.replace(/hide/g,"show")
 
         return stringA === stringB &&
-        editA.target === editB.target &&
+        targetA === targetB &&
         ordersAreEqual(editA.order, editB.order)
 
     }
@@ -543,6 +572,13 @@ function ordersAreEqual(orderA,orderB){
 
     if(!orderA && !orderB) return true
     return orderA == orderB
+}
+
+function getOccurenceNumberInsideStringFromOrder(string, target, order){
+    if(!order)return 1
+    const chunks = getOrderChunks(order)
+    if(!chunks || chunks.length != 4)return 1
+    return chunks[3]
 }
 
 
@@ -614,4 +650,90 @@ function getDataFormatVersionFromDataPage(wikitext){
     if(!match)return 1
     const version = parseInt(match[1],10)
     return version
+}
+
+
+function canTargetContainBCLabelBasedOnMethod(method){
+    return ["bc-y","bc-i","bc-y1","bc-y2","bc-i2","bc-d","bc-sd","bc-dp","bc-00s","bc-000s"].includes(method)
+}
+
+function getTargetIndexInsideString(string,target,order){
+    const reg = new RegExp(target)
+    const occInsideString = getOccurenceNumberInsideStringFromOrder(order)
+    let result
+    let occA = 0
+    while((result = reg.exec(string))){
+        occA += 1
+        if(occA === occInsideString){
+            return result.index//string.substr(0,result.index) + string.substr(result.index + target.length,string.length - 1)
+        }
+    }
+    return string
+}
+
+
+function getReplacementFromEdit(edit,text){
+    const targetWithBCReg = new RegExp(`^(.*?)${bcPattern}`,'i')
+
+    let { string, target, method, order, type, originalSubstitute } = edit
+
+    const orderChunks = getOrderChunks(order)
+
+    if (orderChunks.length !== 4) {
+        console.log('orderChunks.length !== 4')
+        return {edit,isBroken:true}
+    }
+
+    const [string_num_of_oc, string_oc, target_num_of_oc, target_oc] = orderChunks
+    const pattern1 = new RegExp(escapeText(string), 'g')
+    const matchesCount = (text.match(pattern1) || []).length
+
+    if (matchesCount != string_num_of_oc) {
+        console.log('matchesCount != string_num_of_oc')
+        console.log('matchesCount',matchesCount)
+        console.log('string_num_of_oc',string_num_of_oc)
+        return {edit,isBroken:true}
+    }
+
+    if (string_oc < 1 || string_oc > string_num_of_oc) {
+        console.log('string_oc < 1 || string_oc > string_num_of_oc')
+        return {edit,isBroken:true}
+    }
+
+    const pattern2 = new RegExp(escapeText(target), 'g')
+    const targetMatchesCount = (string.match(pattern2) || []).length
+
+    if (targetMatchesCount != target_num_of_oc) {
+        console.log('targetMatchesCount != target_num_of_oc')
+        return {edit,isBroken:true}
+    }
+
+    if (target_oc < 1 || target_oc > target_num_of_oc) {
+        console.log('target_oc < 1 || target_oc > target_num_of_oc')
+        return {edit,isBroken:true}
+    }
+
+
+    const index1 = findIndexOfSubstringOccurrence(text, string, string_oc)
+    const index2 = findIndexOfSubstringOccurrence(string, target, target_oc)
+
+    const index = index1 + index2
+
+    if(index){
+        edit.targetIndex = index
+    }
+    let length = target.length
+
+    if(canTargetContainBCLabelBasedOnMethod(method)){
+        const matches = target.match(targetWithBCReg)
+        if(matches){
+            length = matches[1].length
+        }
+    }
+
+
+    return {isBroken:false, edit, index, length, replacement: createMarker(target, method, type, originalSubstitute) }
+
+
+    
 }

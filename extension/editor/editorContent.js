@@ -437,13 +437,16 @@ function createHTMLWithMarkersForEditor(editsFromServer,htmlWithIgParts,ignoredP
         return item
     })
 
-    replacements = resolveReplacements(localReplacementsArray, finalReplacements)
+
+    const serverRepsWithMergedTails = mergeReplacementsWithLocalReplacements(finalReplacements,localReplacementsArray)
+
+
+    replacements = resolveReplacements(localReplacementsArray, serverRepsWithMergedTails)
 
     replacements = replacements.sort((a, b) => a.index - b.index)
 
+    replacements = mergeReplacements(replacements)
 
-  
- 
 
 
 
@@ -658,7 +661,7 @@ function createInstructions(forWikitext = false) {
     
 
     
-    return instructions
+    return {instructions,cleanText}
     
 }
 
@@ -746,7 +749,8 @@ function toggleTestingModeFromShortcut(){
 
 
 function test() {
-    finalInstructions = createInstructions()
+    let {instructions} = createInstructions()
+    finalInstructions = instructions
 
     finalInstructions = finalInstructions.map(edit => {
         const newEdit = JSON.parse(JSON.stringify(edit))
@@ -862,7 +866,8 @@ async function startWikitextEditing(){
 
     if(!isOnWikipedia)return
 
-    finalInstructions = createInstructions(true)
+    const {instructions} = createInstructions(true)
+    finalInstructions = instructions
     finalInstructions = finalInstructions.map(instruction => ({...instruction,string:removeEscapesFromSemicolons(instruction.string)}))
 
 
@@ -1016,8 +1021,12 @@ function markupDateInSideList(string,target,method,order,originalSubstitute){
 
 
 function showPopupWithInstructions(){
+    let text = ''
     if(!isTestingMode){
-        finalInstructions = createInstructions()
+
+        const {instructions,cleanText} = createInstructions()
+        finalInstructions = instructions
+        text = cleanText
     }
     const nReg = new RegExp('\n','g')
     const tReg = new RegExp('\t','g')
@@ -1032,7 +1041,7 @@ function showPopupWithInstructions(){
 
     for(let template of templates){
         for(let templateEdit of template.subEdits){
-            const edit = finalInstructions.find(item => areEditsInSamePlace(item,templateEdit, true))
+            const edit = finalInstructions.find(item => areEditsInSamePlace(text,item,templateEdit, true, true))
             if(edit){
                 edit.isTemplate = true
                 edit.templateName = template.name
@@ -1206,6 +1215,7 @@ function getFinalReplacementsForWeb(cleanHTML,cleanTexts, text, insertions){
 
     localReplacementsArray = localReplacementsArray.sort((a, b) => a.edit.targetIndex - b.edit.targetIndex)
 
+    localReplacementsArray = mergeReplacements(localReplacementsArray)
 
     const filteredCleanTexts = []
     cleanTexts.forEach((cleanText) => {

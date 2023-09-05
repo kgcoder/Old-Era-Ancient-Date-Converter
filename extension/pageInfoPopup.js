@@ -31,7 +31,7 @@ function flattenListOfEdits(list){
 
         const edit = result[i]
 
-        const rep = replacementsLoadedFromServer.find(rep => areEditsInSamePlace(rep.edit,edit))
+        const rep = replacementsLoadedFromServer.find(rep => areEditsInSamePlace(null,rep.edit,edit))
         
         if(!rep){
             edit.notFound = true

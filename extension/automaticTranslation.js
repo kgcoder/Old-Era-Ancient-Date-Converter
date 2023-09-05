@@ -71,7 +71,7 @@ function createAutomaticReplacements(html, text, insertions, replacementsArray, 
 
     moveReplacementsFromTextToHtml(text,html,intermediaryReplacementsArray, rawReplacementsInHtmlArray, insertions)
 
-    const normalReplacementsInHtml = isEditingMode ? mergeReplacements(rawReplacementsInHtmlArray) : rawReplacementsInHtmlArray
+    const normalReplacementsInHtml = rawReplacementsInHtmlArray// isEditingMode ? mergeReplacements(rawReplacementsInHtmlArray) : rawReplacementsInHtmlArray
 
     addNewReplacementsToArray(normalReplacementsInHtml,replacementsArray)
 
@@ -334,6 +334,81 @@ function mergeReplacements(rawReplacements){
 
 
 }
+
+
+function mergeReplacementsWithLocalReplacements(replacements,localReplacementsArray){
+    
+    const resultArray = []
+    const groupsArray = []
+    let currentGroup = []
+    let lastIndex = 0
+    for(let i = 0; i < replacements.length;i++){
+        const replacement = replacements[i]
+
+        if(replacement.edit.method === 'bc-ig'){
+            if(currentGroup.length > 0){
+                groupsArray.push(currentGroup)
+            }
+            currentGroup = [replacement]  
+            groupsArray.push(currentGroup)
+            lastIndex = replacement.index + replacement.length
+            currentGroup = []
+            continue
+            
+        }
+        
+        if(currentGroup.length === 0){
+            currentGroup.push(replacement)
+            lastIndex = replacement.index + replacement.length
+            
+            const adjasentRep = localReplacementsArray.find(rep => rep.index === lastIndex && rep.edit.method === 'bc-r')
+        
+            if(adjasentRep){
+                currentGroup.push(adjasentRep)
+                lastIndex = adjasentRep.index + adjasentRep.length
+                const adjasentRep2 = localReplacementsArray.find(rep => rep.index === lastIndex && rep.edit.method === 'bc-r')
+
+                if(adjasentRep2){
+                    currentGroup.push(adjasentRep2)
+                    lastIndex = adjasentRep2.index + adjasentRep2.length
+                }
+
+
+            }
+
+            groupsArray.push(currentGroup)
+
+
+            currentGroup = []
+        
+        
+        }
+
+
+
+    }
+
+
+    for(let i = 0; i < groupsArray.length; i++){
+        const group = groupsArray[i]
+        const method = group[0].edit.method
+        const originalSubstitute = group[0].edit.originalSubstitute
+        const otherNumberStringInRange = group[0].edit.otherNumberStringInRange
+        const index = group[0].index 
+        
+        let targetString = ''
+        group.forEach(item => {
+            targetString += item.edit.target
+        })
+
+        addReplacement(resultArray,method,targetString,otherNumberStringInRange,index,true,'normal',originalSubstitute)
+
+
+    }
+
+    return resultArray
+}
+
 
 
 function addNewReplacementsToArray(newReplacements,replacementsArray){

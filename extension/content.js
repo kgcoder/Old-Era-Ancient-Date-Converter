@@ -611,6 +611,7 @@ function translateEverythingOnWeb(finalInstructions = []) {
         replacementsArray = resolveReplacements(replacementsArray, normalReplacementsInHtmlFromServer)
 
     }
+    
 
     
     replacementsArray = replacementsArray.filter(replacement => replacement.edit.method !== 'bc-ig')
