@@ -73,7 +73,7 @@ let replacementsLoadedFromServer = []
 
 let pageStatus = 'page not analysed yet'
 
-
+let adMode = 'E2' // 'nothing', 'E2', 'holocene'
 
 const firstYearOfOldEra_default = 10000
 const lastTranslatedYearWithLabel_default = 6000
@@ -1305,10 +1305,87 @@ function getReplacementStrings(text, originalSubstitute,otherNumberStringInRange
         case 'bc-at': {
             return [abbreviatedTimelineName, "", ""]
         }
+
+        case 'first-ad-year':{
+            switch(adMode){
+                case 'nothing':
+                case 'E2':
+                    return [originalText, "", ""]
+                case 'holocene':
+                    return [translateADYearToHolocene(originalNumber), "", ""]
+            }
+        }
+        case 'second-ad-year':{
+            switch(adMode){
+                case 'nothing':
+                case 'holocene':
+                    return [originalText, "", ""]
+                case 'E2':
+                    return [originalText + " E2", "", ""]
+            }
+        }
+
+        case 'ad-year':{
+            switch(adMode){
+                case 'nothing':
+                    return [originalText, "", ""]
+                case 'E2':
+                    return [originalText + " E2", "", ""]
+                case 'holocene':
+                    return [translateADYearToHolocene(originalNumber), "", ""]
+            }
+        }
+        case 'leading-ad':{
+            switch(adMode){
+                case 'nothing':
+                    return [originalText, "", ""]
+                case 'E2':
+                case 'holocene':
+                    return ["", "", ""]
+            }
+        }
+        case 'trailing-ce':
+        case 'trailing-ad':{
+            switch(adMode){
+                case 'nothing':
+                    return [originalText, "", ""]
+                case 'E2':
+                    return [" E2", "", ""]
+                case 'holocene':
+                    return ["", "", ""]
+            }
+        }
+        case 'leading-ce':{
+            return ["","",""]//currentMode === 2 ? "CE" : "AD"
+        }
+    
+        case 'leading-ad-space':{
+            switch(adMode){
+                case 'nothing':
+                    return [originalText, "", ""]
+                case 'E2':
+                case 'holocene':
+                    return ["", "", ""]
+            }
+            return ["","",""]
+        }
+        case 'trailing-ad-space':{
+            switch(adMode){
+                case 'nothing':
+                case 'E2':
+                    return [originalText, "", ""]
+                case 'holocene':
+                    return ["", "", ""]
+            }
+        }
+
         
 
-        default:
+        default:{
+            console.log('method',method)
             return [originalText, "", ""]
+
+        }
     }
 }
 
@@ -1323,6 +1400,13 @@ function translateYearImprecisely(year){
     return translatedYear
 }
 
+
+
+
+function translateADYearToHolocene(year){
+    const holoceneYear = year + 10000
+    return "1'" + (holoceneYear + '').slice(1)
+}
 
 
 function getFirstYearInRangeReplacementString(originalText,year,otherNumberStringInRange = "",isImprecise = false){

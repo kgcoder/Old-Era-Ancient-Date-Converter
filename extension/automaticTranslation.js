@@ -43,10 +43,34 @@ function createAutomaticReplacements(html, text, insertions, replacementsArray, 
     processCenturyOrMillenniumCategoryPattern(html,replacementsArray)
     processDecadeCategoryPattern(html, replacementsArray)
 
+    console.log('text',text)
     let intermediaryReplacementsArray = []
 
 
     const rawReplacementsInHtmlArray = []
+
+
+    if(!isEditingMode){
+        processYearRangeWithLeadingADPattern(text,intermediaryReplacementsArray)
+        processYearRangeWithLeadingCEPattern(text,intermediaryReplacementsArray)
+    
+        processDecadeWithTrailingADPattern(text,intermediaryReplacementsArray)
+        processDecadeWithTrailingCEPattern(text,intermediaryReplacementsArray)
+    
+        processCenturiesOrMillenniaADPattern(text,intermediaryReplacementsArray)
+        processCenturiesOrMillenniaCEPattern(text,intermediaryReplacementsArray)
+    
+        processYearRangeWithTrailingADPattern(text,intermediaryReplacementsArray)
+        processYearRangeWithTrailingCEPattern(text,intermediaryReplacementsArray)
+    
+        processYearWithLeadingADPattern(text,intermediaryReplacementsArray)
+    
+        processYearWithTrailingADPattern(text,intermediaryReplacementsArray)
+        processYearWithTrailingCEPattern(text,intermediaryReplacementsArray)
+    
+
+
+    }    
 
 
     processYearRangePattern(text,intermediaryReplacementsArray, pageData)
@@ -137,7 +161,15 @@ function extractTextFromHtml(html,unifyRefNumbers = false){
         }else if(character === '>'){
             isIgnoring = false
             let nextCharacter = html.slice(index + 1,index + 2)
+            let isAD = false
+            if(nextCharacter.toLowerCase() === "a"){
+                let secondCharacter = html.slice(index + 2,index + 3)
+                if(secondCharacter.toLowerCase() === "d"){
+                    isAD = true
+                }
+            }
             if((isPreviousCharacterNumber && nextCharacter.match(numReg)) ||
+            isAD ||
             (isPreviousCharacterB && nextCharacter == '.') ||
             (isPreviousCharacterC && nextCharacter == '.') ||
             (isPreviousCharacterE && nextCharacter == '.') ||

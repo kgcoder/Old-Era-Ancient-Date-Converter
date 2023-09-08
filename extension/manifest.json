@@ -19,6 +19,7 @@
                 "location.js",
                 "translation.js",
                 "automaticTranslation.js",
+                "adPatternProcessors.js",
                 "patternProcessors.js",
                 "pageChecker.js",
                 "summaryManager.js",
