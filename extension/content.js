@@ -1378,6 +1378,39 @@ function getReplacementStrings(text, originalSubstitute,otherNumberStringInRange
                     return ["", "", ""]
             }
         }
+        case 'ad-decade':{
+            switch(adMode){
+                case 'nothing':
+                case 'E2':
+                    return [originalText, "", ""]
+                case 'holocene':
+                    return [translateADDecadeToHolocene(originalNumber,originalText)]
+
+            }
+                
+        }
+
+        case 'first-ad-century':{
+            switch(adMode){
+                case 'nothing':
+                case 'E2':
+                    return [originalText, "", ""]
+                case 'holocene':
+                    return [translateADCenturyToHolocene(originalNumber,originalText)]
+
+            }
+        }
+
+        case 'ad-millennium':{
+            switch(adMode){
+                case 'nothing':
+                case 'E2':
+                    return [originalText, "", ""]
+                case 'holocene':
+                    return [translateADMillenniumToHolocene(originalNumber)]
+
+            }
+        }
 
         
 
@@ -1405,7 +1438,24 @@ function translateYearImprecisely(year){
 
 function translateADYearToHolocene(year){
     const holoceneYear = year + 10000
-    return "1'" + (holoceneYear + '').slice(1)
+    return "1," + (holoceneYear + '').slice(1)
+}
+
+function translateADDecadeToHolocene(year,originalText){
+    const holoceneYear = year + 10000
+    const originalTextWithoutDigits = originalText.replace(/\d/g,"")
+    return "1," + (holoceneYear + originalTextWithoutDigits).slice(1)
+}
+
+function translateADCenturyToHolocene(century,originalText){
+    const holoceneCentury = century + 100
+    const originalTextWithoutDigits = originalText.replace(/\d/g,"")
+    return "1," + (holoceneCentury + originalTextWithoutDigits).slice(1)
+}
+
+function translateADMillenniumToHolocene(millennium){
+    const holoceneMillennium = millennium + 10 
+    return holoceneMillennium + 'th'
 }
 
 

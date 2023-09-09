@@ -20,8 +20,8 @@ const nakedDecadePattern = "[0-9]{0,3}0'?s"
 const decadePattern = `(${nakedDecadePattern})${bcPattern}`
 const decadeRangePattern = `((${nakedDecadePattern})(${spacePattern})?(${rangePattern})(${spacePattern})?)((${nakedDecadePattern})${bcPattern})`
 
-const roundnakedYearPattern = '[0-9]{1,3},?000(?!\\])'
-const roundYearrangePattern = `((${roundnakedYearPattern})(${rangePattern})(${circaPattern}(${spacePattern})?)?)((${roundnakedYearPattern})${bcPattern})`
+const roundNakedYearPattern = '[0-9]{1,3},?000(?!\\])'
+const roundYearrangePattern = `((${roundNakedYearPattern})(${rangePattern})(${circaPattern}(${spacePattern})?)?)((${roundNakedYearPattern})${bcPattern})`
 
 const yearRangePattern = `((((${nakedYearPattern}(${supPattern})?/)?${nakedYearPattern}(${supPattern})?${rangePattern}(${circaPattern})?(${spacePattern})?)(${nakedYearPattern}(${supPattern})?/)?)${nakedYearPattern}(${supPattern})?)${bcPattern}`
 
@@ -59,16 +59,27 @@ const leadingCEPattern = `(c\\.(${spacePattern})?e\\.?|ce)`
 const trailingADPattern = `(${spacePattern}|-)?(a\\.(${spacePattern})?d\\.?|ad)`
 const trailingCEPattern = `(${spacePattern}|-)?(c\\.(${spacePattern})?e\\.?|ce)`
 
+const trailingADCEPattern = `(${spacePattern}|-)?(a\\.(${spacePattern})?d\\.?|ad|c\\.(${spacePattern})?e\\.?|ce)`
+
+
 const decadeWithTrailingADPattern = `(${nakedDecadePattern})${trailingADPattern}`
 const decadeWithTrailingCEPattern = `(${nakedDecadePattern})${trailingCEPattern}`
 
-const centuriesOrMillenniaADPattern = `((${nakedCenturyPattern})(${spacePattern}|-)(millennium|millennia|century|centuries|cent\\.|c\\.))(${trailingADPattern})`
-const centuriesOrMillenniaCEPattern = `((${nakedCenturyPattern})(${spacePattern}|-)(millennium|millennia|century|centuries|cent\\.|c\\.))(${trailingCEPattern})`
+
+const centuryADCERangePattern = `((${nakedCenturyPattern}-?${rangePattern})${nakedCenturyPattern}(${spacePattern}|-)(century|centuries|c\\.))${trailingADCEPattern}`
+const centuryRangeWithSlashADCEPattern = `((${nakedCenturyPattern}/)(early(${spacePattern}|-)|late(${spacePattern}|-))?${nakedCenturyPattern}(${spacePattern}|-)(century|centuries|c\\.))${trailingADCEPattern}`
+
+const millenniumADCERangePattern = `((${nakedCenturyPattern}-?${rangePattern})${nakedCenturyPattern}(${spacePattern}|-)(millennium|millennia))${trailingADCEPattern}`
+const millenniumRangeWithSlashADCEPattern = `((${nakedCenturyPattern}/)(early(${spacePattern}|-)|late(${spacePattern}|-))?${nakedCenturyPattern}(${spacePattern}|-)(millennium|millennia))${trailingADCEPattern}`
+
+
+const centuryADCEPattern = `((${nakedCenturyPattern})(${spacePattern}|-)(century|centuries|cent\\.|c\\.))(${trailingADCEPattern})`
+const millenniumADCEPattern = `((${nakedCenturyPattern})(${spacePattern}|-)(millennium|millennia))(${trailingADCEPattern})`
+
 
 const yearWithLeadingADPattern = `\\b${leadingAdPattern}\\b(${spacePattern})${nakedYearPattern}`
 const yearWithTrailingADPattern = `${nakedYearPattern}${trailingADPattern}`
-const yearWithTrailingCEPattern = `${nakedYearPattern}${trailingCEPattern}`
-
+const yearWithTrailingCEPattern = `${nakedYearPattern}${`( |\\&nbsp;|\\&#160;|\\&#8201;|-)?(c\\.(${spacePattern})?e\\.?|ce)`}`
 
 const yearRangeWithLeadingADPattern = `(\\b${leadingAdPattern}\\b(${spacePattern})${nakedYearPattern}${rangePattern})${nakedYearPattern}`
 const yearRangeWithTrailingADPattern = `(${nakedYearPattern}${rangePattern})${nakedYearPattern}${trailingADPattern}`

@@ -57,18 +57,28 @@ function createAutomaticReplacements(html, text, insertions, replacementsArray, 
         processDecadeWithTrailingADPattern(text,intermediaryReplacementsArray)
         processDecadeWithTrailingCEPattern(text,intermediaryReplacementsArray)
     
-        processCenturiesOrMillenniaADPattern(text,intermediaryReplacementsArray)
-        processCenturiesOrMillenniaCEPattern(text,intermediaryReplacementsArray)
+        processCenturyADCERangePattern(text,intermediaryReplacementsArray)
+        processCenturyRangeWithSlashADCEPattern(text,intermediaryReplacementsArray)
+
+        processCenturyADCEPattern(text,intermediaryReplacementsArray)
+
+
+        processMillenniumADCERangePattern(text,intermediaryReplacementsArray)
+        processMillenniumRangeWithSlashADCEPattern(text,intermediaryReplacementsArray)
+
+        processMillenniumADCEPattern(text,intermediaryReplacementsArray)
+
     
         processYearRangeWithTrailingADPattern(text,intermediaryReplacementsArray)
         processYearRangeWithTrailingCEPattern(text,intermediaryReplacementsArray)
     
         processYearWithLeadingADPattern(text,intermediaryReplacementsArray)
     
-        processYearWithTrailingADPattern(text,intermediaryReplacementsArray)
         processYearWithTrailingCEPattern(text,intermediaryReplacementsArray)
+        processYearWithTrailingADPattern(text,intermediaryReplacementsArray)
     
 
+        console.log('intermediaryReplacementsArray',intermediaryReplacementsArray)
 
     }    
 
