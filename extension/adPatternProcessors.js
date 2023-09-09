@@ -65,7 +65,6 @@ function processYearRangeWithLeadingCEPattern(text,replacementsArray){
     let result;
     const reg = giRegForText(yearRangeWithLeadingCEPattern)
     while ((result = reg.exec(text))) {
-        console.log('range with leading ce',result)
         const stringTillSecondYear = result[1] || ''
         const leadingAD = result[2] || ''
         const leadingADSpace = result[4] || ''
@@ -148,15 +147,11 @@ function processYearWithTrailingADPattern(text,replacementsArray){
     let result;
     const reg = giRegForText(yearWithTrailingADPattern)
     while ((result = reg.exec(text))) {
-        console.log('trailing ad',result)
          const year = result[1] || ''
          const space = result[2] || ''
          const ad = result[3] || ''
 
          if(space === '\n')return
-
-    
-
 
          let index = result.index
          addIntermediaryReplacement(replacementsArray,'first-ad-year',year,'',index)
@@ -164,7 +159,6 @@ function processYearWithTrailingADPattern(text,replacementsArray){
          addIntermediaryReplacement(replacementsArray,'trailing-ad-space',space,'',index)
          index += space.length
          addIntermediaryReplacement(replacementsArray,'trailing-ad',ad,'',index)
-
    
     }
 
@@ -173,7 +167,6 @@ function processYearWithTrailingCEPattern(text,replacementsArray){
     let result;
     const reg = giRegForText(yearWithTrailingCEPattern)
     while ((result = reg.exec(text))) {
-        console.log('trailing ce result',result)
         const yearString = result[1] || ''
         const space = result[2] || ''
         const ce = result[3] || ''
@@ -267,7 +260,6 @@ function processCenturyRangeWithSlashADCEPattern(text, replacementsArray) {
     let result;
     const reg = giRegForText(centuryRangeWithSlashADCEPattern)
     while ((result = reg.exec(text))) {
-        console.log('processCenturyRangeWithSlashADCEPattern result',result)
         const stringTillSpace = result[1] || ''
         const stringTillSecondCentury = result[2] || ''
         const firstCentury = result[3] || ''
@@ -297,7 +289,6 @@ function processCenturyADCEPattern(text, replacementsArray) {
     let result;
     const reg = giRegForText(centuryADCEPattern)
     while ((result = reg.exec(text))) {
-        console.log('century ad',result)
         const stringTillSpace = result[1] || ''
         const centuryString = result[2] || ''
         const space = result[9] || ''
@@ -353,7 +344,6 @@ function processMillenniumRangeWithSlashADCEPattern(text, replacementsArray) {
     let result;
     const reg = giRegForText(millenniumRangeWithSlashADCEPattern)
     while ((result = reg.exec(text))) {
-        console.log('processMillenniumRangeWithSlashADCEPattern result',result)
         const stringTillSpace = result[1] || ''
         const stringTillSecondMillennium = result[2] || ''
         const firstCentury = result[3] || ''
@@ -381,7 +371,6 @@ function processMillenniumADCEPattern(text, replacementsArray) {
     let result;
     const reg = giRegForText(millenniumADCEPattern)
     while ((result = reg.exec(text))) {
-        console.log('millennium ad',result)
         const stringTillSpace = result[1] || ''
         const millenniumString = result[2] || ''
         const space = result[9] || ''

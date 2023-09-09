@@ -73,7 +73,7 @@ let replacementsLoadedFromServer = []
 
 let pageStatus = 'page not analysed yet'
 
-let adMode = 'E2' // 'nothing', 'E2', 'holocene'
+let adMode = 'AD/CE' // 'AD/CE', 'E2', 'Holocene'
 
 const firstYearOfOldEra_default = 10000
 const lastTranslatedYearWithLabel_default = 6000
@@ -103,7 +103,7 @@ function getConfigFromLocalStorage(callback){
         'shouldTranslateYearsPrecisely', 'shouldTranslateDatesInBookTitles', 
         'shouldTranslateDatesInQuotes','sitesData',
         'firstYearOfOldEra','lastTranslatedYearWithLabel',
-        'timelineName','ofTimeline','abbreviatedTimelineName','dontShowPopupAgain','templatesToLoadAtStartup'], function (result) {
+        'timelineName','ofTimeline','abbreviatedTimelineName','dontShowPopupAgain','templatesToLoadAtStartup','adMode'], function (result) {
         isExtensionOff = !!result.isExtensionOff
         isEditingMode = !!result.isEditingMode
         shouldNotUseServer = !!result.shouldNotUseServer
@@ -140,6 +140,10 @@ function getConfigFromLocalStorage(callback){
         }
         if(result.abbreviatedTimelineName){
             abbreviatedTimelineName = result.abbreviatedTimelineName
+        }
+
+        if(result.adMode){
+            adMode = result.adMode
         }
 
         if(result.sitesData){
@@ -250,6 +254,15 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     }
     if (message === 'giveMePageMetadata') {
         sendPageMetadata(sendResponse)  
+    }
+    if (message === 'changeAdMode to AD/CE'){
+        changeAdMode('AD/CE')
+    }
+    if (message === 'changeAdMode to E2'){
+        changeAdMode('E2')
+    }
+    if (message === 'changeAdMode to Holocene'){
+        changeAdMode('Holocene')
     }
     if (message === 'giveMePageStatus') {
     
@@ -1308,17 +1321,17 @@ function getReplacementStrings(text, originalSubstitute,otherNumberStringInRange
 
         case 'first-ad-year':{
             switch(adMode){
-                case 'nothing':
+                case 'AD/CE':
                 case 'E2':
                     return [originalText, "", ""]
-                case 'holocene':
+                case 'Holocene':
                     return [translateADYearToHolocene(originalNumber), "", ""]
             }
         }
         case 'second-ad-year':{
             switch(adMode){
-                case 'nothing':
-                case 'holocene':
+                case 'AD/CE':
+                case 'Holocene':
                     return [originalText, "", ""]
                 case 'E2':
                     return [originalText + " E2", "", ""]
@@ -1327,63 +1340,63 @@ function getReplacementStrings(text, originalSubstitute,otherNumberStringInRange
 
         case 'ad-year':{
             switch(adMode){
-                case 'nothing':
+                case 'AD/CE':
                     return [originalText, "", ""]
                 case 'E2':
                     return [originalText + " E2", "", ""]
-                case 'holocene':
+                case 'Holocene':
                     return [translateADYearToHolocene(originalNumber), "", ""]
             }
         }
         case 'leading-ad':{
             switch(adMode){
-                case 'nothing':
+                case 'AD/CE':
                     return [originalText, "", ""]
                 case 'E2':
-                case 'holocene':
+                case 'Holocene':
                     return ["", "", ""]
             }
         }
         case 'trailing-ce':
         case 'trailing-ad':{
             switch(adMode){
-                case 'nothing':
+                case 'AD/CE':
                     return [originalText, "", ""]
                 case 'E2':
                     return [" E2", "", ""]
-                case 'holocene':
+                case 'Holocene':
                     return ["", "", ""]
             }
         }
-        case 'leading-ce':{
-            return ["","",""]//currentMode === 2 ? "CE" : "AD"
-        }
+        // case 'leading-ce':{
+        //     return ["","",""]//currentMode === 2 ? "CE" : "AD"
+        // }
     
         case 'leading-ad-space':{
             switch(adMode){
-                case 'nothing':
+                case 'AD/CE':
                     return [originalText, "", ""]
                 case 'E2':
-                case 'holocene':
+                case 'Holocene':
                     return ["", "", ""]
             }
             return ["","",""]
         }
         case 'trailing-ad-space':{
             switch(adMode){
-                case 'nothing':
+                case 'AD/CE':
                 case 'E2':
                     return [originalText, "", ""]
-                case 'holocene':
+                case 'Holocene':
                     return ["", "", ""]
             }
         }
         case 'ad-decade':{
             switch(adMode){
-                case 'nothing':
+                case 'AD/CE':
                 case 'E2':
                     return [originalText, "", ""]
-                case 'holocene':
+                case 'Holocene':
                     return [translateADDecadeToHolocene(originalNumber,originalText)]
 
             }
@@ -1392,10 +1405,10 @@ function getReplacementStrings(text, originalSubstitute,otherNumberStringInRange
 
         case 'first-ad-century':{
             switch(adMode){
-                case 'nothing':
+                case 'AD/CE':
                 case 'E2':
                     return [originalText, "", ""]
-                case 'holocene':
+                case 'Holocene':
                     return [translateADCenturyToHolocene(originalNumber,originalText)]
 
             }
@@ -1403,10 +1416,10 @@ function getReplacementStrings(text, originalSubstitute,otherNumberStringInRange
 
         case 'ad-millennium':{
             switch(adMode){
-                case 'nothing':
+                case 'AD/CE':
                 case 'E2':
                     return [originalText, "", ""]
-                case 'holocene':
+                case 'Holocene':
                     return [translateADMillenniumToHolocene(originalNumber)]
 
             }
@@ -1415,7 +1428,6 @@ function getReplacementStrings(text, originalSubstitute,otherNumberStringInRange
         
 
         default:{
-            console.log('method',method)
             return [originalText, "", ""]
 
         }
@@ -1529,4 +1541,11 @@ function numberSuffix(number) {
     if (lastDigit === 2) return 'nd'
     if (lastDigit === 3) return 'rd'
     return 'th'
+}
+
+
+function changeAdMode(newMode){
+    adMode = newMode
+    updateDates()
+
 }

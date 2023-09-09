@@ -15,6 +15,7 @@ let isTestingMode = false
 
 let isEditingWikitext = false
 
+let adMode = 'AD/CE'  // 'AD/CE', 'E2', 'Holocene'
 
 let shouldTranslateYearsPrecisely = false
 let shouldTranslateDatesInBookTitles = false
@@ -248,10 +249,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-    chrome.storage.local.get(['isExtensionOff','isEditingMode', 'shouldNotUseServer', 'shouldTranslateYearsPrecisely', 'shouldTranslateDatesInBookTitles', 'shouldTranslateDatesInQuotes','sitesData','firstYearOfOldEra','lastTranslatedYearWithLabel','timelineName','ofTimeline','abbreviatedTimelineName','isEditingWikitext'], function (result) {
+    chrome.storage.local.get(['isExtensionOff','isEditingMode', 'shouldNotUseServer', 'shouldTranslateYearsPrecisely', 'shouldTranslateDatesInBookTitles', 'shouldTranslateDatesInQuotes','sitesData','firstYearOfOldEra','lastTranslatedYearWithLabel','timelineName','ofTimeline','abbreviatedTimelineName','isEditingWikitext','adMode'], function (result) {
         
         isExtensionOff = !!result.isExtensionOff
         isEditingMode = !!result.isEditingMode
+
+
 
         isEditingWikitext = !!result.isEditingWikitext
 
@@ -271,6 +274,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         if(result.abbreviatedTimelineName){
             abbreviatedTimelineName = result.abbreviatedTimelineName
+        }
+
+        if(result.adMode){
+            adMode = result.adMode
         }
      
         updatePageInfoVisibility(false)
@@ -304,6 +311,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         updateButtons()
 
+        updateADRadioButtons()
+
     })
 
     document.getElementById('toggleEditingMode').addEventListener('click', () => {
@@ -328,6 +337,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.getElementById('TranslateYearsPreciselyCheckbox').addEventListener('click', () => {
         togglePreciseTranslationOfYears()
+    }, false)
+
+
+    document.getElementById('ADCE').addEventListener('click', () => {
+        changeAdMode('AD/CE')
+    }, false)
+
+    document.getElementById('E2').addEventListener('click', () => {
+        changeAdMode('E2')
+    }, false)
+
+    document.getElementById('Holocene').addEventListener('click', () => {
+        changeAdMode('Holocene')
     }, false)
 
     // document.getElementById('TranslateInBookTitlesCheckbox').addEventListener('click', () => {
@@ -463,6 +485,19 @@ function updateUIInAccordanceWithMode(){
 }
 
 
+function updateADRadioButtons(){
+    const adceButton = document.getElementById("ADCE")
+    const e2Button = document.getElementById("E2")
+    const holoceneButton = document.getElementById("Holocene")
+
+    adceButton.checked = adMode === 'AD/CE'
+    e2Button.checked = adMode === 'E2'
+    holoceneButton.checked = adMode === 'Holocene'
+
+
+}
+
+
 
 
 function toggleWebsiteUsage() {
@@ -516,6 +551,17 @@ function toggleTranslationsInQuotes() {
 
     sendMessageToPage('updateTranslation')
 }
+
+
+function changeAdMode(newMode){
+    adMode = newMode
+    chrome.storage.local.set({ ['adMode']:newMode }).then(() => {
+        sendMessageToPage('changeAdMode to ' + newMode)
+    })
+    updateADRadioButtons()
+}
+
+
 
 
 function sendMessageToPage(message) {

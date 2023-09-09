@@ -43,7 +43,6 @@ function createAutomaticReplacements(html, text, insertions, replacementsArray, 
     processCenturyOrMillenniumCategoryPattern(html,replacementsArray)
     processDecadeCategoryPattern(html, replacementsArray)
 
-    console.log('text',text)
     let intermediaryReplacementsArray = []
 
 
@@ -77,9 +76,6 @@ function createAutomaticReplacements(html, text, insertions, replacementsArray, 
         processYearWithTrailingCEPattern(text,intermediaryReplacementsArray)
         processYearWithTrailingADPattern(text,intermediaryReplacementsArray)
     
-
-        console.log('intermediaryReplacementsArray',intermediaryReplacementsArray)
-
     }    
 
 
