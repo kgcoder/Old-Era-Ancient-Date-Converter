@@ -633,6 +633,7 @@ function translateEverythingOnWeb(finalInstructions = []) {
     
     editsArray = replacementsArray.map(item => item.edit)
 
+
     
     htmlWithMarkers = createHTMLWithMarkers(replacementsArray, htmlWithIgParts, ignoredParts)
 
@@ -729,22 +730,9 @@ function updatePageStatus(){
 function resolveReplacements(replacementsArray, repsFromServer) {
 
     repsFromServer.forEach(repFromServer => {
-        const duplicates = replacementsArray.filter(local =>{ 
-
-            const localStart = local.index
-            const localEnd = local.index + local.length - 1
-
-            const remoteStart = repFromServer.index
-            const remoteEnd = repFromServer.index + repFromServer.length - 1
-
-            // console.log('!!!')
-            // console.log('remote rep',repFromServer)
-            // console.log('local',local)
-
-            return (localStart <= remoteStart && localEnd >= remoteEnd) ||
-            (localStart >= remoteStart && localStart <= remoteEnd) ||
-            (localEnd >= remoteStart && localEnd <= remoteEnd)        
-        })
+        const duplicates = replacementsArray.filter(local => 
+            replacementsIntersect(local,repFromServer)   
+        )
 
         duplicates.forEach(sameLocalRep => {
             const serverRepWins = repFromServer.replacement !== sameLocalRep.replacement

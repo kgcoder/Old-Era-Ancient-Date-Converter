@@ -737,3 +737,17 @@ function getReplacementFromEdit(edit,text){
 
     
 }
+
+
+
+function replacementsIntersect(repA,repB){
+    const repAStart = repA.index
+    const repAEnd = repA.index + repA.length - 1
+
+    const repBStart = repB.index
+    const repBEnd = repB.index + repB.length - 1
+
+    return (repAStart <= repBStart && repAEnd >= repBEnd) ||
+    (repAStart >= repBStart && repAStart <= repBEnd) ||
+    (repAEnd >= repBStart && repAEnd <= repBEnd)    
+}

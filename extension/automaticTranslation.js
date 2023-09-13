@@ -450,8 +450,14 @@ function mergeReplacementsWithLocalReplacements(replacements,localReplacementsAr
 
 
 function addNewReplacementsToArray(newReplacements,replacementsArray){
+
     newReplacements.forEach(rep => {
-        addReplacement(replacementsArray,rep.edit.method,rep.edit.target,rep.edit.otherNumberStringInRange,rep.index,true,'normal',rep.edit.originalSubstitute)
+
+        const intersectingReps = replacementsArray.filter(existingRep => replacementsIntersect(existingRep,rep) )
+
+        if(intersectingReps.length === 0){
+            addReplacement(replacementsArray,rep.edit.method,rep.edit.target,rep.edit.otherNumberStringInRange,rep.index,true,'normal',rep.edit.originalSubstitute)
+        }
 
     })
 }
