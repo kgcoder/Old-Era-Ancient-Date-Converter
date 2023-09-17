@@ -21,8 +21,7 @@ let datesFolder = `https://${mediawikiDomain}/wiki/index.php/Dates/`
 
 function prepareLocation() {
 
-
-
+    currentLocation = window.location.toString()
 
     domain = currentLocation
     .replace('https://www.','')

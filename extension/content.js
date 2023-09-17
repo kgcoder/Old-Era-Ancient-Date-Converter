@@ -288,7 +288,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 
 
 
-prepareLocation()
+
 
 
 
@@ -312,10 +312,42 @@ function sendPageMetadata(sendResponse) {
 }
 
 
+async function onContentLoad() {
+    prepareLocation()
+
+    if(!isOnWikipedia){
+        handlePage()
+        return
+    }
+
+    const oldWikiUrl = getWikitextUrlOnMyServer()
 
 
+    const redirects = document.getElementsByClassName('mw-redirectedfrom')
+    if(redirects.length){
+        let cycles = 0
+        const i = setInterval(()=>{
+         prepareLocation()
+         const url = getWikitextUrlOnMyServer()
+         if(url !== oldWikiUrl){
+            handlePage(oldWikiUrl)
+            clearInterval(i)
+         }
 
- async function onContentLoad() {
+         cycles++
+         if(cycles > 20){
+            handlePage()
+            clearInterval(i)
+         }
+
+        },100)
+    }else{
+        handlePage()
+    }
+}
+
+
+ async function handlePage(oldUrl = '') {
     if(!isOnWikipedia){
         await prepareListOfWebsitesSupportedByBackend()
     }
@@ -364,7 +396,7 @@ function sendPageMetadata(sendResponse) {
     
         if (!isExtensionOff  && currentLocation && !isOnMediaWikiCategoryPage) {
             if(!shouldNotUseServer && (sitesSupportedByBackend.includes(domain) || domain === 'en.wikipedia.org') ){
-                isEditingMode ? startWebRequestForEditor() :  startWebRequest()
+                isEditingMode ? startWebRequestForEditor() :  startWebRequest(oldUrl)
             } else {
                 if(isEditingMode){
                     editsArray = []
@@ -446,7 +478,7 @@ async function requestListOfWebsites() {
 }
 
 
-async function startWebRequest() {
+async function startWebRequest(oldUrl = '') {
     if(!pageIsLoaded || requestHasStarted)return
     requestHasStarted = true
 
@@ -455,14 +487,32 @@ async function startWebRequest() {
     try{
 
         const r = await fetch(url)
-        const json = r.status !== 200 ? {} : await r.json()
+        let json = r.status !== 200 ? {} : await r.json()
         
         if(json.error){
             if(json.error.code === "missingtitle"){
-                pageNotFoundOnServer = true   
+
+                if(oldUrl && oldUrl !== url){
+                    try{
+                        const r = await fetch(oldUrl)
+                        json = r.status !== 200 ? {} : await r.json()
+                        console.log('json',json)
+                        if(json.error && json.error.code === "missingtitle"){
+                            pageNotFoundOnServer = true 
+                            translateEverythingOnWeb()
+                            return
+                        }
+                    }catch(e){
+                        console.log('oldUrl error',e)
+                    }
+                }else{
+                    pageNotFoundOnServer = true   
+
+                    translateEverythingOnWeb()
+                    return
+                }
             }
-            translateEverythingOnWeb()
-            return 
+           
         }
         
         const wikitext = json.parse.wikitext
