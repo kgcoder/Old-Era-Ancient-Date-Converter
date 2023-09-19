@@ -255,5 +255,6 @@ const colorToMarkupClass = {
 
 
 const prohibitedPages = [
-    "https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Detectable_BC/BCE_dates"
+    "https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Detectable_BC/BCE_dates",
+    "https://en.m.wikipedia.org/wiki/Wikipedia:WikiProject_Detectable_BC/BCE_dates"
 ]

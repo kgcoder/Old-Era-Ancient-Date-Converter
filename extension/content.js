@@ -150,7 +150,7 @@ function getConfigFromLocalStorage(callback){
             const sitesData = JSON.parse(result.sitesData)
             allowedSites = sitesData.allowedSites
         }else{
-            allowedSites = ['en.wikipedia.org']
+            allowedSites = ['en.wikipedia.org', 'en.m.wikipedia.org']
             chrome.storage.local.set({ ['sitesData']: JSON.stringify({allowedSites}) }).then(() => {
                // console.log("Value is set");
             });
@@ -271,14 +271,6 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
             pageStatus
         })
     }
-    if (message === 'openLastOKVersion') {
-        const link = `https://en.wikipedia.org/w/index.php?title=${titleInURL}&oldid=${lastOkVersion}`
-        window.open(link, "_self")
-    }
-    if (message === 'openLastVerifiedVersion') {
-        const link = `https://en.wikipedia.org/w/index.php?title=${titleInURL}&oldid=${translatedForVersion}`
-        window.open(link, "_self")
-    }
 
     return true
    
@@ -395,7 +387,8 @@ async function onContentLoad() {
         });
     
         if (!isExtensionOff  && currentLocation && !isOnMediaWikiCategoryPage) {
-            if(!shouldNotUseServer && (sitesSupportedByBackend.includes(domain) || domain === 'en.wikipedia.org') ){
+            if(!shouldNotUseServer && (sitesSupportedByBackend.includes(domain) || isOnWikipedia) ){
+                
                 isEditingMode ? startWebRequestForEditor() :  startWebRequest(oldUrl)
             } else {
                 if(isEditingMode){
@@ -483,12 +476,11 @@ async function startWebRequest(oldUrl = '') {
     requestHasStarted = true
 
     const url = getWikitextUrlOnMyServer()
-      
+
     try{
 
         const r = await fetch(url)
         let json = r.status !== 200 ? {} : await r.json()
-        
         if(json.error){
             if(json.error.code === "missingtitle"){
 
@@ -496,7 +488,6 @@ async function startWebRequest(oldUrl = '') {
                     try{
                         const r = await fetch(oldUrl)
                         json = r.status !== 200 ? {} : await r.json()
-                        console.log('json',json)
                         if(json.error && json.error.code === "missingtitle"){
                             pageNotFoundOnServer = true 
                             translateEverythingOnWeb()
@@ -575,7 +566,6 @@ async function startWebRequestForEditor(){
     try{
         const r = await fetch(url)
         const json = r.status !== 200 ? {} : await r.json()
-
         if(json.error){
              if(json.error.code === "missingtitle"){
                  pageNotFoundOnServer = true

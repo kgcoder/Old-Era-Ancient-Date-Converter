@@ -31,9 +31,7 @@ function prepareLocation() {
     domain = domain.split('/')[0]
 
 
-
-
-    isOnWikipedia = domain === 'en.wikipedia.org'
+    isOnWikipedia = ['en.wikipedia.org', 'en.m.wikipedia.org'].includes(domain)
 
     isOnMediaWikiCategoryPage = currentLocation && 
     (currentLocation.includes(`https://${mediawikiDomain}/wiki/index.php`) &&
@@ -47,7 +45,7 @@ function prepareLocation() {
 
 
     if (currentLocation.includes(mainBaseURL)) {
-        titleInURL = currentLocation.replace(mainBaseURL, '').split('#')[0]
+        titleInURL = currentLocation.replace('en.m.wikipedia.org','en.wikipedia.org').replace(mainBaseURL, '').split('#')[0]
     } else if (currentLocation.includes(additionalBaseURL)) {
         titleInURL = getParamFromURL('title')
         currentLocation = mainBaseURL + titleInURL

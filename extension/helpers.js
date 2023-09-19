@@ -275,18 +275,22 @@ function getWikitextUrlOnMyServer(uriComponent = ''){
     if(!uriComponent){
         uriComponent = currentLocation.replace('https://','').replace('http://','').replace('www.','')
     }
+    uriComponent = uriComponent.replace('en.m.wikipedia.org','en.wikipedia.org')
     return `${webBaseUrl}/wiki/api.php?action=parse&origin=*&prop=wikitext&formatversion=2&format=json&page=Dates/${uriComponent}`
+
 }
 
 function getPageUrlOnMyServer(){
-    const uriComponent = currentLocation.replace('https://','').replace('http://','').replace('www.','')
+    let uriComponent = currentLocation.replace('https://','').replace('http://','').replace('www.','')
+    uriComponent = uriComponent.replace('en.m.wikipedia.org','en.wikipedia.org')
     return `${webBaseUrl}/wiki/index.php/Dates/${uriComponent}`
 
     
 }
 
 function getPageUrlOnMyServerForEditing(){
-    const uriComponent = currentLocation.replace('https://','').replace('http://','').replace('www.','')
+    let uriComponent = currentLocation.replace('https://','').replace('http://','').replace('www.','')
+    uriComponent = uriComponent.replace('en.m.wikipedia.org','en.wikipedia.org')
     return `${webBaseUrl}/wiki/index.php?title=Dates/${uriComponent}&action=edit`
 }
 
