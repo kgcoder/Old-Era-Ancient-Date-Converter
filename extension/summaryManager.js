@@ -19,7 +19,7 @@ const observer = new MutationObserver(function(mutations) {
                  if(!node.className)return
                  if(typeof node.className !== "string")return
                  
-                 // console.log('node added',node.className)
+                  //console.log('node added',node.className)
                  // if(node.className.includes("loaded-infinite-scroll-container")){
                  //     console.log('node contents',node.innerHTML)
                  // }
@@ -38,14 +38,14 @@ const observer = new MutationObserver(function(mutations) {
                     if (node.className.includes("mwe-popups")) {
                         editSummaryIfNeeded(node);
 
-                        if(isEditingMode){
-                            setTimeout(()=> {
-                                if(node.parentElement){
-                                    node.parentElement.removeChild(node)
-                                }
-                            },5000)
+                        // if(isEditingMode){
+                        //     setTimeout(()=> {
+                        //         if(node.parentElement){
+                        //             node.parentElement.removeChild(node)
+                        //         }
+                        //     },5000)
 
-                        }
+                        // }
                     }
                     else if (node.className.includes("CategoryTreeSection")) {
                         editSummaryIfNeeded(node);
@@ -62,7 +62,10 @@ const observer = new MutationObserver(function(mutations) {
                         editSummaryIfNeeded(node);
                     }
                     else if(node.className.includes("ra-read-more")){
-                        editSummaryIfNeeded(node);
+                        const lis = node.getElementsByClassName("ext-related-articles-card")
+                        for(let li of lis){
+                          editSummaryIfNeeded(li)
+                        }
                     }else if(node.className.includes("mw-mmv-wrapper")){
                         setTimeout(() => {
                             editSummaryIfNeeded(node);
@@ -88,19 +91,19 @@ async function editSummaryIfNeeded(node){
     if(isExtensionOff)return
    
     const nonBreakableSpace = new RegExp(String.fromCharCode(160),'g')
-    const innerHTML = node.innerHTML.replace(/<img([^>]*?)>/,'<img$1/>').replace(/&nbsp;/g,' ').replace(nonBreakableSpace,' ')
+    const outerHTML = node.outerHTML.replace(/<img([^>]*?)>/,'<img$1/>').replace(/&nbsp;/g,' ').replace(nonBreakableSpace,' ')
  
 
     let substituteImageUrl = ''
    
 
 
-    const { htmlWithIgParts, ignoredParts } = htmlWithIgnoredParts(innerHTML)
+    const { htmlWithIgParts, ignoredParts } = htmlWithIgnoredParts(outerHTML)
 
 
     let replacementsArray = []
 
-    const pageData = getPageDataForSummary(innerHTML)
+    const pageData = getPageDataForSummary(outerHTML)
 
     const {text, insertions} = extractTextFromHtml(htmlWithIgParts) 
 
