@@ -518,16 +518,14 @@ async function startWebRequest(oldUrl = '') {
         const lines = wikitext.split('\n')
         
         editsArray = getEditsFromLines(lines)
-        
-       
-        await getTemplatesInfoFromServer(editsArray)
-       
 
+        if(isOnMobile){
+            editsArray = editsArray.filter(edit => !edit.isTemplate)
+        }else{
+            await getTemplatesInfoFromServer(editsArray)
+        }
+        
         editsLoadedFromServer = editsArray
-
-        
-
-
 
         try{
             if(!isEditingMode){
@@ -593,10 +591,11 @@ async function startWebRequestForEditor(){
 
         editsArray = lines.map(line => getEditFromLine(line)).filter(obj => obj !== null).map(edit => convertMethodNameLongToShort(edit))
        
-        await getTemplatesInfoFromServer(editsArray)
-
-        
-
+        if(isOnMobile){
+            editsArray = editsArray.filter(edit => !edit.isTemplate)
+        }else{
+            await getTemplatesInfoFromServer(editsArray)
+        }
 
         editsLoadedFromServer = JSON.parse(JSON.stringify(editsArray))
 

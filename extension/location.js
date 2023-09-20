@@ -7,7 +7,7 @@
 
 let currentLocation = window.location.toString()
 let isOnWikipedia = false
-
+let isOnMobile = false
 let isOnMediaWikiCategoryPage = false
 let isOnMediaWikiDataPage = false
 
@@ -32,6 +32,7 @@ function prepareLocation() {
 
 
     isOnWikipedia = ['en.wikipedia.org', 'en.m.wikipedia.org'].includes(domain)
+    isOnMobile = domain.includes('en.m.')
 
     isOnMediaWikiCategoryPage = currentLocation && 
     (currentLocation.includes(`https://${mediawikiDomain}/wiki/index.php`) &&

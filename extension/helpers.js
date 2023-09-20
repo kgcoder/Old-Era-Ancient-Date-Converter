@@ -367,100 +367,102 @@ function prepareServerReplacements(allEdits,text){
 
     repsFromServer = repsFromServer.sort((a,b) => a.index - b.index)
 
-    let indexOfEditBeforeTemplate = 0
-    let indexInAllEdits = 0
-    let indexInFilteredEdits = 0
-    let insideTemplate = false
-    let lastTemplate = null
+
+    if(!isOnMobile){
+
+        let indexOfEditBeforeTemplate = 0
+        let indexInAllEdits = 0
+        let indexInFilteredEdits = 0
+        let insideTemplate = false
+        let lastTemplate = null
+
+        if(repsFromServer.length){
+            while (indexInAllEdits < allEdits.length || indexInFilteredEdits < repsFromServer.length){
+                const replacement = repsFromServer[Math.min(indexInFilteredEdits,repsFromServer.length - 1)]
+                const edit = allEdits[Math.min(indexInAllEdits,allEdits.length - 1)]
+                
+
+                if(edit.isTemplate){
+                    if(lastTemplate && !lastTemplate.indexAfter){
+                        lastTemplate.indexAfter = -1
+                        edit.indexBefore = -1
+                    }else{
+                        edit.indexBefore = indexOfEditBeforeTemplate
+
+                    }
+                    lastTemplate = edit
+                    insideTemplate = true
+                    indexInAllEdits++
+                    continue
+                }
 
 
+                
+                if(edit.string === replacement.edit.string && edit.method === replacement.edit.method && ordersAreEqual(edit.order,replacement.edit.order)){
+                    
+                    if(insideTemplate){
+                        lastTemplate.indexAfter = replacement.index 
+                        insideTemplate = false
+                        lastTemplate = null
+
+                    }else{
+                        indexOfEditBeforeTemplate = replacement.index + replacement.edit.target.length
+                    }
+                    
+                    indexInAllEdits++
+                    indexInFilteredEdits++
 
 
-
-    if(repsFromServer.length){
-        while (indexInAllEdits < allEdits.length || indexInFilteredEdits < repsFromServer.length){
-            const replacement = repsFromServer[Math.min(indexInFilteredEdits,repsFromServer.length - 1)]
-            const edit = allEdits[Math.min(indexInAllEdits,allEdits.length - 1)]
-            
-
-            if(edit.isTemplate){
-                if(lastTemplate && !lastTemplate.indexAfter){
-                    lastTemplate.indexAfter = -1
-                    edit.indexBefore = -1
                 }else{
-                    edit.indexBefore = indexOfEditBeforeTemplate
+                    indexInAllEdits++
 
                 }
-                lastTemplate = edit
-                insideTemplate = true
-                indexInAllEdits++
-                continue
-            }
-
-
-            
-            if(edit.string === replacement.edit.string && edit.method === replacement.edit.method && ordersAreEqual(edit.order,replacement.edit.order)){
-                
-                if(insideTemplate){
-                    lastTemplate.indexAfter = replacement.index 
-                    insideTemplate = false
-                    lastTemplate = null
-
-                }else{
-                    indexOfEditBeforeTemplate = replacement.index + replacement.edit.target.length
-                }
-                
-                indexInAllEdits++
-                indexInFilteredEdits++
-
-
-            }else{
-                indexInAllEdits++
 
             }
 
+            if(insideTemplate){
+                lastTemplate.indexAfter = text.length - 1
+            }
         }
-
-        if(insideTemplate){
-            lastTemplate.indexAfter = text.length - 1
-        }
-    }
 
     
-    let templates = allEdits.filter(edit => !!edit.isTemplate)
+    
+        let templates = allEdits.filter(edit => !!edit.isTemplate)
 
 
-    if(!repsFromServer.length){
-        templates = templates.map((item,index) => ({
-            ...item,
-            indexBefore:index == 0 ? 0 : -1,
-            indexAfter:index == templates.length - 1 ? text.length - 1 : -1
-        }))
-    }
+        if(!repsFromServer.length){
+            templates = templates.map((item,index) => ({
+                ...item,
+                indexBefore:index == 0 ? 0 : -1,
+                indexAfter:index == templates.length - 1 ? text.length - 1 : -1
+            }))
+        }
 
-    let lastIndexBeforeTemplate = 0
-    for(let template of templates){
-        const startIndex = template.indexBefore == -1 ? lastIndexBeforeTemplate : template.indexBefore
-        const endIndex = template.indexAfter == -1 ? text.length - 1 : template.indexAfter
-         const textPart = text.substr(startIndex, endIndex - startIndex)
+        let lastIndexBeforeTemplate = 0
+        for(let template of templates){
+            const startIndex = template.indexBefore == -1 ? lastIndexBeforeTemplate : template.indexBefore
+            const endIndex = template.indexAfter == -1 ? text.length - 1 : template.indexAfter
+            const textPart = text.substr(startIndex, endIndex - startIndex)
 
-         let {replacementsFromServer:templateReps, badReplacements:badRepsInTemplate} =  getReplacementsFromServerForWeb(template.subEdits, textPart)
+            let {replacementsFromServer:templateReps, badReplacements:badRepsInTemplate} =  getReplacementsFromServerForWeb(template.subEdits, textPart)
 
 
-         templateReps = templateReps.map(rep => ({...rep,index:startIndex + rep.index}))
+            templateReps = templateReps.map(rep => ({...rep,index:startIndex + rep.index}))
 
-         repsFromServer = repsFromServer.concat(templateReps)
+            repsFromServer = repsFromServer.concat(templateReps)
 
-         badReplacements = badReplacements.concat(badRepsInTemplate)
-         
+            badReplacements = badReplacements.concat(badRepsInTemplate)
+            
 
-         const healthyReps = templateReps.filter(rep => !rep.isBroken)
+            const healthyReps = templateReps.filter(rep => !rep.isBroken)
 
-         if(healthyReps.length){
-            const lastRep = healthyReps[healthyReps.length - 1]
-            lastIndexBeforeTemplate = lastRep.index + lastRep.edit.target.length
-         }
+            if(healthyReps.length){
+                const lastRep = healthyReps[healthyReps.length - 1]
+                lastIndexBeforeTemplate = lastRep.index + lastRep.edit.target.length
+            }
 
+
+        }
 
     }
 

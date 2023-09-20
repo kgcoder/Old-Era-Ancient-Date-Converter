@@ -15,6 +15,8 @@ function flattenListOfEdits(list){
             continue
         }
 
+        if(isOnMobile)continue //don't show templates on mobile
+
         const editCopy = JSON.parse(JSON.stringify(edit))
         const subEdits = editCopy.subEdits.map((sEdit,index) => ({
             ...sEdit,
