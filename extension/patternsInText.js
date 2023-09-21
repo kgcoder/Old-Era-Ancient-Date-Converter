@@ -41,11 +41,11 @@ const yearInListPattern = `${nakedYearPattern}(${supPattern})?`
 const longYearListWithMonthPattern = `((${monthNames.join('|')})(${spacePattern}))(${yearInListPattern}${yearListRange})(${yearInListPattern}${yearListRange})?(${yearInListPattern}${yearListRange})?(${yearInListPattern}${yearListRange})?(${yearInListPattern}${yearListRange})?(${yearInListPattern}${yearListRange})?(${yearInListPattern}),?${nakedYearPattern}${bcPattern}`
 const longYearListPattern = `(${yearInListPattern}${yearListRange})?(${yearInListPattern}${yearListRange})?(${yearInListPattern}${yearListRange})?(${yearInListPattern}${yearListRange})?(${yearInListPattern}${yearListRange})?(${yearInListPattern}${yearListRange})?(${yearInListPattern}),?${yearListRange}${nakedYearPattern}${bcPattern}`
 
-const centuriesPattern = `((${nakedCenturyPattern})(${spacePattern}|-)(century|centuries|cent\\.|c\\.))(${bcPattern})`
+const centuriesPattern = `((${nakedCenturyPattern})(${spacePattern}|-)(c@entury|c@enturies|c@ent\\.|c\\.))(${bcPattern})`
 const millenniumPattern = `((${nakedCenturyPattern})(${spacePattern}|-)(millennium|millennia))(${bcPattern})`
 
-const centuryRangePattern = `${nakedCenturyPattern}-?${rangePattern}${nakedCenturyPattern}(${spacePattern}|-)(century|centuries|c\\.)${bcPattern}`
-const centuryRangeWithSlashPattern = `${nakedCenturyPattern}/(early(${spacePattern}|-)|late(${spacePattern}|-))?${nakedCenturyPattern}(${spacePattern}|-)(century|centuries|c\\.)${bcPattern}`
+const centuryRangePattern = `${nakedCenturyPattern}-?${rangePattern}${nakedCenturyPattern}(${spacePattern}|-)(c@entury|c@enturies|c\\.)${bcPattern}`
+const centuryRangeWithSlashPattern = `${nakedCenturyPattern}/(early(${spacePattern}|-)|late(${spacePattern}|-))?${nakedCenturyPattern}(${spacePattern}|-)(c@entury|c@enturies|c\\.)${bcPattern}`
 
 const millenniumRangePattern = `${nakedCenturyPattern}-?${rangePattern}${nakedCenturyPattern}(${spacePattern}|-)(millennium|millennia)${bcPattern}`
 const millenniumRangeWithSlashPattern = `${nakedCenturyPattern}/(early(${spacePattern}|-)|late(${spacePattern}|-))?${nakedCenturyPattern}(${spacePattern}|-)(millennium|millennia)${bcPattern}`
@@ -66,14 +66,14 @@ const decadeWithTrailingADPattern = `(${nakedDecadePattern})${trailingADPattern}
 const decadeWithTrailingCEPattern = `(${nakedDecadePattern})${trailingCEPattern}`
 
 
-const centuryADCERangePattern = `((${nakedCenturyPattern}-?${rangePattern})${nakedCenturyPattern}(${spacePattern}|-)(century|centuries|c\\.))${trailingADCEPattern}`
-const centuryRangeWithSlashADCEPattern = `((${nakedCenturyPattern}/)(early(${spacePattern}|-)|late(${spacePattern}|-))?${nakedCenturyPattern}(${spacePattern}|-)(century|centuries|c\\.))${trailingADCEPattern}`
+const centuryADCERangePattern = `((${nakedCenturyPattern}-?${rangePattern})${nakedCenturyPattern}(${spacePattern}|-)(c@entury|c@enturies|c\\.))${trailingADCEPattern}`
+const centuryRangeWithSlashADCEPattern = `((${nakedCenturyPattern}/)(early(${spacePattern}|-)|late(${spacePattern}|-))?${nakedCenturyPattern}(${spacePattern}|-)(c@entury|c@enturies|c\\.))${trailingADCEPattern}`
 
 const millenniumADCERangePattern = `((${nakedCenturyPattern}-?${rangePattern})${nakedCenturyPattern}(${spacePattern}|-)(millennium|millennia))${trailingADCEPattern}`
 const millenniumRangeWithSlashADCEPattern = `((${nakedCenturyPattern}/)(early(${spacePattern}|-)|late(${spacePattern}|-))?${nakedCenturyPattern}(${spacePattern}|-)(millennium|millennia))${trailingADCEPattern}`
 
 
-const centuryADCEPattern = `((${nakedCenturyPattern})(${spacePattern}|-)(century|centuries|cent\\.|c\\.))(${trailingADCEPattern})`
+const centuryADCEPattern = `((${nakedCenturyPattern})(${spacePattern}|-)(c@entury|c@enturies|c@ent\\.|c\\.))(${trailingADCEPattern})`
 const millenniumADCEPattern = `((${nakedCenturyPattern})(${spacePattern}|-)(millennium|millennia))(${trailingADCEPattern})`
 
 

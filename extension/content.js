@@ -641,15 +641,17 @@ function translateEverythingOnWeb(finalInstructions = []) {
     let replacementsArray = []
     getLocalReplacements(htmlWithIgParts, text, insertions, replacementsArray, currentPageData)
     replacementsArray = replacementsArray.sort((a, b) => a.index - b.index)
+
+
  
     if (finalInstructions.length) {
 
         let {repsFromServer, badReplacements} = prepareServerReplacements(finalInstructions,text)
 
+        console.log('repsFromServer',repsFromServer)
 
         replacementsLoadedFromServer = repsFromServer
 
-        flattenedListOfEdits = flattenListOfEdits(editsLoadedFromServer)
 
         pageIsNotTranslatedYet = repsFromServer.length == 0
 
@@ -660,7 +662,17 @@ function translateEverythingOnWeb(finalInstructions = []) {
 
         const normalReplacementsInHtmlFromServer = rawRepsInHtmlArray// mergeReplacements(rawRepsInHtmlArray)
 
-        replacementsArray = resolveReplacements(replacementsArray, normalReplacementsInHtmlFromServer)
+        const {allReplacements,repsFromServer:serverReps} = resolveReplacements(replacementsArray, normalReplacementsInHtmlFromServer)
+
+        replacementsArray = allReplacements
+
+        console.log('repsFromServer2',replacementsArray)
+
+        console.log('editsLoadedFromServer',editsLoadedFromServer)
+        flattenedListOfEdits = flattenListOfEdits(editsLoadedFromServer)
+
+        flattenedListOfEdits = updateEditStatuses(flattenedListOfEdits,serverReps)
+
 
     }
     
@@ -774,7 +786,15 @@ function resolveReplacements(replacementsArray, repsFromServer) {
         )
 
         duplicates.forEach(sameLocalRep => {
-            const serverRepWins = repFromServer.replacement !== sameLocalRep.replacement
+            const serverRepWins = repFromServer.replacement !== sameLocalRep.replacement// && !repFromServer.wasFixed
+          
+            if(!serverRepWins && repFromServer.wasFixed){
+                repFromServer.wasFixed = undefined
+                repFromServer.isBroken = true
+                repFromServer["duplicate"] = true
+
+                console.log('inside',repFromServer)
+            }else
             if (serverRepWins) {
                 sameLocalRep["duplicate"] = true
 
@@ -812,16 +832,20 @@ function resolveReplacements(replacementsArray, repsFromServer) {
 
             } else {
                 repFromServer["duplicate"] = true
+
+         
             }
         })
     
     })
 
+
+    console.log('r from s',repsFromServer)
     replacementsArray = replacementsArray.concat(repsFromServer)
 
     replacementsArray = replacementsArray.filter(item => !item.duplicate)
 
-    return replacementsArray   
+    return {allReplacements:replacementsArray,repsFromServer}   
 }
 
 
@@ -1061,6 +1085,7 @@ function parseImageData(dataString){
 
 
 function replaceSrcInImage(image,reverse){
+    console.log('images',images)
     const index = images.findIndex(imgObj => {
         const originalImageNameFromServer = getImageNameFromUrl(imgObj.originalImageURL)
         const currentImageNameFromSrc = getImageNameFromUrl(image.src)
@@ -1080,7 +1105,7 @@ function replaceSrcInImage(image,reverse){
 function getImageNameFromUrl(url){
     const chunks = url.split('/')
     const imageName = chunks[chunks.length - 1]
-    return imageName.replace(/\d+px-/,'')
+    return imageName.replace(/\d+px-/,'')//.replace('en.m.wikipedia.org','en.wikipedia.org')
 }
 
 

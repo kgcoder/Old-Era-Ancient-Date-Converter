@@ -142,6 +142,9 @@ function extractTextFromHtml(html,unifyRefNumbers = false){
     const cReg = new RegExp('c','i')
     const eReg = new RegExp('e','i')
 
+    const adceReg = new RegExp('(ad|ce)','i')
+    const anyLetterReg = new RegExp('[a-z]','i')
+
     const mergedCEReg = new RegExp('^(c[a-df-z0-9].*?|ce[a-z0-9].*?)','i')
 
     
@@ -205,6 +208,17 @@ function extractTextFromHtml(html,unifyRefNumbers = false){
                     const indexOfInsertion = result.length - 1
                     insertions.push(indexOfInsertion)
                 }
+            }else{
+                const twoCharacters = html.slice(index,index + 2)
+                if(twoCharacters.match(adceReg)){
+                    const nextLetter = html.slice(index + 2,index + 3)
+                    previousCharacter = html.slice(index - 1,index)
+                    if(nextLetter.match(anyLetterReg) && !previousCharacter.match(anyLetterReg)){
+                        result += '@'
+                        const indexOfInsertion = result.length - 1
+                        insertions.push(indexOfInsertion)
+                    }
+                }
             }
         }
 
@@ -218,6 +232,7 @@ function extractTextFromHtml(html,unifyRefNumbers = false){
             return `[${zerosString}]`
         })
     }
+    console.log('text',result)
     
     return {text:result,insertions}
 }
@@ -290,9 +305,11 @@ function moveReplacementsFromTextToHtml(text,html,replacementsInTextArray,finalR
                 }
 
 
-                const {target,otherNumberStringInRange, index, method, length, originalSubstitute} = currentReplacementInText.edit
+                const {target,otherNumberStringInRange, index, method, length, originalSubstitute } = currentReplacementInText.edit
+                const { isBroken, wasFixed} = currentReplacementInText
 
-                addReplacement(finalReplacementsArray,method,target,otherNumberStringInRange,indexInHtml,true,'normal',originalSubstitute)
+
+                addReplacement(finalReplacementsArray,method,target,otherNumberStringInRange,indexInHtml,true,'normal',originalSubstitute,isBroken, wasFixed)
 
                 indexInText += targetLength
                 indexInHtml += targetLength
@@ -483,7 +500,7 @@ function addIntermediaryReplacement(replacementsArray, method,targetString, othe
 }
 
 
-function addReplacement(replacementsArray, method,targetString, otherNumberStringInRange = '', index, checkIfExists = true, type = 'normal', originalSubstitute = '') {
+function addReplacement(replacementsArray, method,targetString, otherNumberStringInRange = '', index, checkIfExists = true, type = 'normal', originalSubstitute = '',isBroken = false, wasFixed = false) {
     
     if (checkIfExists) {
         const indexOfExistingReplacement = replacementsArray.findIndex(rep => rep.index === index)
@@ -501,7 +518,8 @@ function addReplacement(replacementsArray, method,targetString, otherNumberStrin
     }
 
     const replacement = {
-        isBroken: false,
+        isBroken,
+        wasFixed,
         edit,
         index:index,
         length:targetString.length,
