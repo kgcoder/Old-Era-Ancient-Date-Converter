@@ -664,7 +664,7 @@ function canTargetContainBCLabelBasedOnMethod(method){
 }
 
 function getTargetIndexInsideString(string,target,order){
-    const reg = new RegExp(target)
+    const reg = new RegExp(escapeText(target))
     const occInsideString = getOccurenceNumberInsideStringFromOrder(order)
     let result
     let occA = 0
