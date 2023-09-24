@@ -441,9 +441,8 @@ function createHTMLWithMarkersForEditor(editsFromServer,htmlWithIgParts,ignoredP
     const serverRepsWithMergedTails = mergeReplacementsWithLocalReplacements(finalReplacements,localReplacementsArray)
 
 
-    const {allReplacements,repsFromServer:serverReps} = resolveReplacements(localReplacementsArray, serverRepsWithMergedTails)
+    replacements = resolveReplacements(localReplacementsArray, serverRepsWithMergedTails)
 
-    replacements = allReplacements
     replacements = replacements.sort((a, b) => a.index - b.index)
 
     replacements = mergeReplacements(replacements)

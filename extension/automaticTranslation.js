@@ -232,7 +232,6 @@ function extractTextFromHtml(html,unifyRefNumbers = false){
             return `[${zerosString}]`
         })
     }
-    console.log('text',result)
     
     return {text:result,insertions}
 }

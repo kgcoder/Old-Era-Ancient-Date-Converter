@@ -208,6 +208,7 @@ function textWithComment(originalText, toast, translatedText, type = 'normal') {
 }
 
 
+
 function escapeText(text) {
     return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }

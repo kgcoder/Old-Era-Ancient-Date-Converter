@@ -634,6 +634,8 @@ function translateEverythingOnWeb(finalInstructions = []) {
 
     let htmlWithMarkers
 
+
+
     const { htmlWithIgParts, ignoredParts } = htmlWithIgnoredParts(html)
 
     const {text, insertions} = extractTextFromHtml(htmlWithIgParts, currentPageDataFormatVersion >= 2)
@@ -648,7 +650,6 @@ function translateEverythingOnWeb(finalInstructions = []) {
 
         let {repsFromServer, badReplacements} = prepareServerReplacements(finalInstructions,text)
 
-        console.log('repsFromServer',repsFromServer)
 
         replacementsLoadedFromServer = repsFromServer
 
@@ -662,16 +663,12 @@ function translateEverythingOnWeb(finalInstructions = []) {
 
         const normalReplacementsInHtmlFromServer = rawRepsInHtmlArray// mergeReplacements(rawRepsInHtmlArray)
 
-        const {allReplacements,repsFromServer:serverReps} = resolveReplacements(replacementsArray, normalReplacementsInHtmlFromServer)
+        replacementsArray = resolveReplacements(replacementsArray, normalReplacementsInHtmlFromServer)
 
-        replacementsArray = allReplacements
 
-        console.log('repsFromServer2',replacementsArray)
 
-        console.log('editsLoadedFromServer',editsLoadedFromServer)
         flattenedListOfEdits = flattenListOfEdits(editsLoadedFromServer)
 
-        flattenedListOfEdits = updateEditStatuses(flattenedListOfEdits,serverReps)
 
 
     }
@@ -786,15 +783,8 @@ function resolveReplacements(replacementsArray, repsFromServer) {
         )
 
         duplicates.forEach(sameLocalRep => {
-            const serverRepWins = repFromServer.replacement !== sameLocalRep.replacement// && !repFromServer.wasFixed
+            const serverRepWins = repFromServer.replacement !== sameLocalRep.replacement
           
-            if(!serverRepWins && repFromServer.wasFixed){
-                repFromServer.wasFixed = undefined
-                repFromServer.isBroken = true
-                repFromServer["duplicate"] = true
-
-                console.log('inside',repFromServer)
-            }else
             if (serverRepWins) {
                 sameLocalRep["duplicate"] = true
 
@@ -840,12 +830,11 @@ function resolveReplacements(replacementsArray, repsFromServer) {
     })
 
 
-    console.log('r from s',repsFromServer)
     replacementsArray = replacementsArray.concat(repsFromServer)
 
     replacementsArray = replacementsArray.filter(item => !item.duplicate)
 
-    return {allReplacements:replacementsArray,repsFromServer}   
+    return replacementsArray  
 }
 
 

@@ -245,7 +245,6 @@ function preparePageMetadata(html){
 
 
 function fixBrokenEdits(gaps,html){
-    console.log('gaps',gaps)
     const fixedEdits = []
 
     const targetWithBCReg = new RegExp(`^(.*?)${bcPattern}`,'i')
@@ -258,7 +257,6 @@ function fixBrokenEdits(gaps,html){
 
         let line = html.substr(firstIndex, lastIndex - firstIndex)
 
-        console.log('line',line)
     
         gap.brokenEdits.forEach(brokenEdit => {
             let order = brokenEdit.order

@@ -7,22 +7,6 @@
 
 let pageInfoPopupIsShowing = false
 
-function updateEditStatuses(edits,serverReps){
-    if(edits.length !== serverReps.length){
-        console.log('updateEditStatuses  (arrays length mismatch)')
-        return
-    }
-
-    for(let i = 0; i < edits.length; i++){
-        const edit = edits[i]
-        const serverRep = serverReps[i]
-
-        edit.isSus = serverRep.wasFixed
-        edit.notFound = serverRep.isBroken
-    }
-
-    return edits
-}
 
 
 function flattenListOfEdits(list){
