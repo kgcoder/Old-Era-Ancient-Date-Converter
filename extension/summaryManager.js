@@ -19,10 +19,21 @@ const observer = new MutationObserver(function(mutations) {
                  if(!node.className)return
                  if(typeof node.className !== "string")return
                  
-                  //console.log('node added',node.className)
+                //  console.log('node added',node.className)
                  // if(node.className.includes("loaded-infinite-scroll-container")){
                  //     console.log('node contents',node.innerHTML)
                  // }
+
+
+                 if(node.className.includes("image-carousel")){
+                    setTimeout(()=>{
+                        replaceImagesOnWeb(node)
+                    },500)
+                 }
+
+                 if(node.className.includes("image-lazy-loaded")){
+                    replaceSrcInImage(node)
+                 }
 
                 if(node.className.includes("mw-mmv-final-image")) {
                     const img = node
@@ -35,7 +46,8 @@ const observer = new MutationObserver(function(mutations) {
 
                  
 
-                    if (node.className.includes("mwe-popups")) {
+                    if (node.className.includes("mwe-popups") || 
+                    node.className.includes("page-list")) {
                         editSummaryIfNeeded(node);
 
                         // if(isEditingMode){

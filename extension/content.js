@@ -725,7 +725,7 @@ function translateEverythingOnWeb(finalInstructions = []) {
 
     }
 
-    replaceImagesOnWeb()
+    replaceImagesOnWeb(document)
 
 
 
@@ -1002,14 +1002,14 @@ function updateDataInSpan(span){
 
 function turnOff(){
     updateTranslation()
-    replaceImages(images, true)
+    replaceImages(images, document, true)
 }
 
 function turnOn(){
     getConfigFromLocalStorage(function() {
         if (allWorkFinishedForPage) {
             updateTranslation()
-            replaceImages(images)
+            replaceImages(images,document)
             chrome.runtime.sendMessage('pageMetadataIsReady') //message for the popup script  
         } else if (currentLocation && !shouldNotUseServer && isOnWikipedia) {
             isEditingMode ? startWebRequestForEditor() : startWebRequest()
@@ -1018,10 +1018,10 @@ function turnOn(){
     })
 }
 
-function replaceImages(images, reverse = false) {
+function replaceImages(images,node, reverse = false) {
 
     if (!images || images.length === 0) return
-    const allImages = document.getElementsByTagName('img')
+    const allImages = node.getElementsByTagName('img')
 
     for (let image of allImages) {
 
@@ -1032,11 +1032,11 @@ function replaceImages(images, reverse = false) {
 }
 
 
-async function replaceImagesOnWeb(){
+async function replaceImagesOnWeb(node){
     var dataString = await getDataStringFromStorage('OE-imageUrls');
     if(dataString){
         parseImageData(dataString);
-        replaceImages(images);
+        replaceImages(images,node);
 
     }else{
 
@@ -1050,7 +1050,7 @@ async function replaceImagesOnWeb(){
        
             parseImageData(wikitext);
         
-            replaceImages(images);
+            replaceImages(images,node);
         
         }).catch(function(error) {console.log('fetch failed',error);});
     }
@@ -1074,10 +1074,10 @@ function parseImageData(dataString){
 
 
 function replaceSrcInImage(image,reverse){
-    console.log('images',images)
     const index = images.findIndex(imgObj => {
         const originalImageNameFromServer = getImageNameFromUrl(imgObj.originalImageURL)
         const currentImageNameFromSrc = getImageNameFromUrl(image.src)
+       
         return reverse ? image.src === imgObj.substituteImageURL :  originalImageNameFromServer === currentImageNameFromSrc
     })
 
