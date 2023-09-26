@@ -519,6 +519,9 @@ async function startWebRequest(oldUrl = '') {
         
         editsArray = getEditsFromLines(lines)
 
+
+        editsArray = filterAccordingToPlatform(editsArray)
+
         if(isOnMobile){
             editsArray = editsArray.filter(edit => !edit.isTemplate)
         }else{
@@ -591,6 +594,7 @@ async function startWebRequestForEditor(){
 
         editsArray = lines.map(line => getEditFromLine(line)).filter(obj => obj !== null).map(edit => convertMethodNameLongToShort(edit))
        
+        editsArray = filterAccordingToPlatform(editsArray)
         if(isOnMobile){
             editsArray = editsArray.filter(edit => !edit.isTemplate)
         }else{
@@ -619,7 +623,9 @@ async function startWebRequestForEditor(){
  
 }
 
-
+function filterAccordingToPlatform(edits){
+    return edits.filter(edit => edit.platform !=  (isOnWikipedia && isOnMobile ? 'd' : 'm'))
+}
 
 
 
@@ -810,12 +816,11 @@ function resolveReplacements(replacementsArray, repsFromServer) {
                     const {
                         target,
                         originalSubstitute,
-                        type,
-                        fromTemplate
+                        type
                     } = edit
                     repFromServer["edit"] = edit
                     repFromServer["replacement"] = isEditingMode ?
-                    createMarkerForEditor(target, properMethod, type, originalSubstitute,fromTemplate) :
+                    createMarkerForEditor(target, properMethod, type, originalSubstitute) :
                     createMarker(target,properMethod,type,originalSubstitute)
                 }
          

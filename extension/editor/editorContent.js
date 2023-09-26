@@ -588,7 +588,7 @@ function createInstructions(forWikitext = false) {
 
     while ((result = pattern.exec(ignHtml))) {
         const method = result[1]
-        const fromTemplate = result[2]
+       //const fromTemplate = result[2]
         const color = result[3]
 
         let type = 'normal'
@@ -604,7 +604,7 @@ function createInstructions(forWikitext = false) {
             substitute = chunks[1]
         }
 
-        const obj = { index: result.index, length: result[0].length, method, text, type, substitute, fromTemplate }
+        const obj = { index: result.index, length: result[0].length, method, text, type, substitute }
 
 
         occurrencesOfRawStrings.push(obj)

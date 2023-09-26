@@ -169,7 +169,10 @@ function getEditFromLine(line){
     const type = chunks[3]
     const order = chunks[4]
     const originalSubstitute = chunks[5]
-    const fromTemplate = chunks[6] == "1"
+    const platform = chunks[6] //"m", "d", "" (mobile, desktop, or both)
+
+
+
 
     //TODO:validate data
 
@@ -181,9 +184,9 @@ function getEditFromLine(line){
         type,
         order,
         originalSubstitute,
-        fromTemplate,
         isTemplate:false,
-        subEdits:[]
+        subEdits:[],
+        platform
     }
 }
 
@@ -353,6 +356,7 @@ function getEditsFromLines(lines){
     })
     .map(edit => {
         if(edit.isTemplate)return edit
+       
         return {...edit, string:edit.string.replace(regN,'\n').replace(regT,'\t')} 
     })
 }
@@ -691,7 +695,11 @@ function getReplacementFromEdit(edit,text){
     }
 
     const [string_num_of_oc, string_oc, target_num_of_oc, target_oc] = orderChunks
-    const pattern1 = new RegExp(escapeText(string), 'g')
+
+    const newString =escapeText(string)// replaceNewLines(escapeText(string))
+
+
+    const pattern1 = new RegExp(newString, 'gm')
     const matchesCount = (text.match(pattern1) || []).length
 
     if (matchesCount != string_num_of_oc) {

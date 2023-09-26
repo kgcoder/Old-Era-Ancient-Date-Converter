@@ -46,10 +46,10 @@ function findIndexOfSubstringOccurrence(parentString, substring, occurrenceNumbe
     return indices[occurrenceNumber - 1]
 }
 
-function createMarkerForEditor(text, method, type = 'normal', originalSubstitute = '',fromTemplate = '') {
+function createMarkerForEditor(text, method, type = 'normal', originalSubstitute = '') {
     if(['bc-y-r1','bc-y-r2'].includes(method))method = 'bc-y'
     if(['bc-i-r1','bc-i-r2'].includes(method))method = 'bc-i'
-    return `{{${method}|${text}|${type}|${originalSubstitute}|${fromTemplate}}}`
+    return `{{${method}|${text}|${type}|${originalSubstitute}|}}`
 }
 
 
@@ -211,6 +211,10 @@ function textWithComment(originalText, toast, translatedText, type = 'normal') {
 
 function escapeText(text) {
     return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function replaceNewLines(text){
+    return text.replace(/[ ]+/gm,'[ ]+')
 }
 
 function closePopupOfClass(className){

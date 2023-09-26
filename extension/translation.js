@@ -211,6 +211,15 @@ function removeAttributesFromTags(html){
 function findIndexOfSubstringOccurrence(parentString, substring, occurrenceNumber) {
     let startIndex = 0, index
 
+
+   
+    // const reg = new RegExp(escapeText(substring),'gm')
+    // const indices = []
+    // let result
+    // while((result = reg.exec(parentString))){
+    //     indices.push(result.index)
+
+    // }
     const indices = []
     while ((index = parentString.indexOf(substring, startIndex)) > -1) {
         indices.push(index)
