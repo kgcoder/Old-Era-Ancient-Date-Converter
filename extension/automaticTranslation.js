@@ -170,15 +170,15 @@ function extractTextFromHtml(html,unifyRefNumbers = false){
         }else if(character === '>'){
             isIgnoring = false
             let nextCharacter = html.slice(index + 1,index + 2)
-            let isAD = false
-            if(nextCharacter.toLowerCase() === "a"){
-                let secondCharacter = html.slice(index + 2,index + 3)
-                if(secondCharacter.toLowerCase() === "d"){
-                    isAD = true
-                }
-            }
+           // let isAD = false
+            // if(nextCharacter.toLowerCase() === "a"){
+            //     let secondCharacter = html.slice(index + 2,index + 3)
+            //     if(secondCharacter.toLowerCase() === "d"){
+            //         isAD = true
+            //     }
+            // }
             if((isPreviousCharacterNumber && nextCharacter.match(numReg)) ||
-            isAD ||
+            //isAD ||
             (isPreviousCharacterB && nextCharacter == '.') ||
             (isPreviousCharacterC && nextCharacter == '.') ||
             (isPreviousCharacterE && nextCharacter == '.') ||

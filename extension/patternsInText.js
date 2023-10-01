@@ -78,7 +78,7 @@ const millenniumADCEPattern = `((${nakedCenturyPattern})(${spacePattern}|-)(mill
 
 
 const yearWithLeadingADPattern = `\\b${leadingAdPattern}\\b(${spacePattern})${nakedYearPattern}`
-const yearWithTrailingADPattern = `${nakedYearPattern}${trailingADPattern}`
+const yearWithTrailingADPattern = `${nakedYearPattern}${`( |\\&nbsp;|\\&#160;|\\&#8201;|-)?(a\\.(${spacePattern})?d\\.?|ad)`}`
 const yearWithTrailingCEPattern = `${nakedYearPattern}${`( |\\&nbsp;|\\&#160;|\\&#8201;|-)?(c\\.(${spacePattern})?e\\.?|ce)`}`
 
 const yearRangeWithLeadingADPattern = `(\\b${leadingAdPattern}\\b(${spacePattern})${nakedYearPattern}${rangePattern})${nakedYearPattern}`

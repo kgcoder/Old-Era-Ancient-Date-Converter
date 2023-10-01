@@ -1394,6 +1394,7 @@ function getReplacementStrings(text, originalSubstitute,otherNumberStringInRange
                     return [translateADYearToHolocene(originalNumber), "", ""]
             }
         }
+        case 'leading-ce':
         case 'leading-ad':{
             switch(adMode){
                 case 'AD/CE':
