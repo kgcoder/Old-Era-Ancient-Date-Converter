@@ -117,6 +117,57 @@ function processYearRangeWithTrailingCEPattern(text,replacementsArray){
     
 }
 
+function processYearRangeWithSlashAndTrailingADPattern(text,replacementsArray){
+    let result;
+    const reg = giRegForText(yearRangeWithSlashAndTrailingADPattern)
+    while ((result = reg.exec(text))) {
+
+        const stringTillSecondYear = result[1] || ''
+        const firstYearString = result[2] || ''
+        const secondYearString = result[3] || ''
+        const trailingSpace = result[4] || ''
+        const trailingEraLabel = result[5] || ''
+        
+        if(trailingSpace === "\n")return
+
+        let index = result.index
+  
+        addIntermediaryReplacement(replacementsArray,'first-ad-year',firstYearString,'',index, true)
+        index += stringTillSecondYear.length
+        addIntermediaryReplacement(replacementsArray,'ignore',secondYearString,'',index, true)
+        index += secondYearString.length
+        addIntermediaryReplacement(replacementsArray,'trailing-ad-space',trailingSpace,'',index, true)
+        index += trailingSpace.length
+        addIntermediaryReplacement(replacementsArray,'trailing-ad',trailingEraLabel,'',index, true)
+    }
+}
+
+
+function processYearRangeWithSlashAndTrailingCEPattern(text,replacementsArray){
+    let result;
+    const reg = giRegForText(yearRangeWithSlashAndTrailingCEPattern)
+    while ((result = reg.exec(text))) {
+
+        const stringTillSecondYear = result[1] || ''
+        const firstYearString = result[2] || ''
+        const secondYearString = result[3] || ''
+        const trailingSpace = result[4] || ''
+        const trailingEraLabel = result[5] || ''
+        
+        if(trailingSpace === "\n")return
+
+        let index = result.index
+  
+        addIntermediaryReplacement(replacementsArray,'first-ad-year',firstYearString,'',index, true)
+        index += stringTillSecondYear.length
+        addIntermediaryReplacement(replacementsArray,'ignore',secondYearString,'',index, true)
+        index += secondYearString.length
+        addIntermediaryReplacement(replacementsArray,'trailing-ad-space',trailingSpace,'',index, true)
+        index += trailingSpace.length
+        addIntermediaryReplacement(replacementsArray,'trailing-ce',trailingEraLabel,'',index, true)
+    }
+}
+
 
 
 function processYearWithLeadingADPattern(text,replacementsArray){

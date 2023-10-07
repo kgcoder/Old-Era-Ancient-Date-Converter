@@ -1444,30 +1444,42 @@ function getReplacementStrings(text, originalSubstitute,otherNumberStringInRange
                 case 'E2':
                     return [originalText, "", ""]
                 case 'Holocene':
-                    return [translateADDecadeToHolocene(originalNumber,originalText)]
+                    return [translateADDecadeToHolocene(originalNumber,originalText), "", ""]
 
             }
                 
         }
 
         case 'first-ad-century':{
+            let century = originalNumber
+            let text = originalText
+            if (isNaN(century)) {
+                century = numbersFromWords[text.toLowerCase()]
+                text = originalText.substr(originalText.length - 2,2)
+            }
             switch(adMode){
                 case 'AD/CE':
                 case 'E2':
                     return [originalText, "", ""]
                 case 'Holocene':
-                    return [translateADCenturyToHolocene(originalNumber,originalText)]
+                    return [translateADCenturyToHolocene(century),"",""]
 
             }
         }
 
         case 'ad-millennium':{
+            let millennium = originalNumber
+            let text = originalText
+            if (isNaN(millennium)) {
+                millennium = numbersFromWords[text.toLowerCase()]
+                text = originalText.substr(originalText.length - 2,2)
+            }
             switch(adMode){
                 case 'AD/CE':
                 case 'E2':
                     return [originalText, "", ""]
                 case 'Holocene':
-                    return [translateADMillenniumToHolocene(originalNumber)]
+                    return [translateADMillenniumToHolocene(millennium), "", ""]
 
             }
         }
@@ -1506,10 +1518,10 @@ function translateADDecadeToHolocene(year,originalText){
     return "1," + (holoceneYear + originalTextWithoutDigits).slice(1)
 }
 
-function translateADCenturyToHolocene(century,originalText){
+function translateADCenturyToHolocene(century){
     const holoceneCentury = century + 100
-    const originalTextWithoutDigits = originalText.replace(/\d/g,"")
-    return "1," + (holoceneCentury + originalTextWithoutDigits).slice(1)
+    const translatedText = `${holoceneCentury}${numberSuffix(holoceneCentury)}`
+    return "1," + translatedText.slice(1)
 }
 
 function translateADMillenniumToHolocene(millennium){

@@ -70,6 +70,9 @@ function createAutomaticReplacements(html, text, insertions, replacementsArray, 
     
         processYearRangeWithTrailingADPattern(text,intermediaryReplacementsArray)
         processYearRangeWithTrailingCEPattern(text,intermediaryReplacementsArray)
+
+        processYearRangeWithSlashAndTrailingADPattern(text,intermediaryReplacementsArray)
+        processYearRangeWithSlashAndTrailingCEPattern(text,intermediaryReplacementsArray)
     
         processYearWithLeadingADPattern(text,intermediaryReplacementsArray)
     
