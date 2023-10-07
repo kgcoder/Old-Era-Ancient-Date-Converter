@@ -175,7 +175,11 @@ function getEditFromLine(line,variant = ''){
     const originalSubstitute = chunks[5]
     const platform = chunks[6] //"m", "d", "" (mobile, desktop, or both)
 
-    if(variant && platform !== variant)return null //for template edits with variants
+    if(variant == '1'){//for template edits
+        if(platform !== '' && platform !== variant)return null //for template edits with variants
+    }else if (variant){
+        if(platform !== variant)return null
+    } 
 
 
 
@@ -504,7 +508,8 @@ async function fetchTemplateData(template) {
         if(!wikitext)return "not ok"
 
         const lines = wikitext.split('\n')
-        const templateEdits = getEditsFromLines(lines,template.variant)
+        const variant = template.variant ? template.variant : '1'
+        const templateEdits = getEditsFromLines(lines,variant)
         template.subEdits = templateEdits
         return "ok";
     } catch (error) {
