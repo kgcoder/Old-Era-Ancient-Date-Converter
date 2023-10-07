@@ -157,10 +157,14 @@ function removeEscapesFromSemicolons(text){
 }
 
 
-function getEditFromLine(line){
+function getEditFromLine(line,variant = ''){
     const chunks = chunksFromLine(line)
-    if(chunks.length === 1 && chunks[0].includes("Template:")){
-        return {isTemplate:true,name:chunks[0],subEdits:[]}
+    if((chunks.length === 1 || chunks.length === 2) && chunks[0].includes("Template:")){
+        let variant = ''
+        if(chunks.length === 2){
+            variant = chunks[1]
+        }
+        return {isTemplate:true,name:chunks[0],subEdits:[],variant}
     }
     if(chunks.length !== 7)return null
     const string = chunks[0]
@@ -171,6 +175,7 @@ function getEditFromLine(line){
     const originalSubstitute = chunks[5]
     const platform = chunks[6] //"m", "d", "" (mobile, desktop, or both)
 
+    if(variant && platform !== variant)return null //for template edits with variants
 
 
 
@@ -343,12 +348,12 @@ function addListenerToDefaultPopupCloseButton(){
 }
 
 
-function getEditsFromLines(lines){
+function getEditsFromLines(lines,variant = ''){
     const regN = new RegExp('\\\\n','g')
     const regT = new RegExp('\\\\t','g')
 
     
-    return lines.map(line => getEditFromLine(line))
+    return lines.map(line => getEditFromLine(line,variant))
     .filter(obj => obj !== null)
     .map(edit => {
         if(edit.isTemplate)return edit
@@ -499,7 +504,7 @@ async function fetchTemplateData(template) {
         if(!wikitext)return "not ok"
 
         const lines = wikitext.split('\n')
-        const templateEdits = getEditsFromLines(lines)
+        const templateEdits = getEditsFromLines(lines,template.variant)
         template.subEdits = templateEdits
         return "ok";
     } catch (error) {
