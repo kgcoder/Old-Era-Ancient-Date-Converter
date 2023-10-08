@@ -246,6 +246,7 @@ const colorToMarkupClass = {
     'brown;color:white': 'bc-r',
     'aqua': 'bc-tn',
     'lime': 'bc-ot',
+    'thistle': 'bc-at',
     'dimgray;color:white': 'bc-ig',
     'gainsboro': 'bc-y1',
     'lightslategray;color:white': 'bc-y2'

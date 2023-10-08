@@ -209,14 +209,6 @@ function convertMethodNameLongToShort(edit){
 }
 
 
-function fixNsAndTsInEditString(edit){
-    const newName = longToShortMethodConversions[edit.method]
-    if(newName){
-        return {...edit,method:newName}
-    }
-    return edit
-}
-
 function clearCache(){
 
     try{

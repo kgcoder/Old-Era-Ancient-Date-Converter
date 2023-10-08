@@ -186,6 +186,10 @@ a.disabledLink{
     background-color: lime;
 }
 
+.bc-editing-at{
+    background-color: thistle;
+}
+
 
 .bc-editing-ig{
     background-color: dimgray;

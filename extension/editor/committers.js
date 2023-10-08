@@ -43,12 +43,16 @@ function commitRemovals() {
     commitColor('bc-r', 'brown;color:white')
 }
 
-
 function commitOE() {
+    commitColor('bc-at', 'thistle')
+}
+
+
+function commitOldEra() {
     commitColor('bc-tn', 'aqua')
 }
 
-function commitOfOE() {
+function commitOfOldEra() {
     commitColor('bc-ot', 'lime')
 }
 

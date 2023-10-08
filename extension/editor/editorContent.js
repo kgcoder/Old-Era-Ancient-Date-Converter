@@ -173,21 +173,6 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         case 'goForwardInHistory':
             goForwardInHistory()
             break
-        case 'loadFromTemplates':
-        //    loadFromTemplates()
-            break
-        case 'loadFromServer':
-         //   loadFromServer()
-            break
-        case 'loadFromServerOnlyFixed':
-       //     loadFromServerOnlyFixed()
-            break
-        case 'loadFromServerWithoutFixed':
-       //     loadFromServerWithoutFixed()
-            break
-        case 'loadFromStorage':
-        //    loadFromLocalStorage()
-            break
         case 'find1DigitNumbers':
             selectNumbers(1)
             break
@@ -285,8 +270,11 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         case 'commitOE':
             commitOE()
             break
-        case 'commitOfOE':
-            commitOfOE()
+        case 'commitOldEra':
+            commitOldEra()
+            break
+        case 'commitOfOldEra':
+            commitOfOldEra()
             break
         case 'commitIgnoredPart':
             commitIgnoredPart()

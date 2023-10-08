@@ -120,12 +120,6 @@
         "commitRemovals": {
             "description": "commit removals"
         },
-        "loadFromTemplates":{
-            "description": "load edits from templates"
-        },
-        "loadFromServerWithoutFixed":{
-            "description": "load edits from server (without fixed)"
-        },
         "find1DigitNumbers":{
             "description": "find 1 digit numbers"
         },

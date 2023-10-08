@@ -35,7 +35,8 @@ const buttonIDs = [
     'commit000s',
     'commitRemovals',
     'commitOE',
-    'commitOfOE',
+    'commitOldEra',
+    'commitOfOldEra',
     'commitIgnoredPart',
     // 'markerMode',
     // 'bookTitleMode',
@@ -93,8 +94,6 @@ function updateButtons() {
         const button = document.getElementById(id)
         if(id === 'startWikitextEditing'){
             button.disabled = !isOnWikipedia || isEditingWikitext || isTestingMode
-        }else if(id === 'loadFromServer' || id === 'loadFromServerOnlyFixed' || id === 'loadFromServerWithoutFixed'){
-            button.disabled = isTestingMode || !isServerDataReady
         }else if (id === 'test') {
             button.innerHTML = isTestingMode ? 'Back to editing' : 'Test'
         } else if (isTestingMode) {

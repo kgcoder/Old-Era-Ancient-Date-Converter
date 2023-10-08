@@ -187,6 +187,10 @@ function getReplacementNodeForEditor(text, method, originalSubstitute,fromTempla
             return textWithComment(text, text, 'of the Old Era', type)
         }
 
+        case 'bc-at': {
+            return textWithComment(text, text, 'OE', type)
+        }
+
 
         default:
             return document.createTextNode(text)
@@ -644,6 +648,8 @@ function getColorForMethod(method){
             return 'aqua'
         case 'bc-ot':
             return 'lime'
+        case 'bc-at':
+            return 'thistle'
         case 'bc-ig':
             return 'dimgray;color:white'
         default:
