@@ -429,8 +429,7 @@ function prepareServerReplacements(allEdits,text){
                 }else{
                     indexInAllEdits++
                 }
-                if(indexInAllEdits >= allEdits.length || indexInFilteredEdits >= repsFromServer.length)break
-
+                if(indexInAllEdits >= allEdits.length)break
             }
 
             if(insideTemplate){
