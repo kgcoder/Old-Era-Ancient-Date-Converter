@@ -1,6 +1,6 @@
 {
     "name": "Old Era - Ancient Date Converter",
-    "version": "8.2.0",
+    "version": "8.3.0",
     "manifest_version": 3,
     "description": "Convert dates BC/BCE into Old Era dates (similar to Holocene Calendar aka Human Era).",
     "content_scripts": [
@@ -113,6 +113,9 @@
         },
         "markWordCentury": {
             "description": "mark word 'century'"
+        },
+        "markWordMillennium": {
+            "description": "mark word 'millennium'"
         },
         "commitYears": {
             "description": "commit years"
