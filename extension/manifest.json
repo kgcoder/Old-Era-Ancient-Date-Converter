@@ -93,6 +93,12 @@
         "toggleEditingMode": {
             "description": "toggle editing mode"
         },
+        "goBackInHistory": {
+            "description": "go back in history"
+        },
+        "goForwardInHistory": {
+            "description": "go forward in history"
+        },
         "findRoundYears": {
             "description": "find round years"
         },
@@ -104,6 +110,9 @@
         },
         "findBCs": {
             "description": "find BCs"
+        },
+        "markWordCentury": {
+            "description": "mark word 'century'"
         },
         "commitYears": {
             "description": "commit years"
