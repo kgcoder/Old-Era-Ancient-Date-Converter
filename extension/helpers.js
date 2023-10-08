@@ -428,14 +428,16 @@ function prepareServerReplacements(allEdits,text){
 
                 }else{
                     indexInAllEdits++
-
                 }
+                if(indexInAllEdits >= allEdits.length || indexInFilteredEdits >= repsFromServer.length)break
 
             }
 
             if(insideTemplate){
                 lastTemplate.indexAfter = text.length - 1
             }
+
+
         }
 
     
@@ -716,11 +718,14 @@ function getReplacementFromEdit(edit,text){
         console.log('matchesCount != string_num_of_oc')
         console.log('matchesCount',matchesCount)
         console.log('string_num_of_oc',string_num_of_oc)
+        console.log('string',string)
+        console.log('target',target)
         return {edit,isBroken:true}
     }
 
     if (string_oc < 1 || string_oc > string_num_of_oc) {
         console.log('string_oc < 1 || string_oc > string_num_of_oc')
+     
         return {edit,isBroken:true}
     }
 
