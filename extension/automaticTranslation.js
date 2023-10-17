@@ -138,7 +138,7 @@ function extractTextFromHtml(html,unifyRefNumbers = false){
     let isPreviousCharacterB = false
     let isPreviousCharacterC = false
     let isPreviousCharacterE = false
-    let isPreviousCharecterAnyLetter = false
+    let isPreviousCharacterAnyLetter = false
 
     const insertions = []
     const numReg = new RegExp('[0-9]')
@@ -171,7 +171,7 @@ function extractTextFromHtml(html,unifyRefNumbers = false){
                 isPreviousCharacterE = true
             }
             if(previousCharacter.match(anyLetterReg)){
-                isPreviousCharecterAnyLetter = true
+                isPreviousCharacterAnyLetter = true
             }
             continue;
         }else if(character === '>'){
@@ -181,7 +181,7 @@ function extractTextFromHtml(html,unifyRefNumbers = false){
             let isAD = nextTwoCharacters.toLowerCase() === "ad"
         
             if((isPreviousCharacterNumber && nextCharacter.match(numReg)) ||
-            (isAD && isPreviousCharecterAnyLetter) ||
+            (isAD && isPreviousCharacterAnyLetter) ||
             (isPreviousCharacterB && nextCharacter == '.') ||
             (isPreviousCharacterC && nextCharacter == '.') ||
             (isPreviousCharacterE && nextCharacter == '.') ||
