@@ -302,6 +302,15 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         case 'shortenDecadesInRange':
             shortenDecadesInRange()
             break
+        case 'copyToClipboard':
+            copyEditorContentsToClipboard()
+            break
+        case 'openDataPage':
+            openServerPage()
+            break
+        case 'saveDataPage':
+            saveDataPage()
+            break
         default:
         //do nothing
     }

@@ -633,6 +633,30 @@ function addLinkToTitleOnMediaWikiPage(){
 }
 
 
+async function prepopulateMediaWikiPage(){
+    const textArea = document.getElementById('wpTextbox1')
+    const summaryInput = document.getElementById('wpSummary')
+    if(!textArea.value.trim()){
+        summaryInput.value = 'Page created'
+        try {
+            const savedText = await navigator.clipboard.readText();
+            if(savedText.includes('[[Category:Pages with dates]]')){
+                textArea.value = savedText
+            }
+        } catch (err) {
+            console.error('Failed to read from clipboard: ', err);
+        }
+
+    }
+}
+
+
+function saveDataPage(){
+    const saveButton = document.getElementById('wpSave')
+    saveButton.click()
+}
+
+
 function addLinksToSupportedWebsitesPage(){
     const p = document.getElementsByTagName('p')[0]
     let list = p.innerText.split("\n")

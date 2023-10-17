@@ -355,6 +355,7 @@ async function onContentLoad() {
 
         if(isOnMediaWikiDataPage){
             addLinkToTitleOnMediaWikiPage()
+            prepopulateMediaWikiPage()
         }
 
         if(isOnSupportedWebsitesPage){
