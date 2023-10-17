@@ -636,6 +636,7 @@ function addLinkToTitleOnMediaWikiPage(){
 async function prepopulateMediaWikiPage(){
     const textArea = document.getElementById('wpTextbox1')
     const summaryInput = document.getElementById('wpSummary')
+    if(!textArea || !summaryInput)return
     if(!textArea.value.trim()){
         summaryInput.value = 'Page created'
         try {
