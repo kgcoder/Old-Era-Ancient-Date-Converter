@@ -344,7 +344,7 @@ function processYearMonthRangePattern(text, replacementsArray) {
         if (monthName && middleWord.toLowerCase() === 'or') continue
         const year = numberFromString(yearString)
         const year2 = numberFromString(secondYearNakedString)
-        if(year <= year2)continue
+        if(year < year2)continue
         if(year > firstYearOfOldEra || year === 0) continue
         addIntermediaryReplacement(replacementsArray, 'bc-y', yearString,'', result.index) 
     }
