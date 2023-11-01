@@ -335,4 +335,24 @@ const processedTemplates = [
     "Template:Historical Arab states and dynasties",
     "Template:History of Belgium",
     "Template:Greek language"
-    ]
+]
+
+
+const sentenceBeginnings = [
+    'In',
+    'When in',
+    'In the beginning of',
+    'By the beginning of',
+    'In the end of',
+    'By the end of',
+    'In the middle of',
+    'By the middle of',
+    'Until',
+    'No later than',
+    'Finally, in',
+    'В течение',
+    'By',
+
+]
+ 
+const sentenceBeginningReg = new RegExp(`(${sentenceBeginnings.join('|')}) $`)

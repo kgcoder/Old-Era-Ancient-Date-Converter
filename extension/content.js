@@ -1360,6 +1360,10 @@ function getReplacementStrings(text, originalSubstitute,otherNumberStringInRange
             return ["", "", ""]
         }
 
+        case 'bc-r-with-dot': {
+            return [".", "", ""]
+        }
+
         case 'bc-tn': {
             return [timelineName, "", ""]
         }

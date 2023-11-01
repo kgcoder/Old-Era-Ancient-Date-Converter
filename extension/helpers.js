@@ -796,3 +796,45 @@ function replacementsIntersect(repA,repB){
     (repAStart >= repBStart && repAStart <= repBEnd) ||
     (repAEnd >= repBStart && repAEnd <= repBEnd)    
 }
+
+
+
+
+function methodForBC(text,searchResult,wordBeforeBC,bcEnding){
+
+    const lastCharacterOfBCEnding = bcEnding.substr(bcEnding.length - 1,1)
+    if(lastCharacterOfBCEnding != '.') return 'bc-r' //no extra dot needed
+
+    if(wordBeforeBC){
+        const lastCharacterOfWordBeforeBC = wordBeforeBC.substr(wordBeforeBC.length - 1,1)
+        if(lastCharacterOfWordBeforeBC === '.') return 'bc-r' //no extra dot needed
+    }
+
+    const beginning = text.substr(searchResult.index - 30,30)
+
+
+    const match = beginning.match(sentenceBeginningReg)
+    if(match){
+        return 'bc-r'
+    }
+
+    let ending = text.substr(searchResult.index + searchResult[0].length,10)
+
+    let firstLetterOfEnding = ending.substr(0,1)
+
+    if(firstLetterOfEnding.trim()){
+        return 'bc-r'
+    }
+
+    if(firstLetterOfEnding === '\n'){
+        return 'bc-r'
+    }
+    
+    ending = ending.trim()
+    firstLetterOfEnding = ending.substr(0,1)
+
+    const isUpper = firstLetterOfEnding && firstLetterOfEnding.toLowerCase() !== firstLetterOfEnding
+
+    return isUpper && !wordBeforeBC.includes('.') ? 'bc-r-with-dot' : 'bc-r'
+
+}

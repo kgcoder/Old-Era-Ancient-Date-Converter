@@ -146,7 +146,8 @@ function processYearRangePattern(text,replacementsArray, pageData){
                 addIntermediaryReplacement(replacementsArray, 'bc-r', space,'', index)
             }
             index += space.length
-            addIntermediaryReplacement(replacementsArray, 'bc-r', bc,'', index)
+            const bcMethod = methodForBC(text,result,'',bc)
+            addIntermediaryReplacement(replacementsArray, bcMethod, bc,'', index)
             
         }
 
@@ -159,7 +160,8 @@ function processYearRangePattern(text,replacementsArray, pageData){
                 addIntermediaryReplacement(replacementsArray, 'bc-r', space,'', index)
             }
             index += space.length
-            addIntermediaryReplacement(replacementsArray, 'bc-r', bc,'', index)
+            const bcMethod = methodForBC(text,result,'',bc)
+            addIntermediaryReplacement(replacementsArray, bcMethod, bc,'', index)
         }
 
 
@@ -205,9 +207,10 @@ function processYearRangePattern(text,replacementsArray, pageData){
             addIntermediaryReplacement(replacementsArray, method2, space, yearA2String, index)
         }
         index += space.length
+        if(method2 == 'bc-r'){
+            method2 = methodForBC(text,result,'',bc)
+        }
         addIntermediaryReplacement(replacementsArray, method2, bc, yearA2String, index)
-            
-     
     }
 }
 
@@ -321,7 +324,8 @@ function processYearPattern(text, replacementsArray,pageData) {
             addIntermediaryReplacement(replacementsArray, 'bc-r', space,'', index)
         }
         index += space.length
-        addIntermediaryReplacement(replacementsArray, 'bc-r', bc,'', index)
+        const bcMethod = methodForBC(text,result,'',bc)
+        addIntermediaryReplacement(replacementsArray, bcMethod, bc,'', index)
 
      }
 }
@@ -486,6 +490,7 @@ function processCenturyOrMillenniumPattern(text, replacementsArray, method) {
         const stringTillSpace = result[1] || ''
         const centuryString = result[2] || ''
         if(method === 'bc-m' && parseInt(centuryString, 10) > 10) continue
+        const word = result[7] || ''
         const space = result[9] || ''
         const bc = result[10] || ''
     
@@ -495,7 +500,10 @@ function processCenturyOrMillenniumPattern(text, replacementsArray, method) {
             addIntermediaryReplacement(replacementsArray,'bc-r',space,'',index)
         }
         index += space.length
-        addIntermediaryReplacement(replacementsArray,'bc-r',bc,'',index)
+
+
+        const bcMethod = methodForBC(text,result,word,bc)
+        addIntermediaryReplacement(replacementsArray,bcMethod,bc,'',index)
         
     }
 }
