@@ -611,8 +611,8 @@ function getThreeChunksFromHtml(){
 
     let [left, middle, right] = chunks
 
-    const regLeft = new RegExp("<[^>]*?>$")
-    const regRight = new RegExp("^</[^>]*>")
+    const regLeft = new RegExp("<selection[^>]*?>$")
+    const regRight = new RegExp("^</selection>")
 
     const leftResult = chunks[0].match(regLeft)
     const rightResult = chunks[2].match(regRight)
@@ -628,21 +628,10 @@ function getThreeChunksFromHtml(){
         middle = middle + rightResult[0]
     }
 
-    //Dirty hack. Remove later after fixing the bug properly ==============
-    const reg = new RegExp('^(<abbr title=\"View this template\">)(v)(</abbr>)$')
-    const match = middle.match(reg)
-
-    if(match){
-        left = left + match[1]
-        middle = match[2]
-        right = match[3] + right
-    }
-    //end of dirty hack===========
-
-
-
     return [left, middle, right]
 }
+
+
 
 
 function getColorForMethod(method){
