@@ -23,7 +23,6 @@
                 "patternProcessors.js",
                 "pageChecker.js",
                 "summaryManager.js",
-                "requests.js",
                 "editor/history.js",
                 "editor/editorContent.js",
                 "editor/wikitextEditor.js",

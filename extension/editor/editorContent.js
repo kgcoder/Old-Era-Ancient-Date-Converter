@@ -1127,7 +1127,6 @@ function showPopupWithInstructions(){
             <div class="editorBottomBar">
             ${containsHides ? `<span style="color:red;">Hides!</span>
             <button id="hideToShowButton">Hide-&gt;Show</button>` : ''}
-                ${isOnWikipedia ? '<button id="editorLoadTemplatesButton">Load templates</button>' : ''}
                 <button id="editorCopyButton">Copy</button>
                 <button id="gotoServerButton">Open data page</button>
             </div>
@@ -1146,10 +1145,6 @@ function showPopupWithInstructions(){
         editorIsOpen = false
     })
 
-    const loadTemplatesButton = document.getElementById('editorLoadTemplatesButton')
-    if(isOnWikipedia){
-        loadTemplatesButton.addEventListener('click', loadTemplates)
-    }
 
 
     if(containsHides){
@@ -1169,19 +1164,7 @@ function showPopupWithInstructions(){
 }
 
 
-async function loadTemplates(){
 
-    let templatesOnPage = await getListOfTemplateNamesOnPage()
-    const processedTemplates = await getAllProcessedTemplates()
-    
-    templatesOnPage = templatesOnPage.filter(name => processedTemplates.includes(name))
-
-    
-
-    const text = templatesOnPage.join('\n')
-    chrome.storage.local.set({templatesToLoadAtStartup:text})
-    window.location.reload()
-}
 
 function replaceHideWithShow(){
     const input = document.getElementsByClassName("editorPopup-input")[0]
@@ -1275,7 +1258,6 @@ function getFinalReplacementsForWeb(cleanHTML,cleanTexts, text, insertions){
 
     const replacementsInText = moveReplacementsHtmlToText(cleanHTML,text,insertions,filteredCleanTexts)
 
-    console.log('replacementsInText',replacementsInText)
     const finalInstructions = []
     for(rep of replacementsInText) {
 
