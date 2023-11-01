@@ -1263,6 +1263,9 @@ function getReplacementStrings(text, originalSubstitute,otherNumberStringInRange
             if (isNaN(century)) {
                 century = numbersFromWords[text.toLowerCase()]
             }
+            if (isNaN(century)) {
+                century = latinNumbersDict[text.toUpperCase()]
+            }
             const secondYear = (century - 1) * 100 + 1
             const firstYear = secondYear + 99
 
@@ -1307,6 +1310,9 @@ function getReplacementStrings(text, originalSubstitute,otherNumberStringInRange
             let millennium = originalNumber
             if (isNaN(millennium)) {
                 millennium = numbersFromWords[text.toLowerCase()]
+            }
+            if (isNaN(millennium)) {
+                millennium = latinNumbersDict[text.toUpperCase()]
             }
 
             const secondYear = (millennium - 1) * 1000 + 1
