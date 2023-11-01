@@ -34,7 +34,7 @@ const yearMonthRangePattern = `${nakedYearPattern}(${supPattern})?(${rangePatter
 
 const yearPattern = `((${nakedYearPattern}(${supPattern})?/)?${nakedYearPattern}(${supPattern})?)${bcPattern}`
 
-const nakedCenturyPattern = `((\\d+(st|nd|rd|th))|${ordinalNumberWords.join('|')})`
+const nakedCenturyPattern = `((\\d+(st|nd|rd|th))|${ordinalNumberWords.join('|')}|${latinNumbersList.join('|')})`
 
 const yearListRange = `((${spacePattern})?(—|−|–|-|\\&#8211;|\\&ndash;|\\&#8212;|\\&mdash;|, |or|to|to the|and|-to-|until|till)(${spacePattern})?)`
 const yearInListPattern = `${nakedYearPattern}(${supPattern})?`
@@ -78,7 +78,7 @@ const millenniumADCEPattern = `((${nakedCenturyPattern})(${spacePattern}|-)(mill
 
 
 const yearWithLeadingADPattern = `\\b${leadingAdPattern}\\b(${spacePattern})${nakedYearPattern}`
-const yearWithTrailingADPattern = `${nakedYearPattern}${`( |\\&nbsp;|\\&#160;|\\&#8201;|-)?(a\\.(${spacePattern})?d\\.?|ad)`}`
+const yearWithTrailingADPattern = `${nakedYearPattern}${trailingADPattern}`
 const yearWithTrailingCEPattern = `${nakedYearPattern}${`( |\\&nbsp;|\\&#160;|\\&#8201;|-)?(c\\.(${spacePattern})?e\\.?|ce)`}`
 
 const yearRangeWithLeadingADPattern = `(\\b${leadingAdPattern}\\b(${spacePattern})${nakedYearPattern}${rangePattern})${nakedYearPattern}`
