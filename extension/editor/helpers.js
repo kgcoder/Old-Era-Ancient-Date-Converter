@@ -456,7 +456,6 @@ function moveReplacementsHtmlToText(html,text,insertions,replacementsInHtmlArray
 
 
         if(nextReplacement.method === 'template'){
-            console.log('adding template',nextReplacement)
             result.push({
                 text:nextReplacement.text,
                 method:'template'
@@ -628,6 +627,18 @@ function getThreeChunksFromHtml(){
         right = right.replace(regRight,"")
         middle = middle + rightResult[0]
     }
+
+    //Dirty hack. Remove later after fixing the bug properly ==============
+    const reg = new RegExp('^(<abbr title=\"View this template\">)(v)(</abbr>)$')
+    const match = middle.match(reg)
+
+    if(match){
+        left = left + match[1]
+        middle = match[2]
+        right = match[3] + right
+    }
+    //end of dirty hack===========
+
 
 
     return [left, middle, right]
