@@ -588,6 +588,10 @@ function createInstructions(forWikitext = false) {
        //const fromTemplate = result[2]
         const color = result[3]
 
+        if(forWikitext && method === 'template'){
+            continue
+        }
+
         let type = 'normal'
         if (color === 'blue') type = 'bookTitle'
         if (color === 'violet') type = 'quote'
@@ -615,6 +619,11 @@ function createInstructions(forWikitext = false) {
 
     let indexInOriginalText = 0
     occurrencesOfRawStrings.forEach(obj => {
+
+        
+
+
+
         const fillerText = ignHtml.substr(lastIndex, obj.index - lastIndex)
         lastIndex = obj.index + obj.length
         const targetText = obj.text
@@ -864,7 +873,8 @@ async function startWikitextEditing(){
     if(!isOnWikipedia)return
 
     const {instructions} = createInstructions(true)
-    finalInstructions = instructions
+    
+    finalInstructions = instructions.filter(instruction => instruction.method !== 'template')
     finalInstructions = finalInstructions.map(instruction => ({...instruction,string:removeEscapesFromSemicolons(instruction.string)}))
 
 
@@ -993,6 +1003,10 @@ function renderListOfEditsInWikitextSideBar(instructions){
 
 function markupDateInSideList(string,target,method,order,originalSubstitute){
 
+    if(method === 'template'){
+        return string
+    }
+
     const orderChunks = getOrderChunks(order)
 
     if (orderChunks.length !== 4) {
@@ -1064,6 +1078,13 @@ function showPopupWithInstructions(){
     let lines = finalInstructions.filter(item=> !item.isTemplate || (item.isTemplate && item.isTitle)).map(({string,target,method,originalSubstitute,order,fromTemplate,isTemplate,templateName,isTitle}) => {
 
         if(isTemplate)return templateName
+
+
+        if(method === 'template'){
+            return string
+        }
+
+
         string = string.replace(nReg,'\\n').replace(tReg,'\\t')
         string = addEscapesToSemicolons(string)
         target = addEscapesToSemicolons(target)
@@ -1226,59 +1247,93 @@ function getFinalReplacementsForWeb(cleanHTML,cleanTexts, text, insertions){
             ){
             //no instruction is needed
         }else{
-            filteredCleanTexts.push(cleanText)
+
+
+            if(cleanText.text === 'v' && cleanText.method === 'bc-y'){
+                const previousHtml = cleanHTML.substr(0,cleanText.index)
+                const reg = new RegExp('<a.*?href="(.*?(Template:.*?))".*?>$','i')
+                const matches = previousHtml.match(reg)
+                if(matches){
+                    let templateName = matches[2]
+
+                    if(templateName){
+                        templateName = templateName.replace(/_/g,' ')
+                        cleanText.text = templateName
+                        cleanText.method = 'template'
+                        filteredCleanTexts.push(cleanText)
+                    }
+                }
+            }else{
+                filteredCleanTexts.push(cleanText)
+
+            }
+
+
         }
     })
 
 
     const replacementsInText = moveReplacementsHtmlToText(cleanHTML,text,insertions,filteredCleanTexts)
 
+    console.log('replacementsInText',replacementsInText)
     const finalInstructions = []
-    replacementsInText.forEach((edit) => {
-     
-            const left = getLeftSideInText(text,edit)
-            const right = getRightSideInText(text,edit)
+    for(rep of replacementsInText) {
 
 
-            const targetIndex = edit.index
-            const bigStringIndex = targetIndex - left.length
+        if(rep.method === 'template'){
+            finalInstructions.push({
+                string:rep.text,
+                method:'template'
+            })
+            continue
+        }
 
-            const bigLine = left + edit.text + right
 
-            const stringOccurrences = getOccurrences2(text, bigLine)
 
-            let numberOfOccurrence = 1
+        const left = getLeftSideInText(text,rep)
+        const right = getRightSideInText(text,rep)
 
-            if (stringOccurrences.length !== 1) {
-                numberOfOccurrence = getNumberOfOccurrence(stringOccurrences, bigStringIndex)
-            }
 
-            if(!edit.text)return
+        const targetIndex = rep.index
+        const bigStringIndex = targetIndex - left.length
 
-            const targetOccurrences = getOccurrences2(bigLine, edit.text)
-            let numberOfTargetOccurrence = 1
-            if (targetOccurrences.length !== 1) {
-                const relTargetIndex = left.length
-                numberOfTargetOccurrence = getNumberOfOccurrence(targetOccurrences, relTargetIndex)
-            }
+        const bigLine = left + rep.text + right
 
-            const order = `${stringOccurrences.length}.${numberOfOccurrence}.${targetOccurrences.length}.${numberOfTargetOccurrence}`
+        const stringOccurrences = getOccurrences2(text, bigLine)
 
-            const instruction = {
-                string: addEscapesToSemicolons(bigLine),
-                target: edit.text,
-                method: edit.method,
-            }
-            if (order !== '1.1.1.1') instruction['order'] = order
-            if (edit.type !== 'normal') instruction['type'] = edit.type
-            if (edit.originalSubstitute) instruction['originalSubstitute'] = edit.originalSubstitute
-          //  if(edit.fromTemplate)instruction['fromTemplate'] = true
+        let numberOfOccurrence = 1
 
-          finalInstructions.push(instruction)
+        if (stringOccurrences.length !== 1) {
+            numberOfOccurrence = getNumberOfOccurrence(stringOccurrences, bigStringIndex)
+        }
+
+        if(!rep.text)return
+
+        const targetOccurrences = getOccurrences2(bigLine, rep.text)
+        let numberOfTargetOccurrence = 1
+        if (targetOccurrences.length !== 1) {
+            const relTargetIndex = left.length
+            numberOfTargetOccurrence = getNumberOfOccurrence(targetOccurrences, relTargetIndex)
+        }
+
+        const order = `${stringOccurrences.length}.${numberOfOccurrence}.${targetOccurrences.length}.${numberOfTargetOccurrence}`
+
+        const instruction = {
+            string: addEscapesToSemicolons(bigLine),
+            target: rep.text,
+            method: rep.method,
+        }
+        if (order !== '1.1.1.1') instruction['order'] = order
+        if (rep.type !== 'normal') instruction['type'] = rep.type
+        if (rep.originalSubstitute) instruction['originalSubstitute'] = rep.originalSubstitute
+        //  if(edit.fromTemplate)instruction['fromTemplate'] = true
+
+        finalInstructions.push(instruction)
 
 
         
-    })
+    }
+
 
     return finalInstructions
 

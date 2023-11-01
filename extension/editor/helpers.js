@@ -442,6 +442,7 @@ function moveReplacementsHtmlToText(html,text,insertions,replacementsInHtmlArray
     }
 
 
+
     
 
     let indexInText = 0
@@ -452,6 +453,27 @@ function moveReplacementsHtmlToText(html,text,insertions,replacementsInHtmlArray
     const result = []
 
     while(indexInHtml < html.length){
+
+
+        if(nextReplacement.method === 'template'){
+            console.log('adding template',nextReplacement)
+            result.push({
+                text:nextReplacement.text,
+                method:'template'
+            })
+            nextReplacementIndexInArray++
+            if(nextReplacementIndexInArray < replacementsInHtmlArray.length){
+                nextReplacement = replacementsInHtmlArray[nextReplacementIndexInArray]
+                nextReplacementIndexInHtml = nextReplacement.index
+
+            }else{
+                return result
+            }
+            continue
+        }
+
+
+
         const characterInHtml = html.slice(indexInHtml,indexInHtml + 1)
 
         if(characterInHtml === '<'){
