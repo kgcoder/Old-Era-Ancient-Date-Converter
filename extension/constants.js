@@ -259,3 +259,40 @@ const prohibitedPages = [
     "https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Detectable_BC/BCE_dates",
     "https://en.m.wikipedia.org/wiki/Wikipedia:WikiProject_Detectable_BC/BCE_dates"
 ]
+
+
+const processedTemplates = [
+    "Template:Timeline of Mesopotamia",
+    "Template:Assyrian people footer",
+    "Template:Rulers of the Ancient Near East",
+    "Template:Ancient Egypt dynasties sidebar",
+    "Template:Centuries",
+    "Template:Millennia",
+    "Template:Iran topics",
+    "Template:History of Iran",
+    "Template:History of Tunisia",
+    "Template:History of Turkey",
+    "Template:Iron Age",
+    "Template:Bronze Age",
+    "Template:History of Italy",
+    "Template:Greece topics",
+    "Template:History of China",
+    "Template:State leaders by century",
+    "Template:History of Afghanistan",
+    "Template:Middle kingdoms of India",
+    "Template:History of South Asia",
+    "Template:Babylon dynasties sidebar",
+    "Template:Lists of political entities by century",
+    "Template:History of Greater Iran sidebar",
+    "Template:Neolithic Chronology",
+    "Template:Rulers of Ancient Central Asia",
+    "Template:History of India",
+    "Template:Ancient Greece topics",
+    "Template:Campaignbox Rise of Macedon",
+    "Template:History of Greece",
+    "Template:Timelines of Chinese history",
+    "Template:History of Pakistan",
+    "Template:Historical Arab states and dynasties",
+    "Template:History of Belgium",
+    "Template:Greek language"
+    ]

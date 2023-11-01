@@ -344,6 +344,8 @@ function loadEdits(editsFromServer,shouldFixBrokenEdits = false,showOnlyFixed = 
 
     const {text, insertions} = extractTextFromHtml(htmlWithIgParts,currentPageDataFormatVersion >= 2)
   
+
+
     const htmlWithMarkers = createHTMLWithMarkersForEditor(editsForMarkers,htmlWithIgParts,ignoredParts,text, insertions, shouldFixBrokenEdits,showOnlyFixed)
     currentHTML = replaceCurlyBracesWithMarkup(htmlWithMarkers)
 
@@ -414,10 +416,12 @@ function createHTMLWithMarkersForEditor(editsFromServer,htmlWithIgParts,ignoredP
         }
     }
 
-    let finalReplacements = replacements
+    let finalReplacements = []
+
     if(!pageNotFoundOnServer){
-        finalReplacements = []
         moveReplacementsFromTextToHtml(text,htmlWithIgParts,replacements, finalReplacements, insertions)
+    }else{
+        findAndHighlightTemplates(htmlWithIgParts,finalReplacements)
     }
 
 
