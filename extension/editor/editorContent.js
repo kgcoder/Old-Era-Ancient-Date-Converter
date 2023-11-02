@@ -1281,9 +1281,10 @@ function getFinalReplacementsForWeb(cleanHTML,cleanTexts, text, insertions){
 
 
         const targetIndex = rep.index
-        const bigStringIndex = targetIndex - left.length
+        const trimmedLeft = (left + '@').trim()
+        const bigStringIndex = targetIndex - trimmedLeft.length + 1 // +1 because of previously added @
 
-        const bigLine = left + rep.text + right
+        const bigLine = (left + rep.text + right).trim()
 
         const stringOccurrences = getOccurrences2(text, bigLine)
 
