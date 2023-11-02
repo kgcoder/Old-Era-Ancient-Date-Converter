@@ -146,8 +146,8 @@ function processYearRangePattern(text,replacementsArray, pageData){
                 addIntermediaryReplacement(replacementsArray, 'bc-r', space,'', index)
             }
             index += space.length
-            const bcMethod = methodForBC(text,result,'',bc)
-            addIntermediaryReplacement(replacementsArray, bcMethod, bc,'', index)
+            const bcEnding = getEndingBC(text,result,'',bc)
+            addIntermediaryReplacement(replacementsArray, 'bc-r', bcEnding,'', index)
             
         }
 
@@ -160,8 +160,8 @@ function processYearRangePattern(text,replacementsArray, pageData){
                 addIntermediaryReplacement(replacementsArray, 'bc-r', space,'', index)
             }
             index += space.length
-            const bcMethod = methodForBC(text,result,'',bc)
-            addIntermediaryReplacement(replacementsArray, bcMethod, bc,'', index)
+            const bcEnding = getEndingBC(text,result,'',bc)
+            addIntermediaryReplacement(replacementsArray, 'bc-r', bcEnding,'', index)
         }
 
 
@@ -207,10 +207,11 @@ function processYearRangePattern(text,replacementsArray, pageData){
             addIntermediaryReplacement(replacementsArray, method2, space, yearA2String, index)
         }
         index += space.length
+        let bcEnding = bc
         if(method2 == 'bc-r'){
-            method2 = methodForBC(text,result,'',bc)
+            bcEnding = getEndingBC(text,result,'',bc)
         }
-        addIntermediaryReplacement(replacementsArray, method2, bc, yearA2String, index)
+        addIntermediaryReplacement(replacementsArray, method2, bcEnding, yearA2String, index)
     }
 }
 
@@ -324,8 +325,8 @@ function processYearPattern(text, replacementsArray,pageData) {
             addIntermediaryReplacement(replacementsArray, 'bc-r', space,'', index)
         }
         index += space.length
-        const bcMethod = methodForBC(text,result,'',bc)
-        addIntermediaryReplacement(replacementsArray, bcMethod, bc,'', index)
+        const bcEnding = getEndingBC(text,result,'',bc)
+        addIntermediaryReplacement(replacementsArray, 'bc-r', bcEnding,'', index)
 
      }
 }
@@ -502,8 +503,8 @@ function processCenturyOrMillenniumPattern(text, replacementsArray, method) {
         index += space.length
 
 
-        const bcMethod = methodForBC(text,result,word,bc)
-        addIntermediaryReplacement(replacementsArray,bcMethod,bc,'',index)
+        const bcEnding = getEndingBC(text,result,word,bc)
+        addIntermediaryReplacement(replacementsArray,'bc-r',bcEnding,'',index)
         
     }
 }

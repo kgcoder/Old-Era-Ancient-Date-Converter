@@ -800,14 +800,14 @@ function replacementsIntersect(repA,repB){
 
 
 
-function methodForBC(text,searchResult,wordBeforeBC,bcEnding){
+function getEndingBC(text,searchResult,wordBeforeBC,bcEnding){
 
     const lastCharacterOfBCEnding = bcEnding.substr(bcEnding.length - 1,1)
-    if(lastCharacterOfBCEnding != '.') return 'bc-r' //no extra dot needed
+    if(lastCharacterOfBCEnding != '.') return bcEnding 
 
     if(wordBeforeBC){
         const lastCharacterOfWordBeforeBC = wordBeforeBC.substr(wordBeforeBC.length - 1,1)
-        if(lastCharacterOfWordBeforeBC === '.') return 'bc-r' //no extra dot needed
+        if(lastCharacterOfWordBeforeBC === '.') return bcEnding 
     }
 
     const beginning = text.substr(searchResult.index - 30,30)
@@ -815,26 +815,35 @@ function methodForBC(text,searchResult,wordBeforeBC,bcEnding){
 
     const match = beginning.match(sentenceBeginningReg)
     if(match){
-        return 'bc-r'
+        return bcEnding
     }
 
     let ending = text.substr(searchResult.index + searchResult[0].length,10)
 
-    let firstLetterOfEnding = ending.substr(0,1)
+    const reg = new RegExp(`^(${supPattern})?([\\s\\S])([\\s\\S])[\\s\\S]*?$`,'m')
+    const matchEnding = ending.match(reg)
 
-    if(firstLetterOfEnding.trim()){
-        return 'bc-r'
+    const space = matchEnding[2]
+
+    const firstLetterOfEnding = matchEnding[3]
+
+    const dotlessEnding = bcEnding.slice(0,bcEnding.length - 1)
+
+    if(space.trim()){
+        return dotlessEnding
     }
 
-    if(firstLetterOfEnding === '\n'){
-        return 'bc-r'
+    if(!firstLetterOfEnding.trim()){
+        return dotlessEnding
     }
-    
-    ending = ending.trim()
-    firstLetterOfEnding = ending.substr(0,1)
 
+ 
     const isUpper = firstLetterOfEnding && firstLetterOfEnding.toLowerCase() !== firstLetterOfEnding
 
-    return isUpper && !wordBeforeBC.includes('.') ? 'bc-r-with-dot' : 'bc-r'
+    if(isUpper && !wordBeforeBC.includes('.')){
+        return dotlessEnding
+    }
+
+    return bcEnding
 
 }
