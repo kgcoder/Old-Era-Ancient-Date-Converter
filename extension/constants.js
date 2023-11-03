@@ -334,7 +334,8 @@ const processedTemplates = [
     "Template:History of Pakistan",
     "Template:Historical Arab states and dynasties",
     "Template:History of Belgium",
-    "Template:Greek language"
+    "Template:Greek language",
+    "Template:History of Mongolia"
 ]
 
 

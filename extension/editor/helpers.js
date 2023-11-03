@@ -682,7 +682,7 @@ function getColorForMethod(method){
 
 
 function findAndHighlightTemplates(html,replacementsArray){
-    const reg = new RegExp('(<a href="/wiki/Template:.*?" title="(Template:.*?)"><abbr title="View this template">)v</abbr></a>','gmi')
+    const reg = new RegExp('(<a href="/wiki/Template:.*?" title="(Template:.*?)"><abbr title="View this template"[^>]*?>)v</abbr></a>','gmi')
 
     let result
      while((result = reg.exec(html))){

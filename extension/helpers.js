@@ -829,9 +829,14 @@ function getEndingBC(text,searchResult,wordBeforeBC,bcEnding){
 
     const dotlessEnding = bcEnding.slice(0,bcEnding.length - 1)
 
+
     if(space.trim()){
+        if(space === ',' || space === ';'){
+            return bcEnding
+        }
         return dotlessEnding
     }
+
 
     if(!firstLetterOfEnding.trim()){
         return dotlessEnding
