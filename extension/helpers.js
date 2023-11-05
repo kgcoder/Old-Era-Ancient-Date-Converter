@@ -523,6 +523,8 @@ function areEditsEqual(editA, editB){
 
 function areEditsInSamePlace(text, editA, editB, checkHideShow = false,ignoreBCEndings = false){
 
+    if(editA.method === 'template')return false
+    
     let targetA = editA.target
     let targetB = editB.target
 
@@ -530,8 +532,6 @@ function areEditsInSamePlace(text, editA, editB, checkHideShow = false,ignoreBCE
     let stringB = editB.string
 
     if(ignoreBCEndings){
-
-
 
         const bcReg = new RegExp(bcPattern,'igm')
 
