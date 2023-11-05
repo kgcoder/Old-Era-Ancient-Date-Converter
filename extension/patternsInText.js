@@ -89,5 +89,5 @@ const yearRangeWithSlashAndTrailingCEPattern = `(${nakedYearPattern}/)${nakedYea
 
 
 const yearRangeWithLeadingCEPattern = `(\\b${leadingCEPattern}\\b(${spacePattern})${nakedYearPattern}${rangePattern})${nakedYearPattern}`
-const yearRangeWithTrailingCEPattern = `(${nakedYearPattern}${rangePattern})${nakedYearPattern}${trailingCEPattern}`
+const yearRangeWithTrailingCEPattern = `(${nakedYearPattern}((${spacePattern})?(${circaPattern}))?${rangePattern}((${circaPattern})(${spacePattern})?)?)${nakedYearPattern}${trailingCEPattern}`
 

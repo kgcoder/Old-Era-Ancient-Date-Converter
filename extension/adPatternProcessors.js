@@ -91,12 +91,12 @@ function processYearRangeWithLeadingCEPattern(text,replacementsArray){
 function processYearRangeWithTrailingCEPattern(text,replacementsArray){
     let result;
     const reg = giRegForText(yearRangeWithTrailingCEPattern)
-    while ((result = reg.exec(text))) {
+    while ((result = reg.exec(text))) {       
         const stringTillSecondYear = result[1] || ''
         const firstYearString = result[2] || ''
-        const secondYearString = result[6] || ''
-        const trailingCESpace = result[7] || ''
-        const trailingCE = result[8] || ''
+        const secondYearString = result[12] || ''
+        const trailingCESpace = result[13] || ''
+        const trailingCE = result[14] || ''
         
         if(trailingCESpace === "\n")return
         
