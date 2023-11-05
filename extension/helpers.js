@@ -831,7 +831,7 @@ function getEndingBC(text,searchResult,wordBeforeBC,bcEnding){
 
 
     if(space.trim()){
-        if(space === ',' || space === ';'){
+        if(',;)'.includes(space)){
             return bcEnding
         }
         return dotlessEnding
@@ -850,5 +850,17 @@ function getEndingBC(text,searchResult,wordBeforeBC,bcEnding){
     }
 
     return bcEnding
+
+}
+
+function isEndingOK(text,searchResult){
+    let ending = text.substr(searchResult.index + searchResult[0].length - 2,10)
+
+    const reg = new RegExp(`^BC Lions`)
+    const matchEnding = ending.match(reg)
+
+    if(matchEnding)return false
+
+    return true
 
 }
