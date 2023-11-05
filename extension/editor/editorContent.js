@@ -1048,6 +1048,7 @@ function showPopupWithInstructions(){
         finalInstructions = instructions
         text = cleanText
     }
+
     const nReg = new RegExp('\n','g')
     const tReg = new RegExp('\t','g')
    
@@ -1083,7 +1084,6 @@ function showPopupWithInstructions(){
     finalInstructions = finalInstructions.map(instruction => ({...instruction,string:removeEscapesFromSemicolons(instruction.string)}))
 
 
-
     let lines = finalInstructions.filter(item=> !item.isTemplate || (item.isTemplate && item.isTitle)).map(({string,target,method,originalSubstitute,order,fromTemplate,isTemplate,templateName,isTitle}) => {
 
         if(isTemplate)return templateName
@@ -1094,9 +1094,12 @@ function showPopupWithInstructions(){
         }
 
 
+
         string = string.replace(nReg,'\\n').replace(tReg,'\\t')
         string = addEscapesToSemicolons(string)
         target = addEscapesToSemicolons(target)
+
+        string = escapeHtml(string)
 
         return `${string};${target};${method};;${order ? order : ""};${originalSubstitute ? originalSubstitute : ""};`
     })
