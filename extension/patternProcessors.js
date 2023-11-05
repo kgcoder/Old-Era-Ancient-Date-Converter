@@ -286,6 +286,8 @@ function processYearPattern(text, replacementsArray,pageData) {
         const space = result[7] || ''
         const bc = result[8] || ''
 
+        if(!isEndingOK(text,result))continue
+
         let year2Substitute = ''
         let method1 = 'bc-y'
         let method2 = 'bc-y'
@@ -294,6 +296,8 @@ function processYearPattern(text, replacementsArray,pageData) {
         const year2 = numberFromString(nakedYear2String)
     
          if(nakedYear2String === '000') continue
+
+
 
          if (year1String) {
             const { numberOfDigits, realYear } = checkIfSecondYearIsShortened(year1, year2, nakedYear2String)

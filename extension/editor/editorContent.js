@@ -67,7 +67,10 @@ function onEditorLoad() {
                 return {...edit, string:edit.string.replace(regN,'\n').replace(regT,'\t')} 
             })
     
+          
             loadEdits(editsFromServer,true,false)
+
+          
         
             if (document.addEventListener) {
                 document.addEventListener('click', interceptClickEvent);
@@ -112,6 +115,8 @@ function openAllWikipediaDropDowns(callback){
             }      
         });
 
+        const tableOfContentsToggles = document.getElementsByClassName('vector-toc-toggle')
+        Array.prototype.forEach.call(tableOfContentsToggles, toggle => toggle.click())
 
         callback()
 
