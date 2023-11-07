@@ -694,9 +694,11 @@ function translateEverythingOnWeb(finalInstructions = []) {
 
     if (htmlWithMarkers) {
 
+
         const parser = new DOMParser();
         //const originalBodyDOM = parser.parseFromString(html, "text/xml");
         const cleanHtml = removeAttributesFromTags(htmlWithMarkers)
+
         const bodyDOM = parser.parseFromString(cleanHtml, "text/xml");
 
 
@@ -707,7 +709,6 @@ function translateEverythingOnWeb(finalInstructions = []) {
         textNodesArray = []
         getTextNodesArray(document.body)
 
-  
 
         const textInFirstNode = textNodesArray[1].firstNode.data
   
@@ -723,9 +724,10 @@ function translateEverythingOnWeb(finalInstructions = []) {
             }
         }
 
-      
-
-
+        
+        
+        
+        
         
         doReplacements()
         updateDates()
@@ -925,6 +927,7 @@ function doReplacements() {
     const newTextNodesArray = []
     targets = []
     let lastIndexInNodes = 0;
+    let firstOneFound = false
     
     for (let i = 0; i < textsArray.length; i++) {
         let j = lastIndexInNodes;
@@ -932,7 +935,7 @@ function doReplacements() {
         let nodes;
         let cleanText = getTextWithoutMarkup(text)?.replace(reg, ' ');;
 
-       if(cleanText){
+        if(cleanText){
             while(true){
                 if(j >= textNodesArray.length)break;
                 nodes = textNodesArray[j];
@@ -948,19 +951,31 @@ function doReplacements() {
                     // console.log('clean text:',cleanText)
                     // console.log('text in node',textInNode)
                     // console.log('i',i)
+                    // console.log('j',j)
                 
                     j++;
                     continue;
                 }else{
+                    firstOneFound = true
                     lastIndexInNodes = j + 1;
                     var pair = replaceTextInNodeIfNeeded(nodes, text);
                     newTextNodesArray.push(pair);
+
+                    // console.log('success while replacing')
+                    // console.log('text',text)
+                    // console.log('clean text:',cleanText)
+                    // console.log('text in node',textInNode)
+                    // console.log('i',i)
+                    // console.log('j',j)
                     break;
                 }
-            }   
-        }
-       
-
+                
+            }  
+        }else{
+            if(firstOneFound){
+                lastIndexInNodes = j + 1
+            }
+        } 
     }
 
     textNodesArray = newTextNodesArray  
