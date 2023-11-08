@@ -310,20 +310,7 @@ function findH2Headlines(html, replacementsArray,checkIfExists = false){
     }
 }
 
-function findH3Headlines(html, replacementsArray,checkIfExists = false){
-    let result;
-    const reg = new RegExp(h3Pattern, "gi");
-  
-    while ((result = reg.exec(html))) {
-        const headline = result[1] || ''
-        if(!headline)continue
 
-        console.log('headline:',headline)
-
-        processOneHeadlineUsingServerReps(headline, html, replacementsArray,checkIfExists)
-
-    }
-}
 
 
 
@@ -366,45 +353,3 @@ function processOneHeadline(headline, html, replacementsArray, checkIfExists = f
 
 
 
-function processOneHeadlineUsingServerReps(headline, html, replacementsArray, checkIfExists = false){
-    const reg = new RegExp(generalMarkupPattern, "gi");
-    const firstSpanReg = new RegExp(`(<span class="bc-[^>]*?>)[^<]*?(</span>)`,"gi")
-    const resultsArray = []
-    while ((result = reg.exec(headline))) {
-        let method = result[2] || ''
-        let type = result[4] || ''
-        const originalSubstitute = result[6] || ''
-        const target = result[7] || ''
-        type = convertTypeFromMakup(type)
-        resultsArray.push({method,type,target, originalSubstitute})
-    }
-
-    console.log('results in headline',resultsArray)
-    if(resultsArray.length == 0)return
-
-    const cleanHeader = headline.replace(firstSpanReg,(match) => {
-        console.log('match',match)
-
-        return ''
-        
-    })
-
-    const cleanHeaderReg = new RegExp(escapeText(cleanHeader), "gi")
-
-    const res = cleanHeaderReg.exec(html)
-
-    const mainIndex = res.index
-
-    for (let i = 0; i < resultsArray.length; i++) {
-        let {method,type,target, originalSubstitute} = resultsArray[i]
-        const cleanSpanReg = new RegExp(`(<span>)(${target})</span>`, 'i')
-        const localIndex = cleanHeader.search(cleanSpanReg) + '<span>'.length
-        
-        if(localIndex < 0)return
-        
-        const index = mainIndex + localIndex
-
-        addReplacement(replacementsArray, method,target,'',index, checkIfExists, type, originalSubstitute)
-    }
-
-}
