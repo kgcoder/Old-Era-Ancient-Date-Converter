@@ -831,7 +831,7 @@ function getEndingBC(text,searchResult,wordBeforeBC,bcEnding){
 
 
     if(space.trim()){
-        if(',;)'.includes(space)){
+        if(',:;)'.includes(space)){
             return bcEnding
         }
         return dotlessEnding

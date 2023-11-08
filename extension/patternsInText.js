@@ -4,10 +4,10 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-const bcPattern = `(${spacePattern}|-)?((b\\.(${spacePattern})?c\\.?|bc)e?)`
+const bcPattern = `(${spacePattern}|-)?((b\\.(${spacePattern})?c\\.?|bc)(e\\.?)?)`
 const strictBCPattern = `(${spacePattern}|-)?((b\\.(${spacePattern})?c\\.?|bc))`
 
-const bcePattern = `(${spacePattern}|-)?((b\\.(${spacePattern})?c\\.?|bc)e)`
+const bcePattern = `(${spacePattern}|-)?((b\\.(${spacePattern})?c\\.?|bc)e\\.?)`
 
 const rangePattern = `(${spacePattern})?(‑|—|−|–|-|— ?early|− ?early|– ?early|- ?early|— ?late|− ?late|– ?late|- ?late|\\&#8211;|\\&ndash;|\\&#8212;|\\&mdash;|\\&#8211; ?early|\\&ndash; ?early|\\&#8212; ?early|\\&mdash; ?early|\\&#8211; ?late|\\&ndash; ?late|\\&#8212; ?late|\\&mdash; ?late|or|to|to late|to early|to the|and|and late|and the|and early|or late|or early|-to-|until|till|through)(${spacePattern})?`
 const supPattern = '\\[\\d*?\\]'
