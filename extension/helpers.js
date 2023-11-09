@@ -864,3 +864,84 @@ function isEndingOK(text,searchResult){
     return true
 
 }
+
+
+
+function handleServerRepsInHeadlines(html, replacementsArray,checkIfExists = false){
+
+    const reg = new RegExp(`(${h2Pattern}|${h3Pattern})`, "gi");
+  
+    while ((result = reg.exec(html))) {
+        const stringTillHeadline = result[2] || result[4] || ''
+        const headline = result[3] || result[5] || ''
+        if(!headline)continue
+
+        const startIndex = result.index + stringTillHeadline.length
+        const endIndex = startIndex + headline.length
+
+        const repsInside = JSON.parse(JSON.stringify(replacementsArray.filter(rep => rep.index >= startIndex && rep.index < endIndex)))
+
+        processServerRepsInOneHeadline(headline, html, startIndex, repsInside, replacementsArray,checkIfExists)
+
+    }
+
+
+
+
+  
+}
+
+
+
+
+
+function processServerRepsInOneHeadline(headline, html, headlineIndex, repsInside, replacementsArray,checkIfExists = false){
+
+    const cleanHeadline = headline.replace(new RegExp('<abbr[^>]*?>(.*?)</abbr>','gi'),'$1').replace(new RegExp('<span style="white-space:nowrap;">','gi'),`<span>`)
+    
+    const headerReg = new RegExp(escapeText(cleanHeadline), "gi")
+
+    const res = headerReg.exec(html)
+
+    if(!res)return
+
+
+    repsInside.forEach(rep => {
+
+        const targetReg = new RegExp(escapeText(rep.edit.target))
+        const targetRes = targetReg.exec(cleanHeadline)
+
+        const index = res.index + targetRes.index
+
+        const indexOfExistingRepInTableOfContents = replacementsArray.findIndex(rep => rep.index === index)
+
+        if(indexOfExistingRepInTableOfContents !== -1){
+            rep.index = index
+            replacementsArray[indexOfExistingRepInTableOfContents] = rep
+        }
+    })
+}
+
+
+function removeIntersectingReps(replacementsArray){
+
+    const result = []
+
+    let lastRep = null
+    for(let i = 0; i < replacementsArray.length; i++){
+        const currentRep = replacementsArray[i]
+        if(!lastRep){
+            result.push(currentRep)
+            lastRep = currentRep
+            continue
+        }
+
+        if(replacementsIntersect(lastRep,currentRep))continue
+
+        result.push(currentRep)
+        lastRep = currentRep
+
+    }
+    return result
+}
+

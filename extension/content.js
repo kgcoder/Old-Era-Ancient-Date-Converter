@@ -685,6 +685,10 @@ function translateEverythingOnWeb(finalInstructions = []) {
     replacementsArray = replacementsArray.filter(replacement => replacement.edit.method !== 'bc-ig')
     replacementsArray = replacementsArray.sort((a, b) => a.index - b.index)
 
+
+    handleServerRepsInHeadlines(htmlWithIgParts,replacementsArray)
+    replacementsArray = removeIntersectingReps(replacementsArray)
+
     
     editsArray = replacementsArray.map(item => item.edit)
 

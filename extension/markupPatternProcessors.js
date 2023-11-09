@@ -297,15 +297,15 @@ function createReplacementsFromMarkup(html, replacementsArray) {
 
 
 
-function findH2Headlines(html, replacementsArray,checkIfExists = false){
+function handleMarkupInHeadlines(html, replacementsArray,checkIfExists = false){
     let result;
-    const reg = new RegExp(h2Pattern, "gi");
+    const reg = new RegExp(`(${h2Pattern}|${h3Pattern})`, "gi");
   
     while ((result = reg.exec(html))) {
-        const headline = result[1] || ''
+        const headline = result[3] || result[5] || ''
         if(!headline)continue
 
-        processOneHeadline(headline, html, replacementsArray,checkIfExists)
+        processMarkupInOneHeadline(headline, html, replacementsArray,checkIfExists)
 
     }
 }
@@ -314,7 +314,7 @@ function findH2Headlines(html, replacementsArray,checkIfExists = false){
 
 
 
-function processOneHeadline(headline, html, replacementsArray, checkIfExists = false){
+function processMarkupInOneHeadline(headline, html, replacementsArray, checkIfExists = false){
     const reg = new RegExp(generalMarkupPattern, "gi");
     const firstSpanReg = new RegExp(`<span class="bc-[^>]*>`,"gi")
     const resultsArray = []

@@ -4,7 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-const spacePattern = ' |\\s|\\&nbsp;|\\&#160;|\\&#8201;'
+const spacePattern = ' |\\s|\\&nbsp;|&thinsp;|\\&#160;|\\&#8201;'
 const completeSpacePatternInHtml = `(<span[^>]*?>)(${spacePattern})(</span>)|${spacePattern}`
 const bcPatternInHtml = `(${completeSpacePatternInHtml}|-)((b\\.(${completeSpacePatternInHtml})?c\\.?|bc)e?|(<small>)(bce?)</small>)`
 const methods = Object.keys(shortToLongMethodConversions).join('|')
@@ -22,7 +22,8 @@ const generalMarkupPattern = `(<span class="(${methods})"( data-t="([^>]*?)")?( 
 
 const negativeLookaheadPattern = '(?<!<[^>]*?)'
 
-const h2Pattern = `<h2><span[^>]*?></span><span class="mw-headline"[^>]*?>(.*?)</span><IgnoredPart></h2>`
+const h2Pattern = `(<h2>.*?<span class="mw-headline"[^>]*?>)(.*?)</span><IgnoredPart></h2>`
+const h3Pattern = `(<h3>.*?<span class="mw-headline"[^>]*?>)(.*?)</span><IgnoredPart></h3>`
 
 // const yearInMarkUpWithInnerSpansPattern = `(<span class="(bc-y|bc-i)"( data-t="([^>]*?)")?( data-s="([^>]*?)")?>)([^<]*?)(<span[^>]*?>)(.)(</span>)([^<]*?)</span>`
 // const yearInMarkupPattern = `(<span class="(bc-y|bc-i)"( data-t="([^>]*?)")?( data-s="([^>]*?)")?>)([^<]*?)</span>`
