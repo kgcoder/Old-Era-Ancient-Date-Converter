@@ -61,7 +61,7 @@ function addListenersToEditorButtons(){
 async function sendMsg(message) {
     if (message === 'test') {
        // await chrome.runtime.sendMessage('toggleTestingMode',(response) => {
-       //     console.log('resonse',response)
+       //     console.log('response',response)
        //     console.log('error',chrome.runtime.lastError)
             isTestingMode = !isTestingMode
             updateButtons()

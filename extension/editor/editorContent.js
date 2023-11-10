@@ -256,7 +256,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
             openEditor()
             break
         case 'startWikitextEditing':
-            isEditingWikitext = isOnWikipedia
+            isEditingWikitext = isOnWikipedia 
             startWikitextEditing()
             sendResponse({isEditingWikitext})
             break

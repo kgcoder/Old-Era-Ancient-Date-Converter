@@ -639,6 +639,7 @@ function translateEverythingOnWeb(finalInstructions = []) {
     
     let html = new XMLSerializer().serializeToString(document.body)
 
+   // testStringifyAndParse(html)
     let htmlWithMarkers
 
 
@@ -651,7 +652,6 @@ function translateEverythingOnWeb(finalInstructions = []) {
     getLocalReplacements(htmlWithIgParts, text, insertions, replacementsArray, currentPageData)
     replacementsArray = replacementsArray.sort((a, b) => a.index - b.index)
 
-
  
     if (finalInstructions.length) {
 
@@ -659,6 +659,8 @@ function translateEverythingOnWeb(finalInstructions = []) {
 
 
         replacementsLoadedFromServer = repsFromServer
+
+        
 
 
         pageIsNotTranslatedYet = repsFromServer.length == 0
@@ -700,19 +702,64 @@ function translateEverythingOnWeb(finalInstructions = []) {
 
 
         const parser = new DOMParser();
-        //const originalBodyDOM = parser.parseFromString(html, "text/xml");
         const cleanHtml = removeAttributesFromTags(htmlWithMarkers)
 
-        const bodyDOM = parser.parseFromString(cleanHtml, "text/xml");
+        const pattern = new RegExp('<(.*?)></(.*?)>', 'gm')
 
+        const htmlWithEmptyMarks = cleanHtml.replace(pattern, '<$1>@@@EMPTY@@@</$2>')
+
+        const bodyDOM = parser.parseFromString(htmlWithEmptyMarks, "text/xml");
+
+
+   
 
         textsArray = []
         getTextsArray(bodyDOM.documentElement)
 
+        textsArray = textsArray.filter(text => text !== '@@@EMPTY@@@')
    
         textNodesArray = []
         getTextNodesArray(document.body)
 
+        // console.log('textsArray',JSON.parse(JSON.stringify(textsArray)))
+
+        // console.log('textNodesArray',textNodesArray.map(node => node.firstNode.data))
+
+        //delete===========
+        // const reg = new RegExp('\\s|\\&nbsp;|\\&#160;|\\&#8201;','gi')
+
+        // let j = 0
+        // for(let i = 0;i<textNodesArray.length;i++ ){
+        //     const text = textsArray[i]
+        //     if(j >= textNodesArray.length){
+        //         console.log('stopping')
+        //         console.log('i',i)
+        //         console.log('j',j)
+        //         break
+        //     }
+        //     const textInNode = textNodesArray[j].firstNode.data
+        //     if(text !== textInNode){
+
+        //         let cleanText = getTextWithoutMarkup(text)?.replace(reg, ' ');
+
+        //         let cleanTextInNode = textInNode.replace(reg,' ')
+
+        //         if(cleanText !== cleanTextInNode){
+        //             console.log('mismatch at index:',i)
+        //             console.log('text:',text)
+        //             console.log('textInNode',textInNode)
+        //             j += 1
+        //            // break
+
+        //         }
+
+                
+
+        //     }
+        //     j++
+        // }
+
+        //===========
 
         const textInFirstNode = textNodesArray[1].firstNode.data
   
@@ -935,11 +982,13 @@ function doReplacements() {
     
     for (let i = 0; i < textsArray.length; i++) {
         let j = lastIndexInNodes;
-        const text = textsArray[i]
+        let text = textsArray[i]
         let nodes;
         let cleanText = getTextWithoutMarkup(text)?.replace(reg, ' ');;
 
         if(cleanText){
+
+          
             while(true){
                 if(j >= textNodesArray.length)break;
                 nodes = textNodesArray[j];
@@ -956,7 +1005,7 @@ function doReplacements() {
                     // console.log('text in node',textInNode)
                     // console.log('i',i)
                     // console.log('j',j)
-                
+                    
                     j++;
                     continue;
                 }else{

@@ -111,7 +111,7 @@ function createHTMLWithMarkers(replacementsArray, htmlWithIgParts, ignoredParts)
     for (let i = 0; i < ignoredParts.length; i++) {
         newHtml += chunks[i] + ignoredParts[i]
     }
-    newHtml += chunks[chunks.length - 1]
+   // newHtml += chunks[chunks.length - 1]
 
     return newHtml
 }
@@ -121,17 +121,107 @@ function createHTMLWithMarkers(replacementsArray, htmlWithIgParts, ignoredParts)
 
 function htmlWithIgnoredParts(html) {
 
-    
 
-    const pattern = new RegExp(`(<body.*?>|</body>|<span class="tocnumber">.*?</span>|<span class="vector-toc-numb">.*?</span>|<span class="mw-editsection">.*?</span></span>|<link rel="mw-deduplicated-inline-style"[^>]*?/>|<h1.*?>|<(div|span|table) class="[^>]*?mw-collapsible[^>]*?>|<style[^>]*?>[^<]*?</style>|<script[^>]*?>[^<]*?</script>)`,'gm')
-    const ignoredParts = []
-    const newHTML = html.replace(pattern, (match) => {
-        ignoredParts.push(match)
-        return '<IgnoredPart>'
+    let ignoredPartsWithIndices = []
+
+    //findJustTags(html,ignoredPartsWithIndices,'<body.*?>')
+    findJustTags(html,ignoredPartsWithIndices,'</body>')
+    // findTagsWithContents(html,ignoredPartsWithIndices,'<span class="tocnumber">')
+    // findTagsWithContents(html,ignoredPartsWithIndices,'<span class="tocnumber">')
+    // findTagsWithContents(html,ignoredPartsWithIndices,'<span class="vector-toc-numb">')
+    findTagsWithContents(html,ignoredPartsWithIndices,'<span class="mw-editsection">')
+
+    findJustTags(html,ignoredPartsWithIndices,'<link rel="mw-deduplicated-inline-style"[^>]*?/>')
+
+    //findJustTags(html,ignoredPartsWithIndices,'<h1.*?>')
+    findJustTags(html,ignoredPartsWithIndices,'<(div|span|table) class="[^>]*?mw-collapsible[^>]*?>')
+
+    findTagsWithContents(html,ignoredPartsWithIndices,'<style[^>]*?>')
+    findTagsWithContents(html,ignoredPartsWithIndices,'<script[^>]*?>')
+
+
+    ignoredPartsWithIndices = ignoredPartsWithIndices.sort((a,b) => a.index - b.index)
+
+    let newHTML = ''
+    let lastIndex = 0
+    ignoredPartsWithIndices.forEach(igObj => {
+        const prefix = html.substring(lastIndex,igObj.index)
+        newHTML += prefix
+        newHTML += '<IgnoredPart>'
+
+        lastIndex = igObj.index + igObj.text.length
+
     })
 
-    return { htmlWithIgParts: newHTML, ignoredParts }
+    if(lastIndex < html.length - 1){
+        const postfix = html.substring(lastIndex,html.length - 1)
+        newHTML += postfix
+    }
+
+
+    return { htmlWithIgParts: newHTML, ignoredParts:ignoredPartsWithIndices.map(obj => obj.text) }
 }
+
+
+function findJustTags(html,resultsArray,tag){
+    const pattern = new RegExp(tag,'gm')
+    let result
+    while (result = pattern.exec(html)){
+        resultsArray.push({text:result[0],index:result.index})
+    }
+
+}
+
+function findTagsWithContents(html,resultsArray,openingTag){
+    const pattern = new RegExp(openingTag,'gm')
+    let result
+    while (result = pattern.exec(html)){
+
+        let level = 1
+        let currentIndex = result.index + result[0].length
+
+        let isInsideClosingTag = false
+        let finalString = ''
+        while(true){
+
+            const currentCharacter = html[currentIndex]
+
+            if(currentCharacter === '<'){
+                const nextCharacter = html[currentIndex + 1]
+                if(nextCharacter === '/'){
+                    isInsideClosingTag = true
+                }else{
+                    level += 1
+                }
+
+            }else if(isInsideClosingTag && currentCharacter === '>'){
+                isInsideClosingTag = false
+                level -= 1
+                
+                if(level <= 0){
+                    finalString += currentCharacter
+                    break
+                }
+            
+             
+            }
+           
+            finalString += currentCharacter
+
+            currentIndex++
+
+        }
+
+
+        finalString = result[0] + finalString
+
+
+        resultsArray.push({text:finalString,index:result.index})
+
+    }
+
+}
+
 
 
 function removeAttributesFromTags(html){

@@ -305,6 +305,7 @@ function handleMarkupInHeadlines(html, replacementsArray,checkIfExists = false){
         const headline = result[3] || result[5] || ''
         if(!headline)continue
 
+
         processMarkupInOneHeadline(headline, html, replacementsArray,checkIfExists)
 
     }
@@ -335,13 +336,13 @@ function processMarkupInOneHeadline(headline, html, replacementsArray, checkIfEx
 
     const res = cleanHeaderReg.exec(html)
 
+
     const mainIndex = res.index
 
     for (let i = 0; i < resultsArray.length; i++) {
         let {method,type,target, originalSubstitute} = resultsArray[i]
         const cleanSpanReg = new RegExp(`(<span>)(${target})</span>`, 'i')
         const localIndex = cleanHeader.search(cleanSpanReg) + '<span>'.length
-        
         if(localIndex < 0)return
         
         const index = mainIndex + localIndex

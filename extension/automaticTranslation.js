@@ -20,6 +20,8 @@ function getLocalReplacements(htmlWithIgParts, text, insertions, replacementsArr
     createYearReplacementsWithInnerSpansFromMarkup(htmlWithIgParts, replacementsArray)
     createReplacementsFromMarkup(htmlWithIgParts, replacementsArray)
     
+
+
     handleMarkupInHeadlines(htmlWithIgParts, replacementsArray)
 
 

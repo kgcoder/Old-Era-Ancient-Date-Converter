@@ -653,7 +653,7 @@ function getColorForMethod(method){
         case 'bc-d':
             return 'olive;color:white'
         case 'bc-sd':
-            return 'oliveDrab;color:white'
+            return 'navy;color:white'
         case 'bc-dp':
             return 'peachPuff'
         case 'bc-c':

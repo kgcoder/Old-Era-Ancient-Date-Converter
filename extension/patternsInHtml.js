@@ -22,8 +22,8 @@ const generalMarkupPattern = `(<span class="(${methods})"( data-t="([^>]*?)")?( 
 
 const negativeLookaheadPattern = '(?<!<[^>]*?)'
 
-const h2Pattern = `(<h2>.*?<span class="mw-headline"[^>]*?>)(.*?)</span><IgnoredPart></h2>`
-const h3Pattern = `(<h3>.*?<span class="mw-headline"[^>]*?>)(.*?)</span><IgnoredPart></h3>`
+const h2Pattern = `(<h2>.*?<span class="mw-headline"[^>]*?>)(.*?)</span><IgnoredPart>[\\s\\S]{0,5}</h2>`
+const h3Pattern = `(<h3>.*?<span class="mw-headline"[^>]*?>)(.*?)</span><IgnoredPart>[\\s\\S]{0,5}</h3>`
 
 // const yearInMarkUpWithInnerSpansPattern = `(<span class="(bc-y|bc-i)"( data-t="([^>]*?)")?( data-s="([^>]*?)")?>)([^<]*?)(<span[^>]*?>)(.)(</span>)([^<]*?)</span>`
 // const yearInMarkupPattern = `(<span class="(bc-y|bc-i)"( data-t="([^>]*?)")?( data-s="([^>]*?)")?>)([^<]*?)</span>`

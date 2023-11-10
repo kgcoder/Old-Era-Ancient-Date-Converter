@@ -247,7 +247,7 @@ function shortenDecadesInRange() {
     const chunks = getThreeChunksFromHtml()
     if(!chunks) return
     const pattern = new RegExp('<selection class="bc-d" data-t="(.*?)".*?>(.*?)</selection>', 'g')
-    currentHTML = chunks[0] + chunks[1].replace(pattern, '<selection class="bc-sd" data-t="$1" style="background-color:oliveDrab;color:white;">$2</selection>') + chunks[2]
+    currentHTML = chunks[0] + chunks[1].replace(pattern, '<selection class="bc-sd" data-t="$1" style="background-color:navy;color:white;">$2</selection>') + chunks[2]
 
     setBodyFromCurrentHTML()
     addToHistory(currentHTML)

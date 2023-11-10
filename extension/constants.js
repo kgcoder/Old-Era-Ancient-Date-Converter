@@ -277,7 +277,7 @@ const colorToMarkupClass = {
     'rosyBrown': 'ad-y',
     'pink': 'bc-i',
     'olive;color:white': 'bc-d',
-    'oliveDrab;color:white': 'bc-sd',
+    'navy;color:white': 'bc-sd',
     'peachPuff': 'bc-dp',
     'orange': 'bc-c',
     'coral': 'bc-00s',

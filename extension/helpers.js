@@ -869,7 +869,7 @@ function isEndingOK(text,searchResult){
 
 function handleServerRepsInHeadlines(html, replacementsArray,checkIfExists = false){
 
-    const reg = new RegExp(`(${h2Pattern}|${h3Pattern})`, "gi");
+    const reg = new RegExp(`(${h2Pattern}|${h3Pattern})`, "gim");
   
     while ((result = reg.exec(html))) {
         const stringTillHeadline = result[2] || result[4] || ''
@@ -898,7 +898,6 @@ function handleServerRepsInHeadlines(html, replacementsArray,checkIfExists = fal
 function processServerRepsInOneHeadline(headline, html, headlineIndex, repsInside, replacementsArray,checkIfExists = false){
 
     const cleanHeadline = headline.replace(new RegExp('<abbr[^>]*?>(.*?)</abbr>','gi'),'$1').replace(new RegExp('<span style="white-space:nowrap;">','gi'),`<span>`)
-    
     const headerReg = new RegExp(escapeText(cleanHeadline), "gi")
 
     const res = headerReg.exec(html)
@@ -906,18 +905,32 @@ function processServerRepsInOneHeadline(headline, html, headlineIndex, repsInsid
     if(!res)return
 
 
+
+    let lastIndex = 0
+    let line = ''
     repsInside.forEach(rep => {
 
+        line = cleanHeadline.substring(lastIndex, cleanHeadline.length - 1) 
+
         const targetReg = new RegExp(escapeText(rep.edit.target))
-        const targetRes = targetReg.exec(cleanHeadline)
+        const targetRes = targetReg.exec(line)
 
-        const index = res.index + targetRes.index
 
-        const indexOfExistingRepInTableOfContents = replacementsArray.findIndex(rep => rep.index === index)
 
-        if(indexOfExistingRepInTableOfContents !== -1){
-            rep.index = index
-            replacementsArray[indexOfExistingRepInTableOfContents] = rep
+        if(targetRes){
+            
+            
+            const index = res.index + lastIndex + targetRes.index
+
+            
+            lastIndex = targetRes.index + targetRes[0].length
+            const indexOfExistingRepInTableOfContents = replacementsArray.findIndex(rep => rep.index === index)
+    
+            if(indexOfExistingRepInTableOfContents !== -1){
+                rep.index = index
+                replacementsArray[indexOfExistingRepInTableOfContents] = rep
+            }
+
         }
     })
 }
@@ -945,3 +958,69 @@ function removeIntersectingReps(replacementsArray){
     return result
 }
 
+
+
+function testStringifyAndParse(originalHTML){
+
+    const htlmWithouAttributes = removeAttributesFromTags(originalHTML)
+
+    const parser = new DOMParser();
+    
+    const pattern = new RegExp('<(.*?)></(.*?)>', 'gm')
+    const htmlWithEmptyMarks = htlmWithouAttributes.replace(pattern, '<$1>@@@EMPTY@@@</$2>')
+    const bodyDOM = parser.parseFromString(htmlWithEmptyMarks, "text/xml");
+
+
+
+
+    let finalHtml = new XMLSerializer().serializeToString(bodyDOM)
+
+    finalHtml = finalHtml.replace(/@@@EMPTY@@@/gm,'')
+
+
+    console.log('finalHtml html ',finalHtml)
+    console.log('htmls are same',htlmWithouAttributes === finalHtml)
+    console.log('original html ',originalHTML)
+
+
+    console.log('original html without attributes length',htlmWithouAttributes.length)
+    console.log('final html length',finalHtml.length)
+
+    console.log('original html without attributes:',htlmWithouAttributes)
+
+
+    
+
+
+    let i = 0
+    let j = 0
+
+    let finalString = ''
+    let isInsideAMismatch = false
+    while (i < htlmWithouAttributes.length && j < finalHtml.length){
+        let originalCharachter = htlmWithouAttributes[i]
+        let finalCharachter = finalHtml[j]
+
+        if(originalCharachter !== finalCharachter){
+            if(!isInsideAMismatch){
+                isInsideAMismatch = true
+                finalString += '@@@=@'
+            }
+            finalString += originalCharachter
+            i++
+        }else{
+            if(isInsideAMismatch){
+                isInsideAMismatch = false
+                finalString += '@=@@@'
+            }
+            finalString += originalCharachter
+            i++
+            j++
+        }
+
+    }
+
+    console.log('finalString:',finalString)
+
+
+}
