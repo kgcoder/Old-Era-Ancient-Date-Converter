@@ -869,11 +869,11 @@ function isEndingOK(text,searchResult){
 
 function handleServerRepsInHeadlines(html, replacementsArray,checkIfExists = false){
 
-    const reg = new RegExp(`(${h2Pattern}|${h3Pattern})`, "gim");
+    const reg = new RegExp(`(${h2Pattern}|${h3Pattern}|${h4Pattern})`, "gim");
   
     while ((result = reg.exec(html))) {
-        const stringTillHeadline = result[2] || result[4] || ''
-        const headline = result[3] || result[5] || ''
+        const stringTillHeadline = result[2] || result[4] || result[6] || ''
+        const headline = result[3] || result[5] || result[7] || ''
         if(!headline)continue
 
         const startIndex = result.index + stringTillHeadline.length

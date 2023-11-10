@@ -299,10 +299,10 @@ function createReplacementsFromMarkup(html, replacementsArray) {
 
 function handleMarkupInHeadlines(html, replacementsArray,checkIfExists = false){
     let result;
-    const reg = new RegExp(`(${h2Pattern}|${h3Pattern})`, "gi");
+    const reg = new RegExp(`(${h2Pattern}|${h3Pattern}|${h4Pattern})`, "gi");
   
     while ((result = reg.exec(html))) {
-        const headline = result[3] || result[5] || ''
+        const headline = result[3] || result[5] || result[7] || ''
         if(!headline)continue
 
 
