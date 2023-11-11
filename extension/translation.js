@@ -8,10 +8,10 @@ let pageHasIssues = false
 //let replacementSpans = []
 
 function updateTranslation() {
-
-    chrome.storage.local.get(['isExtensionOff', 'shouldTranslateYearsPrecisely', 'shouldTranslateDatesInBookTitles', 'shouldTranslateDatesInQuotes','firstYearOfOldEra','lastTranslatedYearWithLabel','timelineName','ofTimeline','abbreviatedTimelineName'], function (result) {
+    chrome.storage.local.get(['isExtensionOff', 'shouldTranslateYearsPrecisely','shouldHighlightImpreciseYears', 'shouldTranslateDatesInBookTitles', 'shouldTranslateDatesInQuotes','firstYearOfOldEra','lastTranslatedYearWithLabel','timelineName','ofTimeline','abbreviatedTimelineName'], function (result) {
         isExtensionOff = !!result.isExtensionOff
         shouldTranslateYearsPrecisely = !!result.shouldTranslateYearsPrecisely
+        shouldHighlightImpreciseYears = !!result.shouldHighlightImpreciseYears
         shouldTranslateDatesInBookTitles = !!result.shouldTranslateDatesInBookTitles
         shouldTranslateDatesInQuotes = !!result.shouldTranslateDatesInQuotes
 
@@ -124,16 +124,15 @@ function htmlWithIgnoredParts(html) {
 
     let ignoredPartsWithIndices = []
 
-    //findJustTags(html,ignoredPartsWithIndices,'<body.*?>')
+    findJustTags(html,ignoredPartsWithIndices,'<body.*?>')
     findJustTags(html,ignoredPartsWithIndices,'</body>')
-    // findTagsWithContents(html,ignoredPartsWithIndices,'<span class="tocnumber">')
-    // findTagsWithContents(html,ignoredPartsWithIndices,'<span class="tocnumber">')
-    // findTagsWithContents(html,ignoredPartsWithIndices,'<span class="vector-toc-numb">')
+    findTagsWithContents(html,ignoredPartsWithIndices,'<span class="tocnumber">')
+    findTagsWithContents(html,ignoredPartsWithIndices,'<span class="vector-toc-numb">')
     findTagsWithContents(html,ignoredPartsWithIndices,'<span class="mw-editsection">')
 
     findJustTags(html,ignoredPartsWithIndices,'<link rel="mw-deduplicated-inline-style"[^>]*?/>')
 
-    //findJustTags(html,ignoredPartsWithIndices,'<h1.*?>')
+    findJustTags(html,ignoredPartsWithIndices,'<h1.*?>')
     findJustTags(html,ignoredPartsWithIndices,'<(div|span|table) class="[^>]*?mw-collapsible[^>]*?>')
 
     findTagsWithContents(html,ignoredPartsWithIndices,'<style[^>]*?>')
@@ -142,8 +141,13 @@ function htmlWithIgnoredParts(html) {
 
     ignoredPartsWithIndices = ignoredPartsWithIndices.sort((a,b) => a.index - b.index)
 
+
+
+
+
     let newHTML = ''
     let lastIndex = 0
+
     ignoredPartsWithIndices.forEach(igObj => {
         const prefix = html.substring(lastIndex,igObj.index)
         newHTML += prefix
@@ -157,6 +161,7 @@ function htmlWithIgnoredParts(html) {
         const postfix = html.substring(lastIndex,html.length - 1)
         newHTML += postfix
     }
+
 
 
     return { htmlWithIgParts: newHTML, ignoredParts:ignoredPartsWithIndices.map(obj => obj.text) }
@@ -176,7 +181,6 @@ function findTagsWithContents(html,resultsArray,openingTag){
     const pattern = new RegExp(openingTag,'gm')
     let result
     while (result = pattern.exec(html)){
-
         let level = 1
         let currentIndex = result.index + result[0].length
 

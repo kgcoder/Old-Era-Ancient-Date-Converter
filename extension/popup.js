@@ -18,6 +18,7 @@ let isEditingWikitext = false
 let adMode = 'AD/CE'  // 'AD/CE', 'E2', 'Holocene'
 
 let shouldTranslateYearsPrecisely = false
+let shouldHighlightImpreciseYears = false
 let shouldTranslateDatesInBookTitles = false
 let shouldTranslateDatesInQuotes = false
 let shouldNotUseServer = false
@@ -249,7 +250,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-    chrome.storage.local.get(['isExtensionOff','isEditingMode', 'shouldNotUseServer', 'shouldTranslateYearsPrecisely', 'shouldTranslateDatesInBookTitles', 'shouldTranslateDatesInQuotes','sitesData','firstYearOfOldEra','lastTranslatedYearWithLabel','timelineName','ofTimeline','abbreviatedTimelineName','isEditingWikitext','adMode'], function (result) {
+    chrome.storage.local.get(['isExtensionOff','isEditingMode', 'shouldNotUseServer', 'shouldTranslateYearsPrecisely','shouldHighlightImpreciseYears', 'shouldTranslateDatesInBookTitles', 'shouldTranslateDatesInQuotes','sitesData','firstYearOfOldEra','lastTranslatedYearWithLabel','timelineName','ofTimeline','abbreviatedTimelineName','isEditingWikitext','adMode'], function (result) {
         
         isExtensionOff = !!result.isExtensionOff
         isEditingMode = !!result.isEditingMode
@@ -295,6 +296,11 @@ document.addEventListener('DOMContentLoaded', function () {
         shouldTranslateYearsPrecisely = !!result.shouldTranslateYearsPrecisely
         document.getElementById('TranslateYearsPreciselyCheckbox').checked = shouldTranslateYearsPrecisely
         
+
+        shouldHighlightImpreciseYears = !!result.shouldHighlightImpreciseYears
+        document.getElementById('HighlightImpreciseTranslationsCheckbox').checked = shouldHighlightImpreciseYears
+
+
         shouldTranslateDatesInBookTitles = !!result.shouldTranslateDatesInBookTitles
         //document.getElementById('TranslateInBookTitlesCheckbox').checked = shouldTranslateDatesInBookTitles
         
@@ -337,6 +343,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.getElementById('TranslateYearsPreciselyCheckbox').addEventListener('click', () => {
         togglePreciseTranslationOfYears()
+    }, false)
+
+    document.getElementById('HighlightImpreciseTranslationsCheckbox').addEventListener('click', () => {
+        toggleHighlightImpreciseTranslations()
     }, false)
 
 
@@ -531,6 +541,15 @@ function toggleUsageOfServer() {
 function togglePreciseTranslationOfYears() {
     shouldTranslateYearsPrecisely = !shouldTranslateYearsPrecisely
     chrome.storage.local.set({ shouldTranslateYearsPrecisely }, function(){
+        sendMessageToPage('updateTranslation')
+
+    })
+    
+}
+
+function toggleHighlightImpreciseTranslations() {
+    shouldHighlightImpreciseYears = !shouldHighlightImpreciseYears
+    chrome.storage.local.set({ shouldHighlightImpreciseYears }, function(){
         sendMessageToPage('updateTranslation')
 
     })

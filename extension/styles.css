@@ -124,6 +124,10 @@ a.disabledLink{
 }
 
 
+.highlightedImpreciseYear {
+    background-color: #FDE6E6;
+}
+
 .bc-editing-y{
     background-color: green;
     color: white;

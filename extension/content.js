@@ -12,6 +12,7 @@ let targets = []
 let isExtensionOff = false
 let shouldNotUseServer = false
 let shouldTranslateYearsPrecisely = false
+let shouldHighlightImpreciseYears = false
 let shouldTranslateDatesInBookTitles = false
 let shouldTranslateDatesInQuotes = false
 let lastOkVersion = ''
@@ -100,7 +101,7 @@ chrome.storage.local.set({isEditingWikitext:false})
 
 function getConfigFromLocalStorage(callback){
         chrome.storage.local.get(['isExtensionOff', 'isEditingMode', 'shouldNotUseServer', 
-        'shouldTranslateYearsPrecisely', 'shouldTranslateDatesInBookTitles', 
+        'shouldTranslateYearsPrecisely','shouldHighlightImpreciseYears', 'shouldTranslateDatesInBookTitles', 
         'shouldTranslateDatesInQuotes','sitesData',
         'firstYearOfOldEra','lastTranslatedYearWithLabel',
         'timelineName','ofTimeline','abbreviatedTimelineName','dontShowPopupAgain','templatesToLoadAtStartup','adMode'], function (result) {
@@ -108,6 +109,7 @@ function getConfigFromLocalStorage(callback){
         isEditingMode = !!result.isEditingMode
         shouldNotUseServer = !!result.shouldNotUseServer
         shouldTranslateYearsPrecisely = !!result.shouldTranslateYearsPrecisely
+        shouldHighlightImpreciseYears = !!result.shouldHighlightImpreciseYears
         shouldTranslateDatesInBookTitles = !!result.shouldTranslateDatesInBookTitles
         shouldTranslateDatesInQuotes = !!result.shouldTranslateDatesInQuotes
         dontShowPopupAgain = !!result.dontShowPopupAgain
@@ -721,9 +723,9 @@ function translateEverythingOnWeb(finalInstructions = []) {
         textNodesArray = []
         getTextNodesArray(document.body)
 
-        // console.log('textsArray',JSON.parse(JSON.stringify(textsArray)))
+        //console.log('textsArray',JSON.parse(JSON.stringify(textsArray)))
 
-        // console.log('textNodesArray',textNodesArray.map(node => node.firstNode.data))
+        //console.log('textNodesArray',textNodesArray.map(node => node.firstNode.data))
 
         //delete===========
         // const reg = new RegExp('\\s|\\&nbsp;|\\&#160;|\\&#8201;','gi')
@@ -1064,10 +1066,22 @@ function updateDataInSpan(span){
     // || (type === 'quote' && !shouldTranslateDatesInQuotes)
     ){
 
+        if(method.includes('bc-i')){
+            span.classList.remove("highlightedImpreciseYear")
+        }
+
         span.innerHTML = originalText
         span.title = translatedForToast ?? undefined
         
     }else{
+
+        if(method.includes('bc-i')){
+            if(shouldHighlightImpreciseYears){
+                span.classList.add("highlightedImpreciseYear")
+            }else{
+                span.classList.remove("highlightedImpreciseYear")
+            }
+        }
         span.innerHTML = translated
         span.title = originalForToast ?? undefined
 
