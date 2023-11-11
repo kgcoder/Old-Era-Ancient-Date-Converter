@@ -706,9 +706,12 @@ function translateEverythingOnWeb(finalInstructions = []) {
         const parser = new DOMParser();
         const cleanHtml = removeAttributesFromTags(htmlWithMarkers)
 
-        const pattern = new RegExp('<(.*?)></(.*?)>', 'gm')
+        const pattern = new RegExp('<([^/>]*?)></([^>]*?)>', 'gm')
 
-        const htmlWithEmptyMarks = cleanHtml.replace(pattern, '<$1>@@@EMPTY@@@</$2>')
+        const htmlWithEmptyMarks = cleanHtml.replace(pattern, (match, firstTagName, secondTagName) => {
+            if(firstTagName !== secondTagName)return match
+            return `<${firstTagName}>@@@EMPTY@@@</${secondTagName}>`
+        })
 
         const bodyDOM = parser.parseFromString(htmlWithEmptyMarks, "text/xml");
 
@@ -717,7 +720,6 @@ function translateEverythingOnWeb(finalInstructions = []) {
 
         textsArray = []
         getTextsArray(bodyDOM.documentElement)
-
         textsArray = textsArray.filter(text => text !== '@@@EMPTY@@@')
    
         textNodesArray = []
@@ -731,6 +733,8 @@ function translateEverythingOnWeb(finalInstructions = []) {
         // const reg = new RegExp('\\s|\\&nbsp;|\\&#160;|\\&#8201;','gi')
 
         // let j = 0
+        // let resultHtml = ''
+        // let resultText = ''
         // for(let i = 0;i<textNodesArray.length;i++ ){
         //     const text = textsArray[i]
         //     if(j >= textNodesArray.length){
@@ -750,16 +754,29 @@ function translateEverythingOnWeb(finalInstructions = []) {
         //             console.log('mismatch at index:',i)
         //             console.log('text:',text)
         //             console.log('textInNode',textInNode)
+
+        //             resultHtml += '@@@!' + textInNode + '!@@@'
+        //             resultText += '@@@!' + text + '!@@@'
+
         //             j += 1
         //            // break
 
+        //         }else{
+        //             resultHtml += textInNode
+        //             resultText += text
         //         }
 
                 
 
+        //     }else{
+        //         resultHtml += textInNode
+        //         resultText += text
         //     }
         //     j++
         // }
+
+        // console.log('resultHtml',resultHtml)
+        // console.log('resultText',resultText)
 
         //===========
 
