@@ -35,6 +35,7 @@ const yearMonthRangePattern = `${nakedYearPattern}(${supPattern})?(${rangePatter
 const yearPattern = `((${nakedYearPattern}(${supPattern})?/)?${nakedYearPattern}(${supPattern})?)${bcPattern}`
 
 const nakedCenturyPattern = `((\\d+(st|nd|rd|th))|${ordinalNumberWords.join('|')}|${latinNumbersList.join('|')})`
+const fistCenturyPattern = `((\\d+(st|nd|rd|th)?)|${ordinalNumberWords.join('|')}|${latinNumbersList.join('|')})`
 
 const yearListRange = `((${spacePattern})?(—|−|–|-|\\&#8211;|\\&ndash;|\\&#8212;|\\&mdash;|, |or|to|to the|and|-to-|until|till)(${spacePattern})?)`
 const yearInListPattern = `${nakedYearPattern}(${supPattern})?`
@@ -44,11 +45,11 @@ const longYearListPattern = `(${yearInListPattern}${yearListRange})?(${yearInLis
 const centuriesPattern = `((${nakedCenturyPattern})(${spacePattern}|-)(c@entury|c@enturies|c@ent\\.|c\\.))(${bcPattern})`
 const millenniumPattern = `((${nakedCenturyPattern})(${spacePattern}|-)(millennium|millennia))(${bcPattern})`
 
-const centuryRangePattern = `${nakedCenturyPattern}-?${rangePattern}${nakedCenturyPattern}(${spacePattern}|-)(c@entury|c@enturies|c\\.)${bcPattern}`
-const centuryRangeWithSlashPattern = `${nakedCenturyPattern}/(early(${spacePattern}|-)|late(${spacePattern}|-))?${nakedCenturyPattern}(${spacePattern}|-)(c@entury|c@enturies|c\\.)${bcPattern}`
+const centuryRangePattern = `${fistCenturyPattern}-?${rangePattern}${nakedCenturyPattern}(${spacePattern}|-)(c@entury|c@enturies|c\\.)${bcPattern}`
+const centuryRangeWithSlashPattern = `${fistCenturyPattern}/(early(${spacePattern}|-)|late(${spacePattern}|-))?${nakedCenturyPattern}(${spacePattern}|-)(c@entury|c@enturies|c\\.)${bcPattern}`
 
-const millenniumRangePattern = `${nakedCenturyPattern}-?${rangePattern}${nakedCenturyPattern}(${spacePattern}|-)(millennium|millennia)${bcPattern}`
-const millenniumRangeWithSlashPattern = `${nakedCenturyPattern}/(early(${spacePattern}|-)|late(${spacePattern}|-))?${nakedCenturyPattern}(${spacePattern}|-)(millennium|millennia)${bcPattern}`
+const millenniumRangePattern = `${fistCenturyPattern}-?${rangePattern}${nakedCenturyPattern}(${spacePattern}|-)(millennium|millennia)${bcPattern}`
+const millenniumRangeWithSlashPattern = `${fistCenturyPattern}/(early(${spacePattern}|-)|late(${spacePattern}|-))?${nakedCenturyPattern}(${spacePattern}|-)(millennium|millennia)${bcPattern}`
 
 
 
