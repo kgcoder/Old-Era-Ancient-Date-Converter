@@ -676,10 +676,14 @@ function getColorForMethod(method){
             return 'brown;color:white'
         case 'bc-tn':
             return 'aqua'
-        case 'bc-ot':
-            return 'lime'
+        // case 'bc-ot':
+        //     return 'lime'
         case 'bc-at':
             return 'thistle'
+        case 'ad-tn':
+            return 'chocolate;color:white'
+        case 'ad-at':
+            return 'darkKhaki'
         case 'bc-ig':
             return 'dimgray;color:white'
         default:

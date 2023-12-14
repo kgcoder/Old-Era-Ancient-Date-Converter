@@ -74,7 +74,7 @@ let replacementsLoadedFromServer = []
 
 let pageStatus = 'page not analysed yet'
 
-let adMode = 'AD/CE' // 'AD/CE', 'E2', 'Holocene'
+let adMode = 'Holocene' // 'AD/CE', 'E2', 'Holocene'
 
 const firstYearOfOldEra_default = 10000
 const lastTranslatedYearWithLabel_default = 6000
@@ -1511,7 +1511,7 @@ function getReplacementStrings(text, originalSubstitute,otherNumberStringInRange
                 case 'Holocene':
                     return [originalText, "", ""]
                 case 'E2':
-                    return [originalText + " E2", "", ""]
+                    return [originalText + " " + abbreviatedTimelineADName, "", ""]
             }
         }
 
@@ -1520,7 +1520,7 @@ function getReplacementStrings(text, originalSubstitute,otherNumberStringInRange
                 case 'AD/CE':
                     return [originalText, "", ""]
                 case 'E2':
-                    return [originalText + " E2", "", ""]
+                    return [originalText +  " " + abbreviatedTimelineADName, "", ""]
                 case 'Holocene':
                     return [translateADYearToHolocene(originalNumber), "", ""]
             }
@@ -1541,7 +1541,7 @@ function getReplacementStrings(text, originalSubstitute,otherNumberStringInRange
                 case 'AD/CE':
                     return [originalText, "", ""]
                 case 'E2':
-                    return [" E2", "", ""]
+                    return [" " + abbreviatedTimelineADName, "", ""]
                 case 'Holocene':
                     return ["", "", ""]
             }

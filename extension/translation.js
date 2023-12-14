@@ -8,7 +8,7 @@ let pageHasIssues = false
 //let replacementSpans = []
 
 function updateTranslation() {
-    chrome.storage.local.get(['isExtensionOff', 'shouldTranslateYearsPrecisely','shouldHighlightImpreciseYears', 'shouldTranslateDatesInBookTitles', 'shouldTranslateDatesInQuotes','firstYearOfOldEra','lastTranslatedYearWithLabel','timelineName','ofTimeline','abbreviatedTimelineName'], function (result) {
+    chrome.storage.local.get(['isExtensionOff', 'shouldTranslateYearsPrecisely','shouldHighlightImpreciseYears', 'shouldTranslateDatesInBookTitles', 'shouldTranslateDatesInQuotes','firstYearOfOldEra','lastTranslatedYearWithLabel','timelineName','abbreviatedTimelineName','timelineADName','abbreviatedTimelineADName'], function (result) {
         isExtensionOff = !!result.isExtensionOff
         shouldTranslateYearsPrecisely = !!result.shouldTranslateYearsPrecisely
         shouldHighlightImpreciseYears = !!result.shouldHighlightImpreciseYears
@@ -30,6 +30,14 @@ function updateTranslation() {
         // }
         if(result.abbreviatedTimelineName){
             abbreviatedTimelineName = result.abbreviatedTimelineName
+        }
+
+        if(result.timelineADName){
+            timelineADName = result.timelineADName
+        }
+    
+        if(result.abbreviatedTimelineADName){
+            abbreviatedTimelineADName = result.abbreviatedTimelineADName
         }
 
         updateDates()

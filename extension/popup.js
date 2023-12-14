@@ -15,7 +15,7 @@ let isTestingMode = false
 
 let isEditingWikitext = false
 
-let adMode = 'AD/CE'  // 'AD/CE', 'E2', 'Holocene'
+let adMode = 'Holocene'  // 'AD/CE', 'E2', 'Holocene'
 
 let shouldTranslateYearsPrecisely = false
 let shouldHighlightImpreciseYears = false
@@ -223,6 +223,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
         updateSettingsButtons()
+        updateADRadioButtons()
         
         chrome.storage.local.set({ firstYearOfOldEra, lastTranslatedYearWithLabel, timelineName, abbreviatedTimelineName, timelineADName, abbreviatedTimelineADName }, function () {
             sendMessageToPage('advancedSettingsChanged')
@@ -545,10 +546,13 @@ function updateADRadioButtons(){
     const adceButton = document.getElementById("ADCE")
     const e2Button = document.getElementById("E2")
     const holoceneButton = document.getElementById("Holocene")
+    const e2label = document.getElementById('E2Label')
 
     adceButton.checked = adMode === 'AD/CE'
     e2Button.checked = adMode === 'E2'
     holoceneButton.checked = adMode === 'Holocene'
+
+    e2label.innerText = abbreviatedTimelineADName
 
 
 }
