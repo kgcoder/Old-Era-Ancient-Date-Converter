@@ -1,8 +1,8 @@
 {
-    "name": "Old Era - Ancient Date Converter",
+    "name": "Ancient Date Converter",
     "version": "8.7.1",
     "manifest_version": 3,
-    "description": "Convert dates BC/BCE into Old Era dates (similar to Holocene Calendar aka Human Era).",
+    "description": "Convert dates BC/BCE into Historical Calendar dates (same as Holocene Calendar aka Human Era).",
     "content_scripts": [
         {
             "matches": [

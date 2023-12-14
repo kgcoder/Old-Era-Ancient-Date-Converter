@@ -93,14 +93,20 @@
                     Last translated year that should have era label<br />
                     <input id="lastTranslatedYearWithLabelInput" style="width:200px;"/><br/><br/>
 
-                    Name of the timeline<br />
+                    Name of the BC part of the timeline<br />
                     <input id="timelineNameInput" style="width:200px;"/><br/><br/>
 
-                    "Of the timeline" string<br />
-                    <input id="ofTimelineInput" style="width:200px;"/><br/><br/>
+                    <!-- "Of the timeline" string<br />
+                    <input id="ofTimelineInput" style="width:200px;"/><br/><br/> -->
 
-                    Abbreviated name of the timeline<br />
+                    Abbreviated name of the BC part<br />
                     <input id="abbreviatedTimelineNameInput" style="width:200px;"/><br/><br/>
+
+                    Name of the AD part of the timeline<br />
+                    <input id="timelineADNameInput" style="width:200px;"/><br/><br/>
+
+                    Abbreviated name of the AD part<br />
+                    <input id="abbreviatedTimelineADNameInput" style="width:200px;"/><br/><br/>
                     
                     [<a id="saveSettingsButton" class="disabledLink" href=#>Save</a>] [<a class="disabledLink" id="cancelSettingsEditButton" href=#>Cancel</a>] [<a id="restoreDefaultsButton" class="disabledLink" href=#>Restore defaults</a>]
                     <br/><br/>
@@ -167,9 +173,13 @@
             </div>
             <button id="commitRemovals">Commit removals</button>
             <div style="display: flex;">
-                <button id="commitOE" style="width: 33.3%;">Commit OE</button>
-                <button id="commitOldEra" style="width: 33.3%;">Commit Old Era</button>
-                <button id="commitOfOldEra" style="width: 33.3%;">Commit 'of Old Era'</button>
+                <button id="commitD1" style="width: 50%;">Commit D1</button>
+                <button id="commitFirstDec" style="width: 50%;">Commit First dec.</button>
+                <!-- <button id="commitOfOldEra" style="width: 33.3%;">Commit 'of Old Era'</button> -->
+            </div>
+            <div style="display: flex;">
+                <button id="commitD2" style="width: 50%;">Commit D2</button>
+                <button id="commitSecondDec" style="width: 50%;">Commit Second dec.</button>
             </div>
             <button id="commitIgnoredPart">Commit Ignored part</button>
             <!-- <button id="markerMode">Marker mode</button>

@@ -35,15 +35,21 @@ let currentLocation = ''
 
 const firstYearOfOldEra_default = 10000
 const lastTranslatedYearWithLabel_default = 6000
-const timelineName_default = "Old Era"
-const ofTimeline_default = "of the Old Era"
-const abbreviatedTimelineName_default = "OE"
+const timelineName_default = "First decamillennium"
+//const ofTimeline_default = "of the Old Era"
+const abbreviatedTimelineName_default = "D1"
+
+const timelineADName_default = "Second decamillennium"
+const abbreviatedTimelineADName_default = "D2"
 
 let firstYearOfOldEra = firstYearOfOldEra_default
 let lastTranslatedYearWithLabel = lastTranslatedYearWithLabel_default
 let timelineName = timelineName_default
-let ofTimeline = ofTimeline_default
+//let ofTimeline = ofTimeline_default
 let abbreviatedTimelineName = abbreviatedTimelineName_default
+
+let timelineADName = timelineADName_default
+let abbreviatedTimelineADName = abbreviatedTimelineADName_default
 
 
 
@@ -68,9 +74,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const startingYearInput = document.getElementById("startingYearInput")
     const lastTranslatedYearWithLabelInput = document.getElementById("lastTranslatedYearWithLabelInput")
     const timelineNameInput = document.getElementById("timelineNameInput")
-    const ofTimelineInput = document.getElementById("ofTimelineInput")
+    //const ofTimelineInput = document.getElementById("ofTimelineInput")
     const abbreviatedTimelineNameInput = document.getElementById("abbreviatedTimelineNameInput")
     
+    const timelineADNameInput = document.getElementById("timelineADNameInput")
+    const abbreviatedTimelineADNameInput = document.getElementById("abbreviatedTimelineADNameInput")
+    
+
     const saveSettingsButton = document.getElementById("saveSettingsButton")
     const cancelSettingsEditButton = document.getElementById("cancelSettingsEditButton")
     const restoreDefaultsButton = document.getElementById("restoreDefaultsButton")
@@ -99,16 +109,21 @@ document.addEventListener('DOMContentLoaded', function () {
         return !startingYearInput.value || 
             !lastTranslatedYearWithLabelInput.value || 
             !timelineNameInput.value ||
-            !ofTimelineInput.value ||
-            !abbreviatedTimelineNameInput.value
+            //!ofTimelineInput.value ||
+            !abbreviatedTimelineNameInput.value ||
+            !timelineADNameInput.value ||
+            !abbreviatedTimelineADNameInput.value
     }
     
     function didAnythingChangeInAdvancedSettings(){
         return startingYearInput.value != firstYearOfOldEra || 
         lastTranslatedYearWithLabelInput.value != lastTranslatedYearWithLabel ||
         timelineNameInput.value != timelineName ||
-        ofTimelineInput.value != ofTimeline ||
-        abbreviatedTimelineNameInput.value != abbreviatedTimelineName
+        //ofTimelineInput.value != ofTimeline ||
+        abbreviatedTimelineNameInput.value != abbreviatedTimelineName ||
+        timelineADNameInput.value != timelineADName ||
+        abbreviatedTimelineADNameInput.value != abbreviatedTimelineADName 
+
     }
     
     function areAdvancedSettingsDifferentFromDefaults(){
@@ -116,8 +131,10 @@ document.addEventListener('DOMContentLoaded', function () {
         return firstYearOfOldEra != firstYearOfOldEra_default || 
         lastTranslatedYearWithLabel != lastTranslatedYearWithLabel_default ||
         timelineName != timelineName_default ||
-        ofTimeline != ofTimeline_default ||
-        abbreviatedTimelineName != abbreviatedTimelineName_default
+       // ofTimeline != ofTimeline_default ||
+        abbreviatedTimelineName != abbreviatedTimelineName_default ||
+        timelineADName != timelineADName_default ||
+        abbreviatedTimelineADName != abbreviatedTimelineADName_default
     
     
     }
@@ -167,13 +184,22 @@ document.addEventListener('DOMContentLoaded', function () {
        updateSettingsButtons()
     })
 
-    ofTimelineInput.addEventListener('input', function () {
-        updateSettingsButtons()
-     })
+    // ofTimelineInput.addEventListener('input', function () {
+    //     updateSettingsButtons()
+    //  })
 
     abbreviatedTimelineNameInput.addEventListener('input', function () {
         updateSettingsButtons()
     })
+
+    timelineADNameInput.addEventListener('input', function () {
+        updateSettingsButtons()
+     })
+ 
+ 
+     abbreviatedTimelineADNameInput.addEventListener('input', function () {
+         updateSettingsButtons()
+     })
 
 
 
@@ -189,13 +215,16 @@ document.addEventListener('DOMContentLoaded', function () {
         lastTranslatedYearWithLabel = parseInt(lastTranslatedYearWithLabelInput.value,10)
 
         timelineName = timelineNameInput.value
-        ofTimeline = ofTimelineInput.value
+       // ofTimeline = ofTimelineInput.value
         abbreviatedTimelineName = abbreviatedTimelineNameInput.value
+
+        timelineADName = timelineADNameInput.value
+        abbreviatedTimelineADName = abbreviatedTimelineADNameInput.value
 
 
         updateSettingsButtons()
         
-        chrome.storage.local.set({ firstYearOfOldEra, lastTranslatedYearWithLabel, timelineName, ofTimeline, abbreviatedTimelineName }, function () {
+        chrome.storage.local.set({ firstYearOfOldEra, lastTranslatedYearWithLabel, timelineName, abbreviatedTimelineName, timelineADName, abbreviatedTimelineADName }, function () {
             sendMessageToPage('advancedSettingsChanged')
         })
     
@@ -214,13 +243,16 @@ document.addEventListener('DOMContentLoaded', function () {
         lastTranslatedYearWithLabel = lastTranslatedYearWithLabel_default
 
         timelineName = timelineName_default
-        ofTimeline = ofTimeline_default
+        //ofTimeline = ofTimeline_default
         abbreviatedTimelineName = abbreviatedTimelineName_default
+
+        timelineADName = timelineADName_default
+        abbreviatedTimelineADName = abbreviatedTimelineADName_default
 
         updateInputTexts()
         updateSettingsButtons()
 
-        chrome.storage.local.set({ firstYearOfOldEra, lastTranslatedYearWithLabel, timelineName, ofTimeline, abbreviatedTimelineName }, function () {
+        chrome.storage.local.set({ firstYearOfOldEra, lastTranslatedYearWithLabel, timelineName, abbreviatedTimelineName, timelineADName, abbreviatedTimelineADName }, function () {
             sendMessageToPage('advancedSettingsChanged')
         })
 
@@ -234,15 +266,21 @@ document.addEventListener('DOMContentLoaded', function () {
         const startingYearInput = document.getElementById("startingYearInput")
         const lastTranslatedYearWithLabelInput = document.getElementById("lastTranslatedYearWithLabelInput")
         const timelineNameInput = document.getElementById("timelineNameInput")
-        const ofTimelineInput = document.getElementById("ofTimelineInput")
+       // const ofTimelineInput = document.getElementById("ofTimelineInput")
         const abbreviatedTimelineNameInput = document.getElementById("abbreviatedTimelineNameInput")
+
+        const timelineADNameInput = document.getElementById("timelineADNameInput")
+        const abbreviatedTimelineADNameInput = document.getElementById("abbreviatedTimelineADNameInput")
         
       
         startingYearInput.value = `${firstYearOfOldEra}`
         lastTranslatedYearWithLabelInput.value = `${lastTranslatedYearWithLabel}`
         timelineNameInput.value = timelineName
-        ofTimelineInput.value = ofTimeline
+        //ofTimelineInput.value = ofTimeline
         abbreviatedTimelineNameInput.value = abbreviatedTimelineName
+
+        timelineADNameInput.value = timelineADName
+        abbreviatedTimelineADNameInput.value = abbreviatedTimelineADName
 
 
 
@@ -250,7 +288,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-    chrome.storage.local.get(['isExtensionOff','isEditingMode', 'shouldNotUseServer', 'shouldTranslateYearsPrecisely','shouldHighlightImpreciseYears', 'shouldTranslateDatesInBookTitles', 'shouldTranslateDatesInQuotes','sitesData','firstYearOfOldEra','lastTranslatedYearWithLabel','timelineName','ofTimeline','abbreviatedTimelineName','isEditingWikitext','adMode'], function (result) {
+    chrome.storage.local.get(['isExtensionOff','isEditingMode', 'shouldNotUseServer', 'shouldTranslateYearsPrecisely','shouldHighlightImpreciseYears', 'shouldTranslateDatesInBookTitles', 'shouldTranslateDatesInQuotes','sitesData','firstYearOfOldEra','lastTranslatedYearWithLabel','timelineName','abbreviatedTimelineName','timelineADName','abbreviatedTimelineADName','isEditingWikitext','adMode'], function (result) {
         
         isExtensionOff = !!result.isExtensionOff
         isEditingMode = !!result.isEditingMode
@@ -270,11 +308,19 @@ document.addEventListener('DOMContentLoaded', function () {
         if(result.timelineName){
             timelineName = result.timelineName
         }
-        if(result.ofTimeline){
-            ofTimeline = result.ofTimeline
-        }
+        // if(result.ofTimeline){
+        //     ofTimeline = result.ofTimeline
+        // }
         if(result.abbreviatedTimelineName){
             abbreviatedTimelineName = result.abbreviatedTimelineName
+        }
+
+        if(result.timelineADName){
+            timelineADName = result.timelineADName
+        }
+     
+        if(result.abbreviatedTimelineADName){
+            abbreviatedTimelineADName = result.abbreviatedTimelineADName
         }
 
         if(result.adMode){

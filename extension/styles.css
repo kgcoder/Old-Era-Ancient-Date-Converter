@@ -186,12 +186,21 @@ a.disabledLink{
     background-color: aqua;
 }
 
-.bc-editing-ot{
+/* .bc-editing-ot{
     background-color: lime;
-}
+} */
 
 .bc-editing-at{
     background-color: thistle;
+}
+
+.ad-editing-tn{
+    background-color: chocolate;
+    color: white;
+}
+
+.ad-editing-at{
+    background-color: darkKhaki;
 }
 
 

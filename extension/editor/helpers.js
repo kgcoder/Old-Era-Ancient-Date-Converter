@@ -180,15 +180,23 @@ function getReplacementNodeForEditor(text, method, originalSubstitute,fromTempla
         }
 
         case 'bc-tn': {
-            return textWithComment(text, text, 'Old Era', type)
+            return textWithComment(text, text, 'First decamillennium', type)
         }
 
-        case 'bc-ot': {
-            return textWithComment(text, text, 'of the Old Era', type)
-        }
+        // case 'bc-ot': {
+        //     return textWithComment(text, text, 'of the Old Era', type)
+        // }
 
         case 'bc-at': {
-            return textWithComment(text, text, 'OE', type)
+            return textWithComment(text, text, 'D1', type)
+        }
+
+        case 'ad-tn': {
+            return textWithComment(text, text, 'Second decamillennium', type)
+        }
+
+        case 'ad-at': {
+            return textWithComment(text, text, 'D2', type)
         }
 
 

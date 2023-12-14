@@ -272,14 +272,20 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         case 'commitRemovals':
             commitRemovals()
             break
-        case 'commitOE':
-            commitOE()
+        case 'commitD1':
+            commitD1()
             break
-        case 'commitOldEra':
-            commitOldEra()
+        case 'commitFirstDec':
+            commitFirstDec()
             break
-        case 'commitOfOldEra':
-            commitOfOldEra()
+        // case 'commitOfOldEra':
+        //     commitOfOldEra()
+        //     break
+        case 'commitD2':
+            commitD2()
+            break
+        case 'commitSecondDec':
+            commitSecondDec()
             break
         case 'commitIgnoredPart':
             commitIgnoredPart()

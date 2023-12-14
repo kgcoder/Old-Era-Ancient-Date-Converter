@@ -25,9 +25,9 @@ function updateTranslation() {
         if(result.timelineName){
             timelineName = result.timelineName
         }
-        if(result.ofTimeline){
-            ofTimeline = result.ofTimeline
-        }
+        // if(result.ofTimeline){
+        //     ofTimeline = result.ofTimeline
+        // }
         if(result.abbreviatedTimelineName){
             abbreviatedTimelineName = result.abbreviatedTimelineName
         }

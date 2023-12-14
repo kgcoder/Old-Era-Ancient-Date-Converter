@@ -203,9 +203,11 @@ const shortToLongMethodConversions = {
     "bc-m": "millennium",
     "bc-r": "remove",
     "bc-ig": "bc-ig",//ignore
-    "bc-tn": "OE", // Old Era  timelineName
-    "bc-ot": "ofOE", //of the Old Era ofTimeline
-    "bc-at": "abbreviatedTimeline", //OE
+    "bc-tn": "bc-tn", // timelineName (First decamillennium)
+   // "bc-ot": "ofOE", //of the Old Era ofTimeline
+    "bc-at": "bc-at", //abbreviated timeline name (D1)
+    "ad-tn": "ad-tn", // timelineName (Second decamillennium)
+    "ad-at": "ad-at", //abbreviated timeline name (D2)
 
     //the following classes should not be used in markup
     'bc-y-r1':'bc-y-r1',//first year in range
@@ -231,9 +233,13 @@ const longToShortMethodConversions = {
     "millennium" : "bc-m",
     "remove" : "bc-r",
     "bc-ig": "bc-ig",//ignore
-    "OE" : "bc-tn", // Old Era  timelineName
-    "ofOE" : "bc-ot", //of the Old Era ofTimeline
-    "abbreviatedTimeline" : "bc-at", //OE
+    "bc-tn" : "bc-tn", // timelineName (First decamillennium)
+    //"ofOE" : "bc-ot", //of the Old Era ofTimeline
+    "bc-at" : "bc-at", //abbreviated timeline name (D1)
+    "ad-tn": "ad-tn", // timelineName (Second decamillennium)
+    "ad-at": "ad-at", //abbreviated timeline name (D2)
+
+
 
     //the following classes should not be used in markup
     'bc-y-r1':'bc-y-r1',//first year in range
@@ -261,8 +267,10 @@ const allClasses = [
     'bc-m',
     'bc-000s',
     'bc-tn',
-    'bc-ot',
+    //'bc-ot',
     'bc-at',
+    'ad-tn',
+    'ad-at',
     'bc-ig',
     'bc-y-r1',
     'bc-y-r2',
@@ -285,8 +293,10 @@ const colorToMarkupClass = {
     'blueViolet': 'bc-000s',
     'brown;color:white': 'bc-r',
     'aqua': 'bc-tn',
-    'lime': 'bc-ot',
+    //'lime': 'bc-ot',
     'thistle': 'bc-at',
+    'chocolate;color:white': 'ad-tn',
+    'darkKhaki': 'ad-at',
     'dimgray;color:white': 'bc-ig',
     'gainsboro': 'bc-y1',
     'lightslategray;color:white': 'bc-y2'

@@ -43,17 +43,26 @@ function commitRemovals() {
     commitColor('bc-r', 'brown;color:white')
 }
 
-function commitOE() {
+function commitD1() {
     commitColor('bc-at', 'thistle')
 }
 
 
-function commitOldEra() {
+function commitFirstDec() {
     commitColor('bc-tn', 'aqua')
 }
 
-function commitOfOldEra() {
-    commitColor('bc-ot', 'lime')
+// function commitOfOldEra() {
+//     commitColor('bc-ot', 'lime')
+// }
+
+function commitD2() {
+    commitColor('ad-at', 'darkKhaki')
+}
+
+
+function commitSecondDec() {
+    commitColor('ad-tn', 'chocolate;color:white')
 }
 
 function commitIgnoredPart() {

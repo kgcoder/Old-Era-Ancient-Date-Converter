@@ -78,17 +78,24 @@ let adMode = 'AD/CE' // 'AD/CE', 'E2', 'Holocene'
 
 const firstYearOfOldEra_default = 10000
 const lastTranslatedYearWithLabel_default = 6000
-const timelineName_default = "Old Era"
-const ofTimeline_default = "of the Old Era"
-const abbreviatedTimelineName_default = "OE"
+const timelineName_default = "First decamillennium"
+//const ofTimeline_default = "of the Old Era"
+const abbreviatedTimelineName_default = "D1"
+
+const timelineADName_default = "Second decamillennium"
+//const ofADTimeline_default = "of the Old Era"
+const abbreviatedTimelineADName_default = "D2"
 
 
       
 let firstYearOfOldEra = firstYearOfOldEra_default
 let lastTranslatedYearWithLabel = lastTranslatedYearWithLabel_default
 let timelineName = timelineName_default
-let ofTimeline = ofTimeline_default
+//let ofTimeline = ofTimeline_default
 let abbreviatedTimelineName = abbreviatedTimelineName_default
+
+let timelineADName = timelineADName_default
+let abbreviatedTimelineADName = abbreviatedTimelineADName_default
 
 if(document.readyState === "loading"){
     document.addEventListener("DOMContentLoaded", onContentLoad);
@@ -104,7 +111,7 @@ function getConfigFromLocalStorage(callback){
         'shouldTranslateYearsPrecisely','shouldHighlightImpreciseYears', 'shouldTranslateDatesInBookTitles', 
         'shouldTranslateDatesInQuotes','sitesData',
         'firstYearOfOldEra','lastTranslatedYearWithLabel',
-        'timelineName','ofTimeline','abbreviatedTimelineName','dontShowPopupAgain','templatesToLoadAtStartup','adMode'], function (result) {
+        'timelineName','abbreviatedTimelineName','timelineADName','abbreviatedTimelineADName','dontShowPopupAgain','templatesToLoadAtStartup','adMode'], function (result) {
         isExtensionOff = !!result.isExtensionOff
         isEditingMode = !!result.isEditingMode
         shouldNotUseServer = !!result.shouldNotUseServer
@@ -137,11 +144,19 @@ function getConfigFromLocalStorage(callback){
         if(result.timelineName){
             timelineName = result.timelineName
         }
-        if(result.ofTimeline){
-            ofTimeline = result.ofTimeline
-        }
+        // if(result.ofTimeline){
+        //     ofTimeline = result.ofTimeline
+        // }
         if(result.abbreviatedTimelineName){
             abbreviatedTimelineName = result.abbreviatedTimelineName
+        }
+
+        if(result.timelineADName){
+            timelineADName = result.timelineADName
+        }
+    
+        if(result.abbreviatedTimelineADName){
+            abbreviatedTimelineADName = result.abbreviatedTimelineADName
         }
 
         if(result.adMode){
@@ -1463,12 +1478,22 @@ function getReplacementStrings(text, originalSubstitute,otherNumberStringInRange
             return [timelineName, "", ""]
         }
 
-        case 'bc-ot': {
-            return [ofTimeline, "", ""]
-        }
+        // case 'bc-ot': {
+        //     return [ofTimeline, "", ""]
+        // }
             
         case 'bc-at': {
             return [abbreviatedTimelineName, "", ""]
+        }
+
+        case 'ad-tn': {
+            return [timelineADName, "", ""]
+        }
+
+      
+            
+        case 'ad-at': {
+            return [abbreviatedTimelineADName, "", ""]
         }
 
         case 'first-ad-year':{
