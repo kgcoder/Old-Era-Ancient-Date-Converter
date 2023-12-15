@@ -1487,13 +1487,25 @@ function getReplacementStrings(text, originalSubstitute,otherNumberStringInRange
         }
 
         case 'ad-tn': {
-            return [timelineADName, "", ""]
+            switch(adMode){
+                case 'AD/CE':
+                    return [originalText, "", ""]
+                case 'Holocene':
+                case 'E2':
+                    return [timelineADName, "", ""]
+            }
         }
 
       
             
         case 'ad-at': {
-            return [abbreviatedTimelineADName, "", ""]
+            switch(adMode){
+                case 'AD/CE':
+                    return [originalText, "", ""]
+                case 'Holocene':
+                case 'E2':
+                    return [abbreviatedTimelineADName, "", ""]
+            }
         }
 
         case 'first-ad-year':{

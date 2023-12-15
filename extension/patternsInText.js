@@ -82,13 +82,13 @@ const yearWithLeadingADPattern = `\\b${leadingAdPattern}\\b(${spacePattern})${na
 const yearWithTrailingADPattern = `${nakedYearPattern}${trailingADPattern}`
 const yearWithTrailingCEPattern = `${nakedYearPattern}${`( |\\&nbsp;|\\&#160;|\\&#8201;|-)?(c\\.(${spacePattern})?e\\.?|ce)`}`
 
-const yearRangeWithLeadingADPattern = `(\\b${leadingAdPattern}\\b(${spacePattern})${nakedYearPattern}${rangePattern})${nakedYearPattern}`
-const yearRangeWithTrailingADPattern = `(${nakedYearPattern}${rangePattern})${nakedYearPattern}${trailingADPattern}`
+const yearRangeWithLeadingADPattern = `(\\b${leadingAdPattern}\\b(${spacePattern})${nakedYearPattern}${rangePattern}((${circaPattern})(${spacePattern})?)?)${nakedYearPattern}`
+const yearRangeWithTrailingADPattern = `(${nakedYearPattern}${rangePattern}((${circaPattern})(${spacePattern})?)?)${nakedYearPattern}${trailingADPattern}`
 
 const yearRangeWithSlashAndTrailingADPattern = `(${nakedYearPattern}/)${nakedYearPattern}${trailingADPattern}`
 const yearRangeWithSlashAndTrailingCEPattern = `(${nakedYearPattern}/)${nakedYearPattern}${trailingCEPattern}`
 
 
-const yearRangeWithLeadingCEPattern = `(\\b${leadingCEPattern}\\b(${spacePattern})${nakedYearPattern}${rangePattern})${nakedYearPattern}`
+const yearRangeWithLeadingCEPattern = `(\\b${leadingCEPattern}\\b(${spacePattern})${nakedYearPattern}${rangePattern}((${circaPattern})(${spacePattern})?)?)${nakedYearPattern}`
 const yearRangeWithTrailingCEPattern = `(${nakedYearPattern}((${spacePattern})?(${circaPattern}))?${rangePattern}((${circaPattern})(${spacePattern})?)?)${nakedYearPattern}${trailingCEPattern}`
 

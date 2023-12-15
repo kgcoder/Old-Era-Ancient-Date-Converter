@@ -14,7 +14,7 @@ function processYearRangeWithLeadingADPattern(text,replacementsArray){
         const leadingAD = result[2] || ''
         const space = result[4] || ''
         const firstYear = result[5] || ''
-        const secondYear = result[9] || ''
+        const secondYear = result[12] || ''
 
         if(space === '\n')return
 
@@ -37,9 +37,9 @@ function processYearRangeWithTrailingADPattern(text,replacementsArray){
     while ((result = reg.exec(text))) {
         const stringUntilSecondYear = result[1] || ''
         const firstYearString = result[2] || ''
-        const secondYearString = result[6] || ''
-        const space = result[7] || ''
-        const trailingAD = result[8] || ''
+        const secondYearString = result[9] || ''
+        const space = result[10] || ''
+        const trailingAD = result[11] || ''
 
         if(space === '\n')return
 
@@ -69,7 +69,7 @@ function processYearRangeWithLeadingCEPattern(text,replacementsArray){
         const leadingAD = result[2] || ''
         const leadingADSpace = result[4] || ''
         const firstYearString = result[5] || ''
-        const secondYearString = result[9] || ''
+        const secondYearString = result[12] || ''
 
         if(leadingADSpace === '\n')return
 
