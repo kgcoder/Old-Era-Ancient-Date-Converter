@@ -54,6 +54,7 @@ function selectNumbers(digits) {
         'years',
         'days',
         'times',
+        'triremes',
         'million',
         'billion',
         'january',
@@ -68,10 +69,9 @@ function selectNumbers(digits) {
         'october',
         'november',
         'december',
-        
     ].join('|')
 
-    const pattern = `(?<!(Fig.|AD|A\\.D\\.|age|aged|page|p\\.|p\\..?\\d{1,4}–|<[^>]*?)(| |\\s|\\&nbsp;|\\&#160;))(\\b([0-9]{${digits}}(?!\\])\\b)(?!((${spacePattern})(${prohibitedWordsAfter})|,\\d{3}))(((<span.*?>)( |\\s|\\&nbsp;|\\&#160;)(</span>)| |\\s|\\&nbsp;|\\&#160;)(b\\.( |\\s|\\&nbsp;|\\&#160;)?c\\.|bc)(e)?)?)`;
+    const pattern = `(?<!(Fig.|AD|A\\.D\\.|age|aged|page|p\\.|p\\..?\\d{1,4}–|<[^>]*?)(| |\\s|\\&nbsp;|\\&#160;))(\\b([0-9]{${digits}}(?!\\])\\b)(?!((${spacePattern})(\\b${prohibitedWordsAfter}\\b)|,\\d{3}))(((<span.*?>)( |\\s|\\&nbsp;|\\&#160;)(</span>)| |\\s|\\&nbsp;|\\&#160;)(b\\.( |\\s|\\&nbsp;|\\&#160;)?c\\.|bc)(e)?)?)`;
     const reg = new RegExp(pattern, "gi");
 
     markTextsMatchingRegExp(reg, '$3')
