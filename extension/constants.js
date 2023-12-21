@@ -366,7 +366,6 @@ const sentenceBeginnings = [
     'Until',
     'No later than',
     'Finally, in',
-    'В течение',
     'By',
 
 ]

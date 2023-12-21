@@ -219,7 +219,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     }
 
     if (message === 'openAbout') {
-        const link = 'https://oldera.org'
+        const link = 'https://github.com/kgcoder/Historical-Calendar/wiki'
         window.open(link)
     }
 
