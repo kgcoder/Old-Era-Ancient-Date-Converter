@@ -1,6 +1,6 @@
 {
     "name": "Ancient Date Converter",
-    "version": "9.0.1",
+    "version": "9.0.2",
     "manifest_version": 3,
     "description": "Convert ancient dates into Historical Calendar dates (aka Holocene Calendar or Human Era) or any other year numbering system.",
     "content_scripts": [

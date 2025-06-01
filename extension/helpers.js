@@ -420,6 +420,7 @@ function prepareServerReplacements(allEdits,text){
 
                 }else{
                     indexInAllEdits++
+                    indexInFilteredEdits++
                 }
                 if(indexInAllEdits >= allEdits.length)break
             }
