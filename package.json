@@ -1,0 +1,24 @@
+{
+  "name": "olderaonwikipedia",
+  "version": "1.0.0",
+  "description": "Chrome extension that converts dates BC into Old Era dates",
+  "homepage": "https://github.com/kgcoder/Old-Era-on-Wikipedia#readme",
+  "bugs": {
+    "url": "https://github.com/kgcoder/Old-Era-on-Wikipedia/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kgcoder/Old-Era-on-Wikipedia.git"
+  },
+  "license": "MIT",
+  "author": "Karen Grigorian",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0"
+  }
+}

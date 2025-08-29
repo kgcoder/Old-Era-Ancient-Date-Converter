@@ -572,3 +572,9 @@ function processDecadePattern(text, replacementsArray){
 
 
 
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { 
+        processYearPattern,
+        processCenturyPattern 
+    };
+  }

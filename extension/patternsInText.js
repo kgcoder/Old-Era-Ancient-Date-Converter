@@ -92,3 +92,10 @@ const yearRangeWithSlashAndTrailingCEPattern = `(${nakedYearPattern}/)${nakedYea
 const yearRangeWithLeadingCEPattern = `(\\b${leadingCEPattern}\\b(${spacePattern})${nakedYearPattern}${rangePattern}((${circaPattern})(${spacePattern})?)?)${nakedYearPattern}`
 const yearRangeWithTrailingCEPattern = `(${nakedYearPattern}((${spacePattern})?(${circaPattern}))?${rangePattern}((${circaPattern})(${spacePattern})?)?)${nakedYearPattern}${trailingCEPattern}`
 
+
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { 
+        yearPattern
+    };
+}

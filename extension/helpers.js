@@ -1025,3 +1025,8 @@ function testStringifyAndParse(originalHTML){
 
 
 }
+
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { giRegForHtml, giRegForText };
+}

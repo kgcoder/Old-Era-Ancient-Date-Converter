@@ -32,3 +32,10 @@ const h4Pattern = `(<h4>.*?<span class="mw-headline"[^>]*?>)(.*?)</span><Ignored
 // const yearRangeInMarkupPattern = `((${yearInMarkupPattern}|${nakedYearPattern}|${roundNakedYearPattern})${rangePattern})${yearInMarkupPattern}`
 // const yearRangeWithFirstYearInMarkupPattern = `(${yearInMarkupPattern}${rangePattern})${yearPattern}`
 
+
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { 
+        spacePattern
+    };
+}
