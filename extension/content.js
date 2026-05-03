@@ -498,36 +498,30 @@ async function startWebRequest(oldUrl = '') {
     try{
 
         const r = await fetch(url)
-        let json = r.status !== 200 ? {} : await r.json()
-        if(json.error){
-            if(json.error.code === "missingtitle"){
-
-                if(oldUrl && oldUrl !== url){
-                    try{
-                        const r = await fetch(oldUrl)
-                        json = r.status !== 200 ? {} : await r.json()
-                        if(json.error && json.error.code === "missingtitle"){
-                            pageNotFoundOnServer = true 
-                            translateEverythingOnWeb()
-                            return
-                        }
-                    }catch(e){
-                        console.log('oldUrl error',e)
+        let wikitext = r.status !== 200 ? null : await r.text() || null
+        if(!wikitext){
+            if(oldUrl && oldUrl !== url){
+                try{
+                    const r = await fetch(oldUrl)
+                    wikitext = r.status !== 200 ? null : await r.text() || null
+                    if(!wikitext){
+                        pageNotFoundOnServer = true
+                        translateEverythingOnWeb()
+                        return
                     }
-                }else{
-                    pageNotFoundOnServer = true   
-
-                    translateEverythingOnWeb()
-                    return
+                }catch(e){
+                    console.log('oldUrl error',e)
                 }
+            }else{
+                pageNotFoundOnServer = true
+                translateEverythingOnWeb()
+                return
             }
-           
         }
-        
-        const wikitext = json.parse.wikitext
+
         if (!wikitext) {
             translateEverythingOnWeb()
-            return 
+            return
         }
 
 

@@ -17,6 +17,8 @@ const mainBaseURL = 'https://en.wikipedia.org/wiki/'
 const additionalBaseURL = 'https://en.wikipedia.org/w/index.php?'
 let titleInURL = ''
 
+const mediawikiDomain = 'timeline.oldera.org'
+
 let datesFolder = `https://${mediawikiDomain}/wiki/index.php/Dates/`
 
 function prepareLocation() {

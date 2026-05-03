@@ -280,14 +280,14 @@ function getWikitextUrlOnMyServer(uriComponent = ''){
         uriComponent = currentLocation.replace('https://','').replace('http://','').replace('www.','')
     }
     uriComponent = uriComponent.replace('en.m.wikipedia.org','en.wikipedia.org')
-    return `${webBaseUrl}/wiki/api.php?action=parse&origin=*&prop=wikitext&formatversion=2&format=json&page=Dates/${uriComponent}`
+    return `${webBaseUrl}/wp-json/bc-dates/v1/raw/Dates/${uriComponent}`
 
 }
 
 function getPageUrlOnMyServer(){
     let uriComponent = currentLocation.replace('https://','').replace('http://','').replace('www.','')
     uriComponent = uriComponent.replace('en.m.wikipedia.org','en.wikipedia.org')
-    return `${webBaseUrl}/wiki/index.php/Dates/${uriComponent}`
+    return `${webBaseUrl}/index.php?title=${encodeURI('Dates/' + uriComponent)}`
 
     
 }
@@ -295,7 +295,7 @@ function getPageUrlOnMyServer(){
 function getPageUrlOnMyServerForEditing(){
     let uriComponent = currentLocation.replace('https://','').replace('http://','').replace('www.','')
     uriComponent = uriComponent.replace('en.m.wikipedia.org','en.wikipedia.org')
-    return `${webBaseUrl}/wiki/index.php?title=Dates/${uriComponent}&action=edit`
+    return `${webBaseUrl}/index.php?title=${encodeURI('Dates/' + uriComponent)}&action=edit`
 }
 
 

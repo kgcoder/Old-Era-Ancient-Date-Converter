@@ -5,17 +5,12 @@
  * LICENSE file in the root directory of this source tree.
  */
 
- const baseUrl = 'https://dates.oldera.org'
- const frontendBaseUrl = 'https://dates.oldera.org'
- 
- const mediawikiDomain = 'timeline.oldera.org'
- const webBaseUrl = `https://${mediawikiDomain}`
+
+ const webBaseUrl = `https://oldera.org`
  
  const dataFormatVersionForEditor = 2
 
- //const baseUrl = 'http://localhost:3250'
- //const frontendBaseUrl = 'http://localhost:3000'
- 
+
  const kCacheTTL = 86400000 //cache ttl in milliseconds
  const numbersFromWords = {
      'first': 1,
