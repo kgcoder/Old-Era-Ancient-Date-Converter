@@ -210,9 +210,10 @@ function convertMethodNameLongToShort(edit){
 
 
 function clearCache(){
+    console.log('clear cache')
 
     try{
-        chrome.storage.local.remove(["WebsitesSupportedByBackend"],function(){
+        chrome.storage.local.remove(["WebsitesSupportedByBackend","OE-imageUrls"],function(){
             let error = chrome.runtime.lastError;
                if (error) {
                    console.error(error);
@@ -228,9 +229,11 @@ function clearCache(){
 async function prepareListOfWebsitesSupportedByBackend(){
 
    let websitesSupportedByBackendString = await getDataStringFromStorage('WebsitesSupportedByBackend')
+   console.log('websitesSupportedByBackendString',websitesSupportedByBackendString)
    if(!websitesSupportedByBackendString){
         try{
             websitesSupportedByBackendString = await requestListOfWebsites()
+            console.log('got websites',websitesSupportedByBackendString)
             saveTimestampedDataString('WebsitesSupportedByBackend',websitesSupportedByBackendString)
         }catch(e){
             console.log('error while fetching list of websites',e)
@@ -238,7 +241,7 @@ async function prepareListOfWebsitesSupportedByBackend(){
    }
 
    if(websitesSupportedByBackendString){
-        const websites = websitesSupportedByBackendString.split('\n').filter(line => !line.includes('<')).map(line => line.trim())
+        const websites = websitesSupportedByBackendString.split('\n').filter(line => !line.includes('<')).map(line => line.replace(/https?:\/\//,'').trim())
         sitesSupportedByBackend = websites
    }
 
@@ -277,15 +280,15 @@ function getDataStringFromStorage(key) {
 
 function getWikitextUrlOnMyServer(uriComponent = ''){
     if(!uriComponent){
-        uriComponent = currentLocation.replace('https://','').replace('http://','').replace('www.','')
+        uriComponent = currentLocation.replace('www.','')
     }
     uriComponent = uriComponent.replace('en.m.wikipedia.org','en.wikipedia.org')
-    return `${webBaseUrl}/wp-json/bc-dates/v1/raw/Dates/${uriComponent}`
+    return `${webBaseUrl}/wp-json/bc-dates/v1/raw/Dates/${encodeURI(uriComponent).replace(/'/g, '%27')}`
 
 }
 
 function getPageUrlOnMyServer(){
-    let uriComponent = currentLocation.replace('https://','').replace('http://','').replace('www.','')
+    let uriComponent = currentLocation.replace('www.','')
     uriComponent = uriComponent.replace('en.m.wikipedia.org','en.wikipedia.org')
     return `${webBaseUrl}/index.php?title=${encodeURI('Dates/' + uriComponent)}`
 
@@ -293,7 +296,7 @@ function getPageUrlOnMyServer(){
 }
 
 function getPageUrlOnMyServerForEditing(){
-    let uriComponent = currentLocation.replace('https://','').replace('http://','').replace('www.','')
+    let uriComponent = currentLocation.replace('www.','')
     uriComponent = uriComponent.replace('en.m.wikipedia.org','en.wikipedia.org')
     return `${webBaseUrl}/index.php?title=${encodeURI('Dates/' + uriComponent)}&action=edit`
 }
@@ -597,53 +600,22 @@ function getOccurenceNumberInsideStringFromOrder(string, target, order){
 
 
 
-function addLinksToCategoryMembersOnServer(){
-     const links = document.getElementsByTagName('a')
-    for (let link of links){
-        if(!link.href.includes(`https://${mediawikiDomain}/wiki/index.php/Dates/`))continue
-        if(link.className == "external-link")continue
-        const parent = link.parentElement
-        if(parent.tagName === 'LI'){
-            const newLink = document.createElement('a')
-            newLink.innerText = "⏵"
-            newLink.className = "external-link"
-            newLink.style.marginLeft = "10px"
-            newLink.href = "https://" + link.href.replace(`https://${mediawikiDomain}/wiki/index.php/Dates/`,"")
-            newLink.target = "_blank"
-            parent.appendChild(newLink)
-        }
-    }
-}
 
 
-function addLinkToTitleOnMediaWikiPage(){
-    const h1s = document.getElementsByTagName('h1')
-    if(!h1s || !h1s.length)return
-
-    const header = h1s[0].innerText
 
 
-    const reg = new RegExp('^(.*?Dates/)(.*?)("?)$')
-    const newHeader = header.replace(reg, (match, firstPart, link, quotes) => {
-        if(link === "SupportedWebsites")return match
-        return `${firstPart}<a href="https://${link}" target="_blank">${link}</a>${quotes}`
-    })
-
-    h1s[0].innerHTML = newHeader
-
-}
 
 
 async function prepopulateMediaWikiPage(){
-    const textArea = document.getElementById('wpTextbox1')
-    const summaryInput = document.getElementById('wpSummary')
+    const textArea = document.getElementById('bc_dates_textarea')
+    const summaryInput = document.getElementById('bc_dates_comment')
     if(!textArea || !summaryInput)return
     if(!textArea.value.trim()){
         summaryInput.value = 'Page created'
         try {
             const savedText = await navigator.clipboard.readText();
-            if(savedText.includes('[[Category:Pages with dates]]')){
-                textArea.value = savedText
+            if(savedText.includes(copyPasteMessage)){
+                textArea.value = savedText.replace(copyPasteMessage,'').trim()
             }
         } catch (err) {
             console.error('Failed to read from clipboard: ', err);
@@ -659,28 +631,7 @@ function saveDataPage(){
 }
 
 
-function addLinksToSupportedWebsitesPage(){
-    const p = document.getElementsByTagName('p')[0]
-    let list = p.innerText.split("\n")
 
-    list = ["en.wikipedia.org"].concat(list.filter(domain => !!domain))
-
-    const parent = p.parentNode
-    parent.removeChild(p)
-
-    const listNode = document.createElement('ul')
-    const inner = list.map(domain=> {
-        const externalLink = 'https://' + domain
-        const internalLink = `https://${mediawikiDomain}/wiki/index.php/Category:${domain}`
-        return `<li><a href="${internalLink}">${domain}</a> <a href="${externalLink}" target="_blank">⏵</a></li>`
-    }).join("\n")
-
-    listNode.innerHTML = inner
-
-    parent.appendChild(listNode)
-
-
-}
 
 
 function getDataFormatVersionFromDataPage(wikitext){

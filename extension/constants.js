@@ -366,3 +366,5 @@ const sentenceBeginnings = [
 ]
  
 const sentenceBeginningReg = new RegExp(`(${sentenceBeginnings.join('|')}) $`)
+
+const copyPasteMessage = 'From Ancient Date Converter'

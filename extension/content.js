@@ -219,7 +219,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     }
 
     if (message === 'openAbout') {
-        const link = 'https://github.com/kgcoder/Historical-Calendar/wiki'
+        const link = 'https://oldera.org'
         window.open(link)
     }
 
@@ -229,12 +229,12 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     }
 
     if (message === 'openTimeline') {
-        const link = 'https://timeline.oldera.org/timeline/'
+        const link = 'https://oldera.org/timeline/'
         window.open(link)
     }
 
     if(message === 'openSupportedWebsitesPage'){
-        const link = `https://${mediawikiDomain}/wiki/index.php/Dates/SupportedWebsites`
+        const link = getWikitextUrlOnMyServer('Info:SupportedWebsites')
         window.open(link)
     }
 
@@ -331,6 +331,7 @@ async function onContentLoad() {
 
     const oldWikiUrl = getWikitextUrlOnMyServer()
 
+    console.log('oldWikiUrl',oldWikiUrl)
 
     const redirects = document.getElementsByClassName('mw-redirectedfrom')
     if(redirects.length){
@@ -338,6 +339,7 @@ async function onContentLoad() {
         const i = setInterval(()=>{
          prepareLocation()
          const url = getWikitextUrlOnMyServer()
+         console.log('url',url)
          if(url !== oldWikiUrl){
             handlePage(oldWikiUrl)
             clearInterval(i)
@@ -357,6 +359,7 @@ async function onContentLoad() {
 
 
  async function handlePage(oldUrl = '') {
+    console.log('handle old',oldUrl)
     if(!isOnWikipedia){
         await prepareListOfWebsitesSupportedByBackend()
     }
@@ -366,18 +369,13 @@ async function onContentLoad() {
     getConfigFromLocalStorage(function(){
         updateIcon()
 
-        if(isOnMediaWikiCategoryPage){
-            addLinksToCategoryMembersOnServer()
-        }
 
-        if(isOnMediaWikiDataPage){
-            addLinkToTitleOnMediaWikiPage()
+        if(isOnWPDataPage){
+            console.log('is the page')
             prepopulateMediaWikiPage()
         }
 
-        if(isOnSupportedWebsitesPage){
-            addLinksToSupportedWebsitesPage()
-        }
+     
 
         if(currentLocation){
             const index = allowedSites.findIndex(site => domain === site)
@@ -404,7 +402,7 @@ async function onContentLoad() {
             }
         });
     
-        if (!isExtensionOff  && currentLocation && !isOnMediaWikiCategoryPage) {
+        if (!isExtensionOff  && currentLocation) {
             if(!shouldNotUseServer && (sitesSupportedByBackend.includes(domain) || isOnWikipedia) ){
                 
                 isEditingMode ? startWebRequestForEditor() :  startWebRequest(oldUrl)
@@ -464,20 +462,21 @@ function getPageVersionFromHtml(html) {
 
 async function requestListOfWebsites() {
 
-    const url = getWikitextUrlOnMyServer('SupportedWebsites')
+    const url = getWikitextUrlOnMyServer('Info:SupportedWebsites')
 
+    console.log('will request websites',url)
     return new Promise(async (resolve,reject) => {
         try{
     
             const r = await fetch(url)
-            const json = r.status !== 200 ? {} : await r.json()
+            const text = r.status !== 200 ? {} : await r.text()
         
-            const wikitext = json.parse.wikitext
-            if (!wikitext) {
+            if (!text) {
                 return reject()
             }
     
-            resolve(wikitext)
+            console.log('got text',text)
+            resolve(text)
            
         }catch(e){
             console.log(e)
@@ -498,14 +497,22 @@ async function startWebRequest(oldUrl = '') {
     try{
 
         const r = await fetch(url)
-        let wikitext = r.status !== 200 ? null : await r.text() || null
-        if(!wikitext){
+
+        let text
+
+        if(r.status !== 200){
+
             if(oldUrl && oldUrl !== url){
                 try{
                     const r = await fetch(oldUrl)
-                    wikitext = r.status !== 200 ? null : await r.text() || null
-                    if(!wikitext){
+
+                    if(r.status !== 200){
                         pageNotFoundOnServer = true
+                        translateEverythingOnWeb()
+                        return
+                    }
+                    text = await r.text() || null
+                    if(!text){
                         translateEverythingOnWeb()
                         return
                     }
@@ -517,17 +524,23 @@ async function startWebRequest(oldUrl = '') {
                 translateEverythingOnWeb()
                 return
             }
+        }else{
+
+            text = await r.text() || null
+
+            console.log('found text:',text)
+
         }
 
-        if (!wikitext) {
+        if (!text) {
             translateEverythingOnWeb()
             return
         }
 
 
-        currentPageDataFormatVersion = getDataFormatVersionFromDataPage(wikitext)
+        currentPageDataFormatVersion = getDataFormatVersionFromDataPage(text)
         
-        const lines = wikitext.split('\n')
+        const lines = text.split('\n')
         
         editsArray = getEditsFromLines(lines)
 
@@ -578,9 +591,9 @@ async function startWebRequestForEditor(){
     
     try{
         const r = await fetch(url)
-        const json = r.status !== 200 ? {} : await r.json()
-        if(json.error){
-             if(json.error.code === "missingtitle"){
+        if(r.status !== 200){
+
+            if(json.error.code === "missingtitle"){
                  pageNotFoundOnServer = true
              }
 
@@ -589,10 +602,11 @@ async function startWebRequestForEditor(){
                 onEditorLoad()
             }
             return
-        }
 
-        const wikitext = json.parse.wikitext
-        if (!wikitext) {
+        }
+        const text = await r.text()
+
+        if (!text) {
             editsArray = []
             if(isEditingMode){
                 onEditorLoad()
@@ -600,9 +614,9 @@ async function startWebRequestForEditor(){
             return
         }
 
-        currentPageDataFormatVersion = getDataFormatVersionFromDataPage(wikitext)
+        currentPageDataFormatVersion = getDataFormatVersionFromDataPage(text)
 
-        const lines = wikitext.split('\n')
+        const lines = text.split('\n')
 
         editsArray = lines.map(line => getEditFromLine(line)).filter(obj => obj !== null).map(edit => convertMethodNameLongToShort(edit))
        
@@ -1154,15 +1168,15 @@ async function replaceImagesOnWeb(node){
 
     }else{
 
-        const url = `https://${mediawikiDomain}/wiki/api.php?action=parse&prop=wikitext&formatversion=2&format=json&origin=*&page=OldEraImages.csv`
+        const url  = getWikitextUrlOnMyServer('Info:OldEraImages.csv')
 
-        fetch(url).then(function(res) {return res.json();}).then(function(page) {
-            var wikitext = page.parse.wikitext;
-            if (!wikitext) return;
+        fetch(url).then(function(res) {return res.text();}).then(function(text) {
+            if (!text) return;
     
-            saveTimestampedDataString('OE-imageUrls',wikitext);
+            console.log('images text',text)
+            saveTimestampedDataString('OE-imageUrls',text);
        
-            parseImageData(wikitext);
+            parseImageData(text);
         
             replaceImages(images,node);
         

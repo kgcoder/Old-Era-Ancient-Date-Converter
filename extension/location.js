@@ -8,11 +8,9 @@
 let currentLocation = window.location.toString()
 let isOnWikipedia = false
 let isOnMobile = false
-let isOnMediaWikiCategoryPage = false
-let isOnMediaWikiDataPage = false
+let isOnWPDataPage = false
 
-let isOnSupportedWebsitesPage = false
-
+const wpBaseUrl = 'https://oldera.org'
 const mainBaseURL = 'https://en.wikipedia.org/wiki/'
 const additionalBaseURL = 'https://en.wikipedia.org/w/index.php?'
 let titleInURL = ''
@@ -36,15 +34,13 @@ function prepareLocation() {
     isOnWikipedia = ['en.wikipedia.org', 'en.m.wikipedia.org'].includes(domain)
     isOnMobile = domain.includes('en.m.')
 
-    isOnMediaWikiCategoryPage = currentLocation && 
-    (currentLocation.includes(`https://${mediawikiDomain}/wiki/index.php`) &&
-    currentLocation.includes(`Category:`))
 
-    isOnMediaWikiDataPage = currentLocation && currentLocation.includes(`https://${mediawikiDomain}/wiki/index.php`) &&
-    currentLocation.includes('Dates/')
+    console.log('current location',currentLocation)
+
+    isOnWPDataPage = currentLocation && currentLocation.includes(`${wpBaseUrl}`) &&
+    currentLocation.includes('title=Dates')
 
 
-    isOnSupportedWebsitesPage = currentLocation === `https://${mediawikiDomain}/wiki/index.php/Dates/SupportedWebsites`
 
 
     if (currentLocation.includes(mainBaseURL)) {

@@ -1110,26 +1110,6 @@ function showPopupWithInstructions(){
         return `${string};${target};${method};;${order ? order : ""};${originalSubstitute ? originalSubstitute : ""};`
     })
 
-    const isEmpty = lines.length === 0
-
-    const categories = [
-        '[[Category:Pages with dates]]',
-        `[[Category:${domain}]]`,
-        `[[Category:Format version ${dataFormatVersionForEditor}]]`
-    ]
-
-    if(isEmpty){
-        lines = categories
-    }else{
-        lines = ['<poem><nowiki>'].concat(lines).concat([
-            '</nowiki></poem>',
-        ]).concat(categories)
-    }
-
-
-    if (isOnWikipedia && titleInURL.includes("Template:")){
-        lines.push('[[Category:Wikipedia templates]]')
-    }
 
     const finalText = lines.join('\n')
 
@@ -1194,7 +1174,7 @@ async function copyEditorContentsToClipboard(){
 
     const input = document.getElementsByClassName("editorPopup-input")[0]
     try {
-        await navigator.clipboard.writeText(input.value);
+        await navigator.clipboard.writeText(copyPasteMessage + '\n' + input.value);
         const toast = document.createElement('div');
         toast.className = 'toast'
         toast.innerText = "Text was copied to clipboard"
