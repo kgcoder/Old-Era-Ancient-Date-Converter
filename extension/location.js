@@ -15,9 +15,8 @@ const mainBaseURL = 'https://en.wikipedia.org/wiki/'
 const additionalBaseURL = 'https://en.wikipedia.org/w/index.php?'
 let titleInURL = ''
 
-const mediawikiDomain = 'timeline.oldera.org'
 
-let datesFolder = `https://${mediawikiDomain}/wiki/index.php/Dates/`
+let datesFolder = `https://${wpBaseUrl}/?title=Dates`
 
 function prepareLocation() {
 
@@ -35,7 +34,6 @@ function prepareLocation() {
     isOnMobile = domain.includes('en.m.')
 
 
-    console.log('current location',currentLocation)
 
     isOnWPDataPage = currentLocation && currentLocation.includes(`${wpBaseUrl}`) &&
     currentLocation.includes('title=Dates')

@@ -5,8 +5,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-const mediawikiDomain = 'timeline.oldera.org'
-
 
 let isExtensionOff = false
 let isEditingMode = false

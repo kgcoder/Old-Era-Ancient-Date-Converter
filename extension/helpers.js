@@ -210,7 +210,6 @@ function convertMethodNameLongToShort(edit){
 
 
 function clearCache(){
-    console.log('clear cache')
 
     try{
         chrome.storage.local.remove(["WebsitesSupportedByBackend","OE-imageUrls"],function(){
@@ -229,11 +228,9 @@ function clearCache(){
 async function prepareListOfWebsitesSupportedByBackend(){
 
    let websitesSupportedByBackendString = await getDataStringFromStorage('WebsitesSupportedByBackend')
-   console.log('websitesSupportedByBackendString',websitesSupportedByBackendString)
    if(!websitesSupportedByBackendString){
         try{
             websitesSupportedByBackendString = await requestListOfWebsites()
-            console.log('got websites',websitesSupportedByBackendString)
             saveTimestampedDataString('WebsitesSupportedByBackend',websitesSupportedByBackendString)
         }catch(e){
             console.log('error while fetching list of websites',e)
@@ -606,7 +603,7 @@ function getOccurenceNumberInsideStringFromOrder(string, target, order){
 
 
 
-async function prepopulateMediaWikiPage(){
+async function prepopulateWPDataPage(){
     const textArea = document.getElementById('bc_dates_textarea')
     const summaryInput = document.getElementById('bc_dates_comment')
     if(!textArea || !summaryInput)return

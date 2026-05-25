@@ -8,7 +8,6 @@
 chrome.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
    
     const message = request.message
-  
    
     if (message === 'updateIcon') {
 

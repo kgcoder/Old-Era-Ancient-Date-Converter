@@ -331,7 +331,6 @@ async function onContentLoad() {
 
     const oldWikiUrl = getWikitextUrlOnMyServer()
 
-    console.log('oldWikiUrl',oldWikiUrl)
 
     const redirects = document.getElementsByClassName('mw-redirectedfrom')
     if(redirects.length){
@@ -339,7 +338,6 @@ async function onContentLoad() {
         const i = setInterval(()=>{
          prepareLocation()
          const url = getWikitextUrlOnMyServer()
-         console.log('url',url)
          if(url !== oldWikiUrl){
             handlePage(oldWikiUrl)
             clearInterval(i)
@@ -359,7 +357,8 @@ async function onContentLoad() {
 
 
  async function handlePage(oldUrl = '') {
-    console.log('handle old',oldUrl)
+    console.log('handle page')
+    return
     if(!isOnWikipedia){
         await prepareListOfWebsitesSupportedByBackend()
     }
@@ -371,8 +370,7 @@ async function onContentLoad() {
 
 
         if(isOnWPDataPage){
-            console.log('is the page')
-            prepopulateMediaWikiPage()
+            prepopulateWPDataPage()
         }
 
      
@@ -464,7 +462,6 @@ async function requestListOfWebsites() {
 
     const url = getWikitextUrlOnMyServer('Info:SupportedWebsites')
 
-    console.log('will request websites',url)
     return new Promise(async (resolve,reject) => {
         try{
     
@@ -475,7 +472,6 @@ async function requestListOfWebsites() {
                 return reject()
             }
     
-            console.log('got text',text)
             resolve(text)
            
         }catch(e){
@@ -527,8 +523,6 @@ async function startWebRequest(oldUrl = '') {
         }else{
 
             text = await r.text() || null
-
-            console.log('found text:',text)
 
         }
 
@@ -1173,7 +1167,6 @@ async function replaceImagesOnWeb(node){
         fetch(url).then(function(res) {return res.text();}).then(function(text) {
             if (!text) return;
     
-            console.log('images text',text)
             saveTimestampedDataString('OE-imageUrls',text);
        
             parseImageData(text);
