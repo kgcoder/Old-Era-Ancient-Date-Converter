@@ -419,8 +419,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const advancedSettingsButton = document.getElementById('ShowHideAdvancedSettingsButton')
     advancedSettingsButton.addEventListener('click', () => {
         const div = document.getElementById("AdvancedSettings")
-        div.hidden = !div.hidden
-        advancedSettingsButton.innerHTML = div.hidden ? "Show" : "Hide"
+
+        div.classList.toggle('adc-settings-hidden')
+        advancedSettingsButton.innerHTML = div.classList.contains('adc-settings-hidden') ? "Show" : "Hide"
         
     }, false)
 

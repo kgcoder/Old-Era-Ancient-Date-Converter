@@ -88,7 +88,7 @@ function updateIcon(tabId){
                         currentVersionSeemsOK = response.currentVersionSeemsOK
                     }
 
-                    if (pageStatus !== 'has issues' && response.currentVersionSeemsOK) {
+                    if (pageStatus !== 'has issues' && currentVersionSeemsOK) {
                         chrome.action.setIcon({ path: "/images/icon16.png" });
                     } else {
                         chrome.action.setIcon({ path: "/images/icon16alert.png" });

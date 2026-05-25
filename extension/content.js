@@ -357,8 +357,6 @@ async function onContentLoad() {
 
 
  async function handlePage(oldUrl = '') {
-    console.log('handle page')
-    return
     if(!isOnWikipedia){
         await prepareListOfWebsitesSupportedByBackend()
     }
