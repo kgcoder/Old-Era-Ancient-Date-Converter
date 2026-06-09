@@ -663,7 +663,7 @@ function translateEverythingOnWeb(finalInstructions = []) {
 
     const { htmlWithIgParts, ignoredParts } = htmlWithIgnoredParts(html)
 
-    const {text, insertions} = extractTextFromHtml(htmlWithIgParts, currentPageDataFormatVersion >= 2)
+    const {text, insertions} = extractTextFromHtml(htmlWithIgParts, true)
 
     let replacementsArray = []
     getLocalReplacements(htmlWithIgParts, text, insertions, replacementsArray, currentPageData)

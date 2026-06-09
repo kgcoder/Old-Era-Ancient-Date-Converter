@@ -216,6 +216,8 @@ function clearCache(){
             let error = chrome.runtime.lastError;
                if (error) {
                    console.error(error);
+               }else{
+                console.log('cache cleared')
                }
         })
 
@@ -673,7 +675,7 @@ function getReplacementFromEdit(edit,text){
 
     const [string_num_of_oc, string_oc, target_num_of_oc, target_oc] = orderChunks
 
-    const newString =escapeText(string)// replaceNewLines(escapeText(string))
+    const newString = escapeText(string)// replaceNewLines(escapeText(string))
 
 
     const pattern1 = new RegExp(newString, 'gm')

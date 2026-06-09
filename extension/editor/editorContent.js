@@ -353,7 +353,7 @@ function loadEdits(editsFromServer,shouldFixBrokenEdits = false,showOnlyFixed = 
 
     const { htmlWithIgParts, ignoredParts } = htmlWithIgnoredParts(html)
 
-    const {text, insertions} = extractTextFromHtml(htmlWithIgParts,currentPageDataFormatVersion >= 2)
+    const {text, insertions} = extractTextFromHtml(htmlWithIgParts,true)
   
 
 
