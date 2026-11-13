@@ -281,15 +281,17 @@ function getWikitextUrlOnMyServer(uriComponent = ''){
     if(!uriComponent){
         uriComponent = currentLocation.replace('www.','')
     }
+
     uriComponent = uriComponent.replace('en.m.wikipedia.org','en.wikipedia.org')
-    return `${webBaseUrl}/wp-json/bc-dates/v1/raw/Dates/${encodeURI(uriComponent).replace(/'/g, '%27')}`
+    console.log('uriComponent',uriComponent)
+    return `${webBaseUrl}/wp-json/bc-dates/v1/raw/Dates/${fixSymbolsInUrlComponent(encodeURI(uriComponent))}`
 
 }
 
 function getPageUrlOnMyServer(){
     let uriComponent = currentLocation.replace('www.','')
     uriComponent = uriComponent.replace('en.m.wikipedia.org','en.wikipedia.org')
-    return `${webBaseUrl}/index.php?title=${encodeURI('Dates/' + uriComponent)}`
+    return `${webBaseUrl}/index.php?title=${'Dates/' + fixSymbolsInUrlComponent(encodeURI(uriComponent))}`
 
     
 }
@@ -297,10 +299,12 @@ function getPageUrlOnMyServer(){
 function getPageUrlOnMyServerForEditing(){
     let uriComponent = currentLocation.replace('www.','')
     uriComponent = uriComponent.replace('en.m.wikipedia.org','en.wikipedia.org')
-    return `${webBaseUrl}/index.php?title=${encodeURI('Dates/' + uriComponent)}&action=edit`
+    return `${webBaseUrl}/index.php?title=${'Dates/' + fixSymbolsInUrlComponent(encodeURI(uriComponent))}&action=edit`
 }
 
-
+function fixSymbolsInUrlComponent(url){
+    return url.replace(/'/g, '%27').replace(/%25/g,'%')
+}
 
 function showDefaultPopup(message){
 
