@@ -1196,8 +1196,14 @@ function replaceSrcInImage(image,reverse){
     const index = images.findIndex(imgObj => {
         const originalImageNameFromServer = getImageNameFromUrl(imgObj.originalImageURL)
         const currentImageNameFromSrc = getImageNameFromUrl(image.src)
+        const substituteImageName = getImageNameFromUrl(imgObj.substituteImageURL)
+        
+        if(currentImageNameFromSrc.includes(originalImageNameFromServer)){
+            image.setAttribute('data-adc-original-src', image.src);
+        }
+
        
-        return reverse ? image.src === imgObj.substituteImageURL :  originalImageNameFromServer === currentImageNameFromSrc
+        return reverse ? image.src.includes(substituteImageName) :  currentImageNameFromSrc.includes(originalImageNameFromServer)
     })
 
     if (index === -1) return
@@ -1205,14 +1211,14 @@ function replaceSrcInImage(image,reverse){
 
     image.crossOrigin = undefined
 
-    image.src = reverse ? imgObj.originalImageURL : imgObj.substituteImageURL
-    image.srcset = reverse ? imgObj.originalImageURL : imgObj.substituteImageURL
+    image.src = reverse ? image.getAttribute('data-adc-original-src') : imgObj.substituteImageURL
+    image.srcset = reverse ? image.getAttribute('data-adc-original-src') : imgObj.substituteImageURL
 }
 
 
 function getImageNameFromUrl(url){
     const chunks = url.split('/')
-    const imageName = chunks[chunks.length - 1]
+    const imageName = chunks[chunks.length - 1].trim()
     return imageName.replace(/\d+px-/,'')//.replace('en.m.wikipedia.org','en.wikipedia.org')
 }
 
